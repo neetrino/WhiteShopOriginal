@@ -4,7 +4,7 @@
 **Չափ.** Size C product scope
 **Architecture proposal.** Feature-based modular monolith
 **Ամսաթիվ.** 2026-07-17
-**Ստատուս.** Սևագիր — approval required before application code
+**Ստատուս.** Հաստատված kickoff defaults-ով — 2026-07-18 (implementation authorized)
 
 > ✅ սահմանված է brief-ով · 🟡 առաջարկ/հաստատում է պահանջում · ⬜ implementation-ում ստուգվող · ➖ scope-ից դուրս
 
@@ -12,13 +12,13 @@
 
 | Պարամետր | Որոշում | Ստատուս | Նշում |
 |---|---|---|---|
-| Project scope | Size C | 🟡 | 50+ capabilities, commerce data integrity, admin և integrations |
-| Runtime layout | Single Next.js modular monolith | 🟡 | Monorepo/microservices միայն ապացուցված extraction need-ի դեպքում |
+| Project scope | Size C | ✅ | 50+ capabilities, commerce data integrity, admin և integrations |
+| Runtime layout | Single Next.js modular monolith | ✅ | Monorepo/microservices միայն ապացուցված extraction need-ի դեպքում |
 | Package manager | pnpm | ✅ | Exact version pin Corepack/`packageManager`-ով |
-| Node.js | Active LTS compatible with selected Next.js | 🟡 | Exact major-ը lock անել kickoff-ին |
-| TypeScript | Strict mode | ✅ | `noUncheckedIndexedAccess` և strict server/client boundaries առաջարկվում են |
-| Git strategy | Feature branches կամ trunk-based ըստ թիմի | 🟡 | Commit/push միայն explicit request-ով |
-| Commit convention | Conventional Commits | 🟡 | CI enforcement ըստ repository baseline-ի |
+| Node.js | 22 LTS (Active) | ✅ | Pin `engines` + Corepack; Next.js exact version lock kickoff-ին |
+| TypeScript | Strict mode | ✅ | `noUncheckedIndexedAccess` և strict server/client boundaries |
+| Git strategy | Feature branches | ✅ | Commit/push միայն explicit request-ով |
+| Commit convention | Conventional Commits | ✅ | CI enforcement ըստ repository baseline-ի |
 
 ## 2. Frontend և rendering
 
@@ -35,7 +35,7 @@
 | Carousel | Embla Carousel | ✅ | Hero և related products |
 | Icons | Lucide React | ✅ | Icon-only control-ները ունեն accessible name |
 | Internal navigation | Next.js `Link` | ✅ | Selective prefetch, no plain `<a>` internal routes-ի համար |
-| i18n | Locale segment + translation dictionaries | ✅ | `hy`, `en`, `ru`; library choice implementation detail/ADR |
+| i18n | Locale segment + translation dictionaries | ✅ | `hy`, `en`, `ru`; admin content՝ locale selector + մեկ դաշտերի հավաքածու (`DEC-017`) |
 | SEO | Metadata API, sitemap, robots, JSON-LD | ✅ | Product/Breadcrumb/BlogPosting schemas |
 
 ## 3. Backend և application boundary
@@ -44,10 +44,10 @@
 |---|---|---|---|
 | Backend | Next.js Server Actions + Route Handlers | ✅ | Server Actions first-party UI mutations-ի համար; webhooks/uploads/exports՝ Route Handlers |
 | Validation | Zod at every trust boundary | ✅ | Form, search params, webhook payload, env |
-| Business logic | Feature application services/pure domain functions | 🟡 | UI/action/route handler-ում duplication չկա |
-| API style | Internal typed commands/queries; REST-ish HTTP endpoints where needed | 🟡 | Public API չի ենթադրվում v1-ում |
+| Business logic | Feature application services/pure domain functions | ✅ | UI/action/route handler-ում duplication չկա |
+| API style | Internal typed commands/queries; REST-ish HTTP endpoints where needed | ✅ | Public API չի ենթադրվում v1-ում |
 | Idempotency | DB-backed order keys + short-lived Redis guard | ✅ | DB unique constraint-ը վերջնական պաշտպանությունն է |
-| Background work | Provider-neutral job/outbox extension point | 🟡 | Queue provider դեռ ընտրված չէ |
+| Background work | Provider-neutral job/outbox extension point | ✅ | Durable queue deferred (DEF-003); outbox-ready sync flows |
 | File upload | Presigned R2 flow | ✅ | MIME/size/dimensions validation և metadata persistence |
 
 ## 4. Տվյալների շերտ
@@ -56,10 +56,10 @@
 |---|---|---|---|
 | Database | PostgreSQL on Neon | ✅ | Durable source of truth |
 | ORM | Drizzle ORM + Drizzle Kit | ✅ | SQL migrations committed, reviewed, reversible strategy |
-| IDs | UUIDv7 կամ sortable secure ID | 🟡 | Մեկ ռազմավարություն բոլոր նոր tables-ի համար |
+| IDs | UUIDv7 | ✅ | Մեկ ռազմավարություն բոլոր նոր tables-ի համար |
 | Money | Integer amount + ISO currency code | ✅ | No float/JS `number` arithmetic beyond safe integer range |
 | Transactions | Checkout, stock, order/status critical flows | ✅ | Row lock/conditional update strategy պետք է test արվի |
-| Search | PostgreSQL indexes/FTS initial release | 🟡 | External search deferred |
+| Search | PostgreSQL indexes/FTS initial release | ✅ | External search deferred (DEF-002) |
 | Canonical schema | 25 application tables | ✅ | Lean model-ը սահմանված է `03-DATA-MODEL.md`-ում |
 | Multilingual content | Parent-table `translations JSONB` | ✅ | UI copy-ն առանձին locale JSON files-ում է |
 | Soft delete | Products/categories/users-ի համար ըստ lifecycle-ի | ✅ | Orders/payments/audit immutable/archived |
@@ -76,7 +76,7 @@ Connection pool size, `statement_timeout`, `lock_timeout`, `idle_in_transaction_
 |---|---|---|---|
 | Auth | Auth.js | ✅ | Credentials flow; OAuth `accounts` table-ը initial scope-ում չկա |
 | Password hashing | Argon2id | ✅ | Parameters benchmark անել target runtime-ում |
-| Sessions | Database-backed secure sessions | 🟡 | Safer revocation/suspension; final confirm hosting constraints-ից հետո |
+| Sessions | Database-backed secure sessions | ✅ | Safer revocation/suspension; Auth.js DB adapter |
 | Roles | `ADMIN`, `CUSTOMER` | ✅ | Server-side checks every protected read/mutation-ում |
 | Verification | Email verification required | ✅ | Redis-ում hashed, TTL, atomic single-use token |
 | Reset | Forgot/reset password | ✅ | Redis token, generic response, session revocation |
@@ -94,18 +94,18 @@ Connection pool size, `statement_timeout`, `lock_timeout`, `idle_in_transaction_
 | Exchange rates | Provider interface + Redis cache | ✅ | Concrete source/rounding policy բաց է |
 | Payments | Provider interface + COD adapter | ✅ | Online adapter(s) բաց են |
 | Analytics | First-party aggregate queries | ✅ | Product analytics provider optional/open |
-| Error tracking | Provider-neutral boundary | 🟡 | Sentry կամ այլ provider բաց է |
+| Error tracking | Provider-neutral boundary | ✅ | Structured logs first; Sentry adapter optional later |
 
 ## 7. Hosting և environments
 
 | Պարամետր | Որոշում | Ստատուս | Նշում |
 |---|---|---|---|
-| Hosting | TBD | 🟡 | Vercel-compatible architecture, բայց provider-ը հաստատված չէ |
-| Environments | Local + preview/staging + production | 🟡 | Առանձին DB/Redis/R2 resources կամ safe namespaces |
-| CI | GitHub Actions | 🟡 | format, lint, typecheck, unit/integration, build, selected E2E |
-| CDN/WAF | Hosting edge + optional Cloudflare WAF | 🟡 | Domain/DNS decision-ից հետո |
-| Logs | Structured server logs | 🟡 | Secret/PII redaction պարտադիր |
-| Backups | Neon capabilities + restore drill policy | 🟡 | Retention/RPO/RTO հաստատել |
+| Hosting | Vercel-compatible (deploy deferred) | ✅ | Local-first; production deploy միայն explicit approval-ով |
+| Environments | Local + preview/staging + production | ✅ | Առանձին DB/Redis/R2 resources կամ safe namespaces |
+| CI | GitHub Actions | ✅ | format, lint, typecheck, unit/integration, build, selected E2E |
+| CDN/WAF | Hosting edge + optional Cloudflare WAF | ✅ | Domain/DNS decision-ից հետո |
+| Logs | Structured server logs | ✅ | Secret/PII redaction պարտադիր |
+| Backups | Neon capabilities + restore drill policy | ✅ | Retention/RPO/RTO՝ ops phase-ում |
 
 ## 8. Testing և quality
 
@@ -115,7 +115,7 @@ Connection pool size, `statement_timeout`, `lock_timeout`, `idle_in_transaction_
 | Components | React Testing Library | ✅ | Interaction և accessibility semantics |
 | Integration | Vitest + isolated PostgreSQL test DB | ✅ | Auth/catalog/cart/checkout/profile |
 | E2E | Playwright | ✅ | Critical customer/admin/locale journeys |
-| Coverage | Risk-based; domain minimum target approval required | 🟡 | Percentage-ը success-ի միակ չափանիշը չէ |
+| Coverage | Risk-based; domain critical paths first | ✅ | Percentage-ը success-ի միակ չափանիշը չէ |
 | Lint/format | ESLint + Prettier | ✅ | Zero hidden failures |
 | Accessibility | Automated smoke + keyboard/manual critical flows | ✅ | WCAG 2.2 AA target առաջարկվում է |
 
@@ -130,8 +130,8 @@ Connection pool size, `statement_timeout`, `lock_timeout`, `idle_in_transaction_
 | Enumeration resistance | ✅ | Generic auth/reset responses և comparable paths |
 | Upload security | ✅ | Presigned restrictions, MIME sniffing/metadata validation, no secret on client |
 | Audit | ✅ | Admin/security/financial mutations actor+target+correlation metadata-ով |
-| Dependency scanning | 🟡 | Dependabot և CI audit policy |
-| Security headers | 🟡 | CSP/HSTS/referrer/permissions policy hosting-aware rollout |
+| Dependency scanning | ✅ | Dependabot և CI audit policy |
+| Security headers | ✅ | CSP/HSTS/referrer/permissions policy hosting-aware rollout |
 
 ## 10. Environment contract
 
@@ -160,17 +160,17 @@ RESEND_API_KEY=
 
 Next.js, TypeScript, Neon/PostgreSQL, Drizzle, Auth.js, Upstash, R2, Tailwind, shadcn/ui, forms/tables/query/carousel/icon stack, Resend abstraction, Argon2id, tests, pnpm, locale/currency և security/data-integrity սկզբունքներ։
 
-### Մինչ կոդավորումը հաստատել
+### Kickoff-ում հաստատված (2026-07-18)
 
-- [ ] Size C scope + modular monolith layout
-- [ ] Exact compatible dependency versions և Node LTS
-- [ ] Hosting/runtime/regions և environment topology
-- [ ] Session strategy
-- [ ] ID strategy
-- [ ] Online payment launch scope
-- [ ] Exchange-rate source/rounding
-- [ ] Tax/order/refund policies
-- [ ] Observability/analytics providers
-- [ ] Design system source և legal content ownership
+- [x] Size C scope + modular monolith layout
+- [x] Node 22 LTS + pnpm; Next.js exact versions lock scaffold-ում
+- [x] Hosting: Vercel-compatible architecture; deploy deferred
+- [x] Session strategy: database-backed Auth.js sessions
+- [x] ID strategy: UUIDv7
+- [x] Online payment launch scope: COD only (OPEN-002 deferred)
+- [x] Exchange-rate: admin-maintained AMD rates + Redis cache (OPEN-003 default)
+- [x] Tax: amount 0 field reserved; tax-inclusive policy TBD without blocking P0
+- [x] Observability: structured logs; analytics first-party only
+- [x] Design: shadcn/ui + Tailwind tokens, light theme, minimal UI first; legal routes shell until copy approved
 
-Կապված open items-ը՝ [`DECISIONS.md`](./DECISIONS.md)։
+Կապված open items-ը՝ [`DECISIONS.md`](./DECISIONS.md)։ Non-blocking OPEN-* defaults apply until product owner overrides։

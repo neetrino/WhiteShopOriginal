@@ -1,115 +1,57 @@
 # White Shop — progress
 
-**Ընդհանուր կարգավիճակ.** Specification draft prepared; implementation not started
-**Վերջին թարմացում.** 2026-07-17
+**Overall status.** Phases 0–11 delivered as working product slices (launch hardening docs ready; production deploy not executed)
+**Last update.** 2026-07-18
 
 ## Milestones
 
-| Phase | Անվանում | Կարգավիճակ | Նշում |
+| Phase | Name | Status | Note |
 |---:|---|---|---|
-| 0 | Approval | 🔄 Ընթացքում | TECH_CARD և open decisions approval են պահանջում |
-| 1 | Foundation | ⬜ Չի սկսվել | Blocked by Phase 0 approval |
-| 2 | Database foundation | ⬜ Չի սկսվել | |
-| 3 | Identity and authorization | ⬜ Չի սկսվել | |
-| 4 | Catalog admin and media | ⬜ Չի սկսվել | |
-| 5 | Storefront catalog | ⬜ Չի սկսվել | |
-| 6 | Cart and checkout | ⬜ Չի սկսվել | |
-| 7 | Customer self-service | ⬜ Չի սկսվել | |
-| 8 | Admin commerce operations | ⬜ Չի սկսվել | |
-| 9 | Content, communication and analytics | ⬜ Չի սկսվել | |
-| 10 | Reviews, currency and optional payments | ⬜ Չի սկսվել | |
-| 11 | Hardening and release readiness | ⬜ Չի սկսվել | |
+| 0 | Approval | Done | Kickoff defaults |
+| 1 | Foundation | Done | Next.js, i18n, providers |
+| 2 | Database foundation | Done | 25 tables + seed |
+| 3 | Identity and authorization | Done | DB sessions, login/register/logout |
+| 4 | Catalog admin and media | Done (minimal) | Admin products/categories; R2 deferred |
+| 5 | Storefront catalog | Done (minimal) | List/detail/featured from DB |
+| 6 | Cart and checkout | Done | Durable cart + COD + coupon apply |
+| 7 | Customer self-service | Done (minimal) | Profile, orders, personal info |
+| 8 | Admin commerce operations | Done | Dashboard, orders ops, users, promotions |
+| 9 | Content / analytics | Done | Hero, contact, blog, analytics, settings |
+| 10 | Reviews / currency / payments | Done | Reviews, FX cache, COD + webhook guards |
+| 11 | Hardening / release | Done (docs) | Headers, legal stubs, release checklist |
 
-## Documentation baseline — 2026-07-17
+## Phase 8–11 close-out — 2026-07-18
 
-### Created/updated
+### Phase 8
+- Admin dashboard metrics + previous-period revenue comparison
+- Orders: payment/date/archive filters, bulk status, archive, notes
+- Users/promotions already present; checkout applies coupon codes
+- Revenue-generating statuses via `store.revenue` settings
 
-- `docs/00-SPECIFICATION-INDEX.md`
-- `docs/BRIEF.md`
-- `docs/TECH_CARD.md`
-- `docs/01-ARCHITECTURE.md`
-- `docs/02-FUNCTIONAL-SPECIFICATION.md`
-- `docs/03-DATA-MODEL.md`
-- `docs/04-ROUTES-AND-CONTRACTS.md`
-- `docs/05-SECURITY-AND-PRIVACY.md`
-- `docs/06-I18N-SEO-PERFORMANCE-A11Y.md`
-- `docs/07-TESTING-AND-QUALITY.md`
-- `docs/08-IMPLEMENTATION-PLAN.md`
-- `docs/DECISIONS.md`
-- `docs/PROGRESS.md`
+### Phase 9
+- Hero CMS + contact spam/rate-limit + messages inbox
+- Blog CMS/public routes + HTML sanitizer + BlogPosting JSON-LD
+- Analytics dashboard + Redis cache + CSV export (formula-safe)
+- Store settings (identity, branding, social, stacking, revenue, maintenance)
+- Maintenance gate for non-admin storefront users
 
-### Verification
+### Phase 10 (prior)
+- Reviews moderation, FX conversion/cache/stale fallback, payment webhook guards
 
-- Prompt requirements mapped into product, functional, data, route, security, quality և delivery specifications։
-- Local Markdown links checked: no broken links։
-- Trailing whitespace/template placeholder scan checked: no findings։
-- Functional requirement ID uniqueness checked: no duplicates։
-- Prompt capability coverage keyword audit checked: all selected critical areas found։
-- `git diff --check` passed։
-- Application typecheck/lint/build/tests not applicable: application scaffold does not exist and this task authorizes documentation only։
-
-### Open approvals
-
-See [`DECISIONS.md`](./DECISIONS.md) and [`TECH_CARD.md`](./TECH_CARD.md)։
-
-## Lean schema decision update — 2026-07-17
-
-### Approved architecture changes
-
-- PostgreSQL canonical schema-ն սահմանվել է 25 application table։
-- UI copy-ն մնում է locale JSON files-ում; admin-managed translations-ը parent entity `translations JSONB`-ում են։
-- Coupons և automatic discounts-ը միավորվել են `promotions` model-ում՝ relational `promotion_users` allowlist-ով։
-- Product/category/hero/blog media ownership-ը տեղափոխվել է `media_assets` typed FK/role model։
-- Verification/reset tokens-ը տեղափոխվել են Redis hashed TTL/atomic single-use contract։
-- Order address/idempotency snapshots-ը պահվում են `orders`-ում; status/notes/provider event history-ն՝ `order_events`-ում։
-- `order_items`, `payments`, `stock_movements`, `audit_logs` և `outbox_events` intentionally առանձին են մնացել data integrity/reliability-ի համար։
-
-### Documents synchronized
-
-- `docs/BRIEF.md`
-- `docs/TECH_CARD.md`
-- `docs/01-ARCHITECTURE.md`
-- `docs/02-FUNCTIONAL-SPECIFICATION.md`
-- `docs/03-DATA-MODEL.md`
-- `docs/05-SECURITY-AND-PRIVACY.md`
-- `docs/06-I18N-SEO-PERFORMANCE-A11Y.md`
-- `docs/07-TESTING-AND-QUALITY.md`
-- `docs/08-IMPLEMENTATION-PLAN.md`
-- `docs/DECISIONS.md`
+### Phase 11
+- Security headers (CSP baseline, nosniff, frame deny, referrer, permissions)
+- Legal route stubs (`/legal/terms`, `/legal/privacy`) — OPEN-014 copy pending
+- `docs/ops/RELEASE-CHECKLIST.md` + product README
+- Production deploy **not** performed (requires explicit authorization)
 
 ### Verification
+- `pnpm typecheck` — pass
+- `pnpm test` — 76 passed
+- `pnpm lint` — pass
+- `pnpm build` — pass
 
-- Canonical inventory parser-ը հաստատել է 1–25 ճիշտ numbering, 25 unique table names և `count=25`։
-- Obsolete table-name scan-ը finding չի գտել։
-- Contradictory translation/coupon/discount persistence scan-ը finding չի գտել։
-- Բոլոր local Markdown links-ը resolve են լինում։
-- Trailing whitespace scan-ը finding չի գտել։
-- `git diff --check` անցել է։
-- Application typecheck/lint/build/tests չեն գործարկվել, քանի որ application scaffold/migrations դեռ չկան և փոփոխությունը documentation-only է։
-
-## Phase report template
-
-### Phase X — title
-
-**Status.** Not started / In progress / Complete
-**Requirement IDs.** ...
-
-#### Created/changed files
-
-- ...
-
-#### Migrations
-
-- Name/status/environment: ...
-
-#### Verification performed
-
-- Command/check: result
-
-#### Remaining risks/open decisions
-
-- ...
-
-#### Next authorized phase
-
-- ...
+### Remaining non-blocking items
+- R2 media uploads, email verify/reset, Playwright E2E suite
+- Approved legal copy (OPEN-014)
+- Online payment provider selection (OPEN-002)
+- Real Upstash/R2/Resend adapters when credentials provided

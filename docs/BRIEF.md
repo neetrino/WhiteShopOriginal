@@ -33,7 +33,7 @@ White Shop-ը բազմալեզու, բազմարժույթ, production-ready e-c
 3. Guest cart-ը login/registration-ից հետո merge է լինում customer-ի durable cart-ի հետ։
 4. Customer-ը ընտրում/ստեղծում է հասցե, կիրառում coupon, ընտրում delivery/payment և idempotent կերպով ստեղծում order։
 5. Customer-ը դիտում է order detail-ը և միայն կատարված գնումից հետո ստեղծում մեկ review տվյալ product-ի համար։
-6. Admin-ը ստեղծում է multilingual product, upload է անում պատկերներ, կառավարում stock/discount/status-ը և հրապարակում այն։
+6. Admin-ը ստեղծում է product՝ locale selector-ով մեկ դաշտերի հավաքածուով (ցանկալի լեզուներով), upload է անում պատկերներ, կառավարում stock/discount/status-ը և հրապարակում այն։
 7. Admin-ը մշակում է order status/payment status-ը՝ history և audit trail-ով։
 8. Admin-ը կառավարում է hero, categories, coupons, delivery rules, blog, messages և store settings։
 

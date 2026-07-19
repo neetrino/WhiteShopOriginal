@@ -2,8 +2,8 @@
 
 **Architecture.** Feature-based modular monolith
 **Product scope.** Size C
-**Կարգավիճակ.** Proposed, implementation approval required
-**Վերջին թարմացում.** 2026-07-17
+**Կարգավիճակ.** Approved for implementation — 2026-07-18
+**Վերջին թարմացում.** 2026-07-18
 
 ## 1. Architecture drivers
 

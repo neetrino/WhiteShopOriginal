@@ -2,7 +2,7 @@
 
 **Կարգավիճակ.** Draft
 **Տարբերակ.** 1.0
-**Վերջին թարմացում.** 2026-07-17
+**Վերջին թարմացում.** 2026-07-18
 
 ## 1. Locale model
 
@@ -43,11 +43,18 @@ src/locales/
 ## 3. Database translation model
 
 - Product, category, hero և blog admin-managed translations-ը պահվում են համապատասխան parent table-ի versioned `translations JSONB` դաշտում։ Առանձին translation tables չկան canonical 25-table schema-ում։
-- JSON structure-ը ունի fixed `hy`, `en`, `ru` keys և entity-specific Zod schema։
-- Slug-ը unique է per locale/entity namespace՝ PostgreSQL expression unique indexes-ով (`translations->'hy'->>'slug'` և այլն)։
-- Public publish command-ը ստուգում է required locale completeness-ը։ Առաջարկ՝ P0 catalog/hero/policy-ի համար բոլոր երեք locale-ները պարտադիր։
-- Locale translation բացակայելու դեպքում unrelated language slug/content silently չի ցուցադրվում. fallback policy-ն entity type-ով explicit է։
+- JSON structure-ը entity-specific Zod schema ունի; `hy`/`en`/`ru` keys-ը optional են (partial translations թույլատրված են՝ `DEC-017`)։
+- Slug-ը unique է per locale/entity namespace՝ PostgreSQL expression unique indexes-ով (`translations->'hy'->>'slug'` և այլն) միայն առկա locale keys-ի համար։
+- Public publish command-ը ստուգում է առնվազն մեկ լրիվ locale-ի completeness-ը, ոչ բոլոր երեք locale-ները։
+- Locale translation բացակայելու դեպքում այդ լեզվի storefront-ում product/entity-ը չի ցուցադրվում (ոչ silent cross-locale content leak). fallback policy-ն entity type-ով explicit է։
 - Slug change-ը redirect-history model է պահանջում, եթե SEO continuity-ն launch requirement է; հակառակ դեպքում հին URL-ը 404 է։
+
+### 3.1 Admin content editing UX (`DEC-017`)
+
+- Admin create/edit forms-ը (product, category, hero, blog) ցուցադրում են **մեկ** դաշտերի հավաքածու՝ Title, Slug, Description և այլ locale-bound fields — ինչպես single-language Basic Information form։
+- Active locale-ը ընտրվում է selector/tabs control-ով; selector փոխելիս նույն դաշտերում բեռնվում/պահվում է այդ locale-ի JSONB entry-ն։
+- Զուգահեռ `hy` + `en` + `ru` դաշտեր նույն էջում չեն ցուցադրվում։
+- Admin-ը կարող է լրացնել միայն այն լեզուները, որոնք պետք են; մյուսները դատարկ են մնում մինչև հետագա edit։
 
 ## 4. Locale switch behavior
 

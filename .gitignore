@@ -23,6 +23,9 @@ tmp/
 temp/
 .cache/
 
+# Local stub product uploads (until R2)
+public/uploads/
+
 # IDE (optional, uncomment if needed)
 # .idea/
 # .vscode/

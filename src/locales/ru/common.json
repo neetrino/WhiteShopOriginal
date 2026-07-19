@@ -1,0 +1,284 @@
+{
+  "brand": "White-Shop",
+  "nav": {
+    "home": "Главная",
+    "products": "Товары",
+    "blog": "Блог",
+    "cart": "Корзина",
+    "about": "О нас",
+    "contact": "Контакты",
+    "wishlist": "Избранное",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню",
+    "navigation": "Навигация"
+  },
+  "blog": {
+    "empty": "Пока нет записей в блоге.",
+    "tags": "Теги"
+  },
+  "catalog": {
+    "paginationLabel": "Страницы каталога",
+    "previousPage": "Назад",
+    "nextPage": "Далее",
+    "pageStatus": "Страница {page} из {total}"
+  },
+  "wishlist": {
+    "empty": "Ваш список избранного пуст.",
+    "signInPrompt": "Войдите, чтобы сохранять товары в избранное."
+  },
+  "product": {
+    "sku": "SKU",
+    "inStock": "В наличии",
+    "outOfStock": "Нет в наличии",
+    "quantity": "Количество",
+    "addToCart": "В корзину",
+    "adding": "Добавляем…",
+    "added": "Добавлено в корзину.",
+    "addError": "Не удалось добавить товар в корзину.",
+    "related": "Похожие товары",
+    "reviews": "Отзывы",
+    "reviewCount": "{count} отзывов",
+    "averageRating": "Средняя {average} / 5 ({count} отзывов)",
+    "noReviews": "Одобренных отзывов пока нет.",
+    "emptyPrompt": "Пока нет отзывов. Будьте первым, кто оставит отзыв об этом товаре!",
+    "writeReview": "Написать отзыв",
+    "alreadyReviewed": "Вы уже оставили отзыв на этот товар.",
+    "reviewsUnlock": "Отзывы доступны после доставки заказа.",
+    "signIn": "Войти",
+    "signInToReview": "чтобы оставить отзыв о подтверждённой покупке.",
+    "backToProducts": "Товары"
+  },
+  "header": {
+    "language": "Язык",
+    "currency": "Валюта",
+    "login": "Вход",
+    "logout": "Выход",
+    "profile": "Профиль",
+    "admin": "Админ",
+    "createAccount": "Создать аккаунт"
+  },
+  "auth": {
+    "loginTitle": "С возвращением",
+    "loginSubtitle": "Войдите в аккаунт, чтобы продолжить",
+    "registerTitle": "Создать аккаунт",
+    "email": "Email",
+    "password": "Пароль",
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "submitLogin": "Войти",
+    "submitRegister": "Создать аккаунт",
+    "genericError": "Не удалось войти с этими данными.",
+    "registerSubtitle": "Присоединяйтесь к White-Shop, чтобы начать покупки",
+    "hasAccount": "Уже есть аккаунт?",
+    "signInLink": "Войти",
+    "submittingRegister": "Создание…"
+  },
+  "home": {
+    "title": "White Shop",
+    "subtitle": "Многоязычный магазин уже работает.",
+    "cta": "Смотреть товары",
+    "featuredTitle": "Рекомендуемые товары",
+    "viewAll": "Смотреть ещё",
+    "emptyFeatured": "Пока нет рекомендуемых товаров.",
+    "aboutEyebrow": "О нас",
+    "aboutTitle": "Мы предлагаем качественные товары",
+    "aboutDescription": "Откройте для себя тщательно отобранный ассортимент с надёжной доставкой и поддержкой.",
+    "aboutCta": "Подробнее",
+    "features": {
+      "deliveryTitle": "Быстрая доставка",
+      "deliveryDescription": "Быстрая и надёжная доставка до двери.",
+      "qualityTitle": "Лучшее качество",
+      "qualityDescription": "Тщательно отобранные товары, которым можно доверять.",
+      "returnTitle": "Бесплатный возврат",
+      "returnDescription": "Простой возврат, если что-то не так."
+    }
+  },
+  "contact": {
+    "title": "Контакты",
+    "subtitle": "Отправьте сообщение — мы ответим вам.",
+    "name": "Имя",
+    "email": "Email",
+    "phone": "Телефон (необязательно)",
+    "subject": "Тема",
+    "message": "Сообщение",
+    "submit": "Отправить",
+    "success": "Спасибо — сообщение отправлено.",
+    "error": "Не удалось отправить сообщение.",
+    "storePhone": "+374 XX XXX XXX",
+    "storeEmail": "info@shop.am",
+    "storeAddress": "Ереван, Абовян 10",
+    "social": {
+      "instagram": "https://instagram.com",
+      "facebook": "https://facebook.com",
+      "linkedin": "https://linkedin.com"
+    },
+    "callTitle": "Позвоните нам:",
+    "callDescription": "Мы на связи 24/7, 7 дней в неделю.",
+    "writeTitle": "Напишите нам:",
+    "writeDescription": "Заполните форму, и мы свяжемся с вами в течение 24 часов.",
+    "emailLabel": "Email:",
+    "hqTitle": "Главный офис:",
+    "hoursWeekdays": "Понедельник - Пятница: 9:00-20:00",
+    "hoursSaturday": "Суббота: 11:00 - 15:00",
+    "mapTitle": "Расположение магазина"
+  },
+  "footer": {
+    "shop": "Магазин",
+    "description": "Профессиональный интернет-магазин для повседневных покупок.",
+    "quickLinks": "Быстрые ссылки",
+    "legal": "Правовая информация",
+    "privacyPolicy": "Политика конфиденциальности",
+    "terms": "Условия",
+    "contactInfo": "Контактная информация",
+    "rights": "Все права защищены",
+    "createdBy": "Создано NEETRINO IT COMPANY"
+  },
+  "about": {
+    "eyebrow": "Элегантный дизайн",
+    "title": "О нашем интернет-магазине",
+    "paragraphs": [
+      "Мы рады приветствовать вас в нашем интернет-магазине. Мы стремимся обеспечить лучший опыт покупок с широким ассортиментом качественных товаров и отличным сервисом.",
+      "Наша миссия — сделать онлайн-покупки простыми, удобными и приятными. Мы тщательно отбираем каждый товар, чтобы гарантировать высокое качество и удовлетворённость клиентов.",
+      "Мы гордимся тем, что предлагаем не только отличные товары, но и отличный сервис. Наша команда всегда готова помочь найти именно то, что вы ищете."
+    ],
+    "teamEyebrow": "О нас",
+    "teamTitle": "Наша команда",
+    "teamDescription": "Наша команда состоит из опытных специалистов, преданных своему делу и стремящихся обеспечить лучший сервис для клиентов.",
+    "heroImageAlt": "Наша команда за работой"
+  },
+  "profile": {
+    "title": "Мой профиль",
+    "dashboard": "Панель",
+    "orders": "Заказы",
+    "personal": "Личные данные",
+    "addresses": "Адреса",
+    "password": "Сменить пароль",
+    "deleteAccount": "Удалить аккаунт",
+    "logout": "Выйти",
+    "welcome": "Добро пожаловать",
+    "totalOrders": "Всего заказов",
+    "pendingOrders": "В ожидании",
+    "completedOrders": "Завершённые",
+    "totalSpent": "Потрачено",
+    "recentOrders": "Недавние заказы",
+    "viewAllOrders": "Все заказы",
+    "noOrders": "Заказов пока нет.",
+    "orderNumber": "Заказ",
+    "status": "Статус",
+    "total": "Итого",
+    "save": "Сохранить",
+    "saving": "Сохранение…",
+    "cancel": "Отмена",
+    "comingSoon": "UI секции готов. Backend пока не меняем.",
+    "addressBook": {
+      "addNew": "Добавить адрес",
+      "defaultBadge": "Основной",
+      "setDefault": "Сделать основным",
+      "edit": "Изменить",
+      "delete": "Удалить",
+      "deleteConfirm": "Удалить этот адрес?",
+      "noAddresses": "Адресов пока нет.",
+      "formAddTitle": "Добавить адрес",
+      "formEditTitle": "Изменить адрес",
+      "line1": "Адрес",
+      "city": "Город",
+      "isDefault": "Сделать адресом доставки по умолчанию",
+      "add": "Добавить",
+      "update": "Обновить"
+    },
+    "passwordForm": {
+      "currentPassword": "Текущий пароль",
+      "newPassword": "Новый пароль",
+      "confirmPassword": "Подтвердите новый пароль",
+      "currentPasswordPlaceholder": "Введите текущий пароль",
+      "newPasswordPlaceholder": "Введите новый пароль",
+      "confirmPasswordPlaceholder": "Повторите новый пароль",
+      "change": "Сменить пароль",
+      "changing": "Смена…"
+    },
+    "deleteAccountForm": {
+      "description": "Удаление аккаунта необратимо. Вы сразу потеряете доступ к профилю.",
+      "pointOrders": "Записи прошлых заказов сохраняются для юридических и бухгалтерских целей без ваших контактных данных.",
+      "pointLogin": "Вы больше не сможете войти в этот аккаунт.",
+      "pointData": "Сохранённые адреса, wishlist и данные корзины будут удалены из профиля.",
+      "currentPassword": "Текущий пароль",
+      "currentPasswordPlaceholder": "Введите пароль для подтверждения",
+      "acknowledge": "Я понимаю, что это действие нельзя отменить.",
+      "submit": "Удалить аккаунт",
+      "deleting": "Удаление…"
+    }
+  },
+  "checkout": {
+    "title": "Оформление",
+    "contactInformation": "Контактные данные",
+    "shippingMethod": "Способ доставки",
+    "shippingAddress": "Адрес доставки",
+    "paymentMethod": "Способ оплаты",
+    "orderSummary": "Итог заказа",
+    "form": {
+      "firstName": "Имя",
+      "lastName": "Фамилия",
+      "email": "Email",
+      "phone": "Телефон",
+      "address": "Адрес",
+      "city": "Город"
+    },
+    "placeholders": {
+      "phone": "+374XXXXXXXX",
+      "address": "Улица, квартира, офис и т.д.",
+      "city": "Город"
+    },
+    "shipping": {
+      "storePickup": "Самовывоз",
+      "storePickupDescription": "Заберите заказ в магазине (Бесплатно)",
+      "delivery": "Доставка",
+      "deliveryDescription": "Доставим заказ по вашему адресу",
+      "freePickup": "Бесплатно (Самовывоз)",
+      "enterCity": "Укажите город"
+    },
+    "payment": {
+      "cashOnDelivery": "Наличными при получении",
+      "cashOnDeliveryDescription": "Оплатите наличными при получении заказа",
+      "idram": "Idram",
+      "idramDescription": "Оплата через Idram или картой",
+      "arca": "ArCa",
+      "arcaDescription": "Оплата картой ArCa"
+    },
+    "summary": {
+      "subtotal": "Подытог",
+      "shipping": "Доставка",
+      "tax": "Налог",
+      "total": "Итого"
+    },
+    "buttons": {
+      "placeOrder": "Оформить заказ",
+      "processing": "Обработка…",
+      "continueShopping": "Продолжить покупки"
+    },
+    "errors": {
+      "cartEmpty": "Корзина пуста"
+    },
+    "success": {
+      "title": "Заказ подтверждён",
+      "body": "Заказ {orderNumber} успешно оформлен. Корзина очищена.",
+      "total": "Итого: {amount}",
+      "continueShopping": "Продолжить покупки",
+      "viewOrders": "Мои заказы"
+    }
+  },
+  "cartDrawer": {
+    "title": "Корзина",
+    "itemsOne": "1 товар",
+    "itemsMany": "{count} товара",
+    "empty": "Ваша корзина пуста.",
+    "loading": "Загрузка корзины…",
+    "subtotal": "Подытог",
+    "shipping": "Доставка",
+    "total": "Итого",
+    "checkout": "Перейти к оформлению",
+    "close": "Закрыть корзину",
+    "removeItem": "Удалить товар",
+    "decreaseQuantity": "Уменьшить количество",
+    "increaseQuantity": "Увеличить количество"
+  }
+}
