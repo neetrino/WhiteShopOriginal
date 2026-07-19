@@ -1,8 +1,8 @@
 # White Shop — փուլային implementation plan
 
-**Կարգավիճակ.** Proposed; կոդավորումը չի սկսվել
+**Կարգավիճակ.** Active — Phase 2 schema migrated; seed/auth next
 **Scope model.** Vertical slices after foundation
-**Վերջին թարմացում.** 2026-07-17
+**Վերջին թարմացում.** 2026-07-18
 
 ## 1. Delivery principles
 
@@ -23,9 +23,9 @@
 
 ### Exit criteria
 
-- [ ] TECH_CARD status-ը `հաստատված` է։
-- [ ] Բոլոր blocking open decisions-ը resolved են։
-- [ ] Product owner/tech lead-ը հաստատել են implementation sequence-ը։
+- [x] TECH_CARD status-ը `հաստատված` է։
+- [x] Բոլոր blocking open decisions-ը resolved են (non-blocking OPEN-* defaults documented)։
+- [x] Product owner/tech lead-ը հաստատել են implementation sequence-ը։
 
 ## 3. Foundation — Phase 1
 

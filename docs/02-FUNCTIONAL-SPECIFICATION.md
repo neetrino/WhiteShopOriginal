@@ -242,17 +242,18 @@
 
 | ID | Պահանջ / acceptance criteria |
 |---|---|
-| APROD-001 | Fields՝ multilingual title/description, per-locale generated/editable slug, SKU, media, primary/sort, categories, price, compare-at, stock, threshold, status, featured/upcoming, badge style/position և SEO։ |
-| APROD-002 | SKU unique է; `(locale, slug)` unique է և server-side ստուգվում է constraint-ով։ |
+| APROD-001 | Fields՝ title/description/SEO + generated/editable slug **ընտրված locale-ի համար** (մեկ դաշտերի հավաքածու + locale selector, `DEC-017`), SKU, media, primary/sort, categories, price, compare-at, stock, threshold, status, featured/upcoming, badge style/position։ Locale-ից անկախ fields-ը (SKU, price, stock, …) մեկ անգամ են։ |
+| APROD-002 | SKU unique է; `(locale, slug)` unique է և server-side ստուգվում է constraint-ով՝ յուրաքանչյուր լրացված locale-ի համար։ |
 | APROD-003 | Price/compare-at/stock/threshold constraints-ը server + DB checks ունեն։ |
 | APROD-004 | Multiple images-ի primary uniqueness և sort order-ը պահպանվում են transaction-safe։ |
 | APROD-005 | Product delete-ը archive/soft delete է; պատմական order item-ը չի փոխվում։ |
 | APROD-006 | Stock manual adjustment-ը ստեղծում է stock movement, ոչ ուղղակի անբացատրելի overwrite։ |
 | APROD-007 | Variant model-ի extension point կա, բայց launch UI-ը `OPEN-007`-ով է որոշվում։ |
+| APROD-008 | Publish-ին պարտադիր է առնվազն մեկ լրիվ locale translation; բացակա locale-ում product-ը public catalog-ում չի երևում։ |
 
 ## 14. Admin categories
 
-- Hierarchy tree/table, multilingual title/description/SEO, locale slug, image, optional parent, sort, active։
+- Hierarchy tree/table, title/description/SEO + locale slug՝ նույն `DEC-017` pattern-ով (locale selector + մեկ դաշտերի հավաքածու), image, optional parent, sort, active։
 - Parent-ը չի կարող լինել self կամ descendant; cycle prevention-ը server + transaction check է։
 - Products/children ունեցող category-ի delete-ը պահանջում է reassign կամ archive։
 - Public catalog/breadcrumb caches-ը invalid են դառնում mutation-ից հետո։
@@ -342,7 +343,7 @@ Feature-ը `Done` է միայն եթե՝
 1. Real PostgreSQL persistence/query-ը աշխատում է։
 2. Server validation և authorization-ը կան։
 3. Loading/error/empty/success/disabled states-ը կան։
-4. `hy/en/ru` translations-ը լրացված են։
+4. UI chrome dictionaries-ը (`src/locales`) լրացված են բոլոր supported locale-ների համար; admin-managed content-ի համար լրացված է առնվազն այն locale-ը, որով feature-ը publish է արվում (`DEC-017`)։
 5. Mobile/desktop և հիմնական keyboard flow-ը ստուգված են։
 6. Relevant unit/integration/E2E tests-ը անցնում են։
 7. Typecheck, lint և build regression չկա։

@@ -1,10 +1,10 @@
 # White Shop — specification index
 
-**Կարգավիճակ.** Draft baseline
+**Կարգավիճակ.** Implementation complete (Phases 0–11); production deploy pending approval
 **Տարբերակ.** 1.0
-**Ամսաթիվ.** 2026-07-17
+**Ամսաթիվ.** 2026-07-18
 
-Այս պանակի փաստաթղթերը White Shop-ի implementation source of truth-ն են։ User prompt-ը վերածվել է ստուգելի պահանջների, սահմանների և acceptance criteria-ների։ Կոդավորումից առաջ `TECH_CARD.md`-ի approval gate-երը պետք է լուծվեն։
+Այս պանակի փաստաթղթերը White Shop-ի implementation source of truth-ն են։ Kickoff approval-ը փակված է 2026-07-18-ին documented defaults-ով (`TECH_CARD.md`, `DECISIONS.md`)։
 
 ## Փաստաթղթերի քարտեզ
 

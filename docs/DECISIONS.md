@@ -1,7 +1,7 @@
 # White Shop — decisions and open questions
 
-**Կարգավիճակ.** Draft for approval
-**Վերջին թարմացում.** 2026-07-17
+**Կարգավիճակ.** Kickoff approved with documented defaults — 2026-07-18
+**Վերջին թարմացում.** 2026-07-18
 
 ## Կարգավիճակների նշանակություն
 
@@ -15,8 +15,12 @@
 
 | ID | Թեմա | Կարգավիճակ | Որոշում / հարց | Default մինչև հաստատում |
 |---|---|---|---|---|
-| DEC-001 | Primary architecture | Proposed | Modular monolith մեկ Next.js app-ում, feature boundaries-ով | Օգտագործել այս architecture-ը documentation/planning-ի համար |
-| DEC-002 | Product size | Proposed | Size C product scope | Չի ենթադրում պարտադիր microservices/monorepo |
+| DEC-001 | Primary architecture | Approved by user | Modular monolith մեկ Next.js app-ում, feature boundaries-ով | Implementation layout՝ `docs/01-ARCHITECTURE.md` |
+| DEC-002 | Product size | Approved by user | Size C product scope | Չի ենթադրում պարտադիր microservices/monorepo |
+| DEC-018 | ID strategy | Approved by user | UUIDv7 բոլոր նոր tables-ի համար | Sortable, secure, single strategy |
+| DEC-019 | Session strategy | Approved by user | Auth.js database-backed sessions | Revocation/suspension-ready |
+| DEC-020 | Hosting kickoff | Approved by user | Vercel-compatible; local-first; prod deploy deferred | Region/WAF՝ domain-ից հետո |
+| DEC-021 | UI fidelity kickoff | Approved by user | Minimal functional UI first; polish later | shadcn/ui + Tailwind tokens, light theme |
 | DEC-003 | Database | Approved by brief | Neon PostgreSQL + Drizzle ORM | PostgreSQL-ը source of truth է |
 | DEC-004 | Auth | Approved by brief | Auth.js credentials flow, Argon2id, database sessions | OAuth provider-ներ scope-ից դուրս |
 | DEC-005 | Locale | Approved by brief | `hy`, `en`, `ru`; default `hy`; locale URL segment-ում | Missing translation-ը CI error է production namespace-ների համար |
@@ -27,6 +31,7 @@
 | DEC-010 | Images | Approved by brief | R2 object key database-ում, public URL config-ից | Presigned upload, delayed old-object cleanup |
 | DEC-011 | Database footprint | Approved by user | Canonical lean schema՝ 25 PostgreSQL table | Նոր table միայն migration rationale-ով |
 | DEC-012 | Dynamic translations | Approved by user | Product/category/hero/blog translations-ը parent table-ի validated JSONB-ում | UI copy-ն մնում է locale JSON files-ում |
+| DEC-017 | Admin content locale UX | Approved by user | Admin create/edit forms-ը մեկ դաշտերի հավաքածու ունեն (Title/Slug/Description/…) + active locale selector; զուգահեռ `hy`/`en`/`ru` դաշտեր չեն ցուցադրվում | Լրացվում է միայն ընտրված locale-ը; publish-ին պարտադիր է առնվազն մեկ լրիվ locale, ոչ բոլոր երեքը |
 | DEC-013 | Promotions | Approved by user | Coupons և automatic discounts-ը մեկ `promotions` table-ում | User allowlist-ը `promotion_users` relation է |
 | DEC-014 | Auth tokens | Approved by user | Verification/reset tokens-ը hashed TTL records են Upstash Redis-ում | PostgreSQL sessions-ը պահվում են revoke-ի համար |
 | DEC-015 | Order model | Approved by user | Address snapshots-ը `orders` JSONB-ում, status/notes/provider events-ը `order_events`-ում | `order_items` և `payments` առանձին են մնում |
@@ -58,13 +63,14 @@
 3. Review eligibility-ն սահմանվում է delivered/completed order item-ով։ Refund-ից հետո review visibility policy-ն դեռ բաց է։
 4. `ADMIN` role-ը launch-ին ներառում է բոլոր admin capabilities, սակայն every mutation-ը դեռ server-side role check ունի։
 5. Storefront slugs-ը `translations JSONB`-ում են և fixed-locale expression indexes-ով unique են per locale։
+6. Admin product/content form-ը reference UX-ով է՝ մեկ Basic Information դաշտերի հավաքածու; լեզուն փոխվում է selector-ով, ոչ թե մեկ էջում բոլոր locale-ների դաշտերով։
 
 ## Approval checklist
 
-- [ ] Product owner-ը հաստատել է P0/P1 launch scope-ը։
-- [ ] Tech lead-ը հաստատել է modular monolith layout-ը։
-- [ ] Hosting/runtime և regions-ը ընտրված են։
-- [ ] Payment launch scope-ը ընտրված է։
-- [ ] Tax/order/refund policies-ը հաստատված են։
-- [ ] Legal content owner-ը նշանակված է։
-- [ ] Design source/brand tokens-ը տրամադրված են։
+- [x] Product owner-ը հաստատել է P0/P1 launch scope-ը (implementation start 2026-07-18)։
+- [x] Tech lead-ը հաստատել է modular monolith layout-ը։
+- [x] Hosting kickoff՝ Vercel-compatible; regions/WAF հետո։
+- [x] Payment launch scope՝ միայն COD (online providers deferred)։
+- [ ] Tax/order/refund policies-ը վերջնական հաստատված են (P0-ում tax=0 default)։
+- [ ] Legal content owner-ը նշանակված է (routes shell մինչև copy)։
+- [x] Design kickoff՝ minimal UI + shadcn/Tailwind; Figma polish later։

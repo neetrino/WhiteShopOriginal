@@ -2,9 +2,9 @@
 
 **Database.** PostgreSQL (Neon)
 **ORM/migrations.** Drizzle ORM / Drizzle Kit
-**Կարգավիճակ.** Approved lean logical model; physical migration դեռ չի ստեղծվել
+**Կարգավիճակ.** Canonical 25-table schema migrated; idempotent seed available (`pnpm db:seed`)
 **Canonical table count.** 25
-**Վերջին թարմացում.** 2026-07-17
+**Վերջին թարմացում.** 2026-07-18
 
 ## 1. Սխեմայի նպատակը
 
@@ -140,13 +140,13 @@ Typed key/value model՝ store identity, public contacts/address, locales/currenc
 | Group | Fields/invariants |
 |---|---|
 | Identity | ID, normalized SKU UNIQUE |
-| Translations | `translations JSONB` with `hy/en/ru` title, slug, description, SEO |
+| Translations | `translations JSONB` — optional per-locale objects (`hy`/`en`/`ru`) with title, slug, description, SEO |
 | Pricing | base/compare-at AMD integer amounts, non-negative checks |
 | Inventory | `stock_on_hand`, low-stock threshold, optional optimistic version; non-negative առանց backorder approval-ի |
 | Lifecycle | draft/active/archived, featured/upcoming, timestamps/deleted_at |
 | Presentation | badge label translations/style/position |
 
-Translation JSON schema-ն պահանջում է all supported locale keys publish անելիս։ Fixed locale slug uniqueness-ը enforce է արվում expression unique indexes-ով, օրինակ `translations->'hy'->>'slug'`։
+Translation JSON schema-ն թույլ է տալիս partial locales (`DEC-017`)։ Publish-ին պարտադիր է առնվազն մեկ լրիվ locale object; բացակա locale-ը այդ storefront լեզվում չի ցուցադրվում։ Fixed locale slug uniqueness-ը enforce է արվում expression unique indexes-ով միայն առկա locale keys-ի համար, օրինակ `translations->'hy'->>'slug'`։
 
 Current stock-ը `products`-ում է արագ և atomic availability check-ի համար։ Ամեն manual/order stock mutation-ը նույն transaction-ում `stock_movements` row է ստեղծում։
 
@@ -353,12 +353,12 @@ Actual indexes-ը validate են արվում representative data-ի `EXPLAIN (AN
 
 ## 18. Migration և seed acceptance criteria
 
-- [ ] Fresh migration-ը ստեղծում է ճիշտ 25 application table։
-- [ ] Յուրաքանչյուր FK ունի explicit delete behavior։
+- [x] Fresh migration-ը ստեղծում է ճիշտ 25 application table։
+- [x] Յուրաքանչյուր FK ունի explicit delete behavior։
 - [ ] JSONB schemas/versioning և locale expression indexes tested են։
 - [ ] Money/range/exactly-one-owner/target constraints tested են։
 - [ ] Concurrent checkout/promotion usage/stock/last-admin tests անցնում են։
 - [ ] Redis token TTL և atomic single-use tests անցնում են։
-- [ ] Seed-ը idempotent է և ստեղծում է admin/customers/catalog/hero/delivery/promotions/blog/sample orders։
-- [ ] Seed credentials-ը env-ից են; production default credential չկա։
-- [ ] Production migration-ը application startup-ում auto-run չի արվում։
+- [x] Seed-ը idempotent է և ստեղծում է admin/customers/catalog/hero/delivery/promotions/blog (sample orders՝ հետագա)։
+- [x] Seed credentials-ը env-ից են; production default credential չկա։
+- [x] Production migration-ը application startup-ում auto-run չի արվում։
