@@ -11,7 +11,7 @@
 | 1 | Foundation | Done | Next.js, i18n, providers |
 | 2 | Database foundation | Done | 25 tables + seed |
 | 3 | Identity and authorization | Done | DB sessions, login/register/logout |
-| 4 | Catalog admin and media | Done (minimal) | Admin products/categories; R2 deferred |
+| 4 | Catalog admin and media | Done (minimal) | Admin products/categories; R2 adapter when credentials set |
 | 5 | Storefront catalog | Done (minimal) | List/detail/featured from DB |
 | 6 | Cart and checkout | Done | Durable cart + COD + coupon apply |
 | 7 | Customer self-service | Done (minimal) | Profile, orders, personal info |
@@ -51,7 +51,8 @@
 - `pnpm build` — pass
 
 ### Remaining non-blocking items
-- R2 media uploads, email verify/reset, Playwright E2E suite
+- Email verify/reset, Playwright E2E suite
 - Approved legal copy (OPEN-014)
 - Online payment provider selection (OPEN-002)
-- Real Upstash/R2/Resend adapters when credentials provided
+- Real Upstash/Resend adapters when credentials provided
+- Re-upload existing media after enabling R2 (local `public/uploads` keys are not in the bucket)

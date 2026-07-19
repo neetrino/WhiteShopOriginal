@@ -20,6 +20,8 @@ const envSchema = z.object({
   R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
   R2_BUCKET_NAME: z.string().min(1).optional(),
   R2_PUBLIC_BASE_URL: z.string().url().optional(),
+  /** Optional custom S3 API endpoint; defaults to account R2 endpoint. */
+  R2_ENDPOINT: z.string().url().optional(),
   EMAIL_FROM: z.string().email().optional(),
   RESEND_API_KEY: z.string().min(1).optional(),
 });
@@ -27,6 +29,14 @@ const envSchema = z.object({
 export type AppEnv = z.infer<typeof envSchema>;
 
 let cachedEnv: AppEnv | undefined;
+
+function resolvePublicBaseUrl(): string | undefined {
+  return (
+    process.env.R2_PUBLIC_BASE_URL ||
+    process.env.R2_PUBLIC_URL ||
+    undefined
+  );
+}
 
 export function getEnv(): AppEnv {
   if (cachedEnv) {
@@ -44,7 +54,8 @@ export function getEnv(): AppEnv {
     R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID,
     R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY,
     R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
-    R2_PUBLIC_BASE_URL: process.env.R2_PUBLIC_BASE_URL,
+    R2_PUBLIC_BASE_URL: resolvePublicBaseUrl(),
+    R2_ENDPOINT: process.env.R2_ENDPOINT,
     EMAIL_FROM: process.env.EMAIL_FROM,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
   });

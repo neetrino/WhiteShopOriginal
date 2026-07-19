@@ -1,22 +1,17 @@
 import "server-only";
 
-import { mkdir, unlink, writeFile } from "node:fs/promises";
-import path from "node:path";
-
 import { and, asc, eq, inArray } from "drizzle-orm";
 
+import { getProviders } from "@/config/providers";
 import { getDb } from "@/db/client";
 import { mediaAssets } from "@/db/schema";
 import { createId } from "@/lib/id";
+import {
+  extensionForImageMime,
+  validateImageFile,
+} from "@/lib/media/image-file";
 import { mediaPublicUrl } from "@/lib/media/public-url";
 
-const ALLOWED_MIME = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-]);
-const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_IMAGES = 12;
 
 export type ProductMediaInput = {
@@ -27,27 +22,12 @@ export type ProductMediaInput = {
   removeImageIds: string[];
 };
 
-function extensionFor(mimeType: string): string {
-  if (mimeType === "image/png") return "png";
-  if (mimeType === "image/webp") return "webp";
-  if (mimeType === "image/gif") return "gif";
-  return "jpg";
-}
-
-async function deleteLocalObject(objectKey: string): Promise<void> {
-  const absolute = path.join(process.cwd(), "public", objectKey);
-  try {
-    await unlink(absolute);
-  } catch {
-    // Best-effort cleanup for local stub storage.
-  }
-}
-
-/** Saves new product images and updates primary/removal for local stub storage. */
+/** Saves new product images and updates primary/removal via object storage. */
 export async function persistProductMedia(
   input: ProductMediaInput,
 ): Promise<{ error: string | null }> {
   const db = getDb();
+  const storage = getProviders().storage;
   const existing = await db
     .select({
       id: mediaAssets.id,
@@ -62,18 +42,19 @@ export async function persistProductMedia(
     (row) => !input.removeImageIds.includes(row.id),
   );
 
-  if (
-    remainingAfterRemove.length + input.files.length > MAX_IMAGES
-  ) {
+  if (remainingAfterRemove.length + input.files.length > MAX_IMAGES) {
     return { error: `At most ${MAX_IMAGES} images are allowed.` };
   }
 
   for (const file of input.files) {
-    if (!ALLOWED_MIME.has(file.type)) {
-      return { error: "Only JPEG, PNG, WebP, or GIF images are allowed." };
-    }
-    if (file.size > MAX_BYTES) {
-      return { error: "Each image must be 5MB or smaller." };
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      return {
+        error:
+          validationError === "Image must be 5MB or smaller."
+            ? "Each image must be 5MB or smaller."
+            : validationError,
+      };
     }
   }
 
@@ -90,28 +71,24 @@ export async function persistProductMedia(
             toRemove.map((row) => row.id),
           ),
         );
-      await Promise.all(toRemove.map((row) => deleteLocalObject(row.objectKey)));
+      await Promise.all(
+        toRemove.map((row) => storage.deleteObject(row.objectKey)),
+      );
     }
   }
-
-  const uploadDir = path.join(
-    process.cwd(),
-    "public",
-    "uploads",
-    "products",
-    input.productId,
-  );
-  await mkdir(uploadDir, { recursive: true });
 
   const createdIds: string[] = [];
   let sortBase = remainingAfterRemove.length;
 
   for (const file of input.files) {
     const id = createId();
-    const objectKey = `uploads/products/${input.productId}/${id}.${extensionFor(file.type)}`;
-    const absolute = path.join(process.cwd(), "public", objectKey);
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(absolute, buffer);
+    const objectKey = `uploads/products/${input.productId}/${id}.${extensionForImageMime(file.type)}`;
+    const body = Buffer.from(await file.arrayBuffer());
+    await storage.putObject({
+      objectKey,
+      body,
+      contentType: file.type,
+    });
 
     await db.insert(mediaAssets).values({
       id,
@@ -150,7 +127,10 @@ export async function persistProductMedia(
     .update(mediaAssets)
     .set({ isPrimary: false, role: "GALLERY", updatedAt: new Date() })
     .where(
-      and(eq(mediaAssets.productId, input.productId), eq(mediaAssets.isPrimary, true)),
+      and(
+        eq(mediaAssets.productId, input.productId),
+        eq(mediaAssets.isPrimary, true),
+      ),
     );
 
   if (nextPrimaryId) {
