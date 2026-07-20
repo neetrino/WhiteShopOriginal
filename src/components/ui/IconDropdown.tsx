@@ -7,6 +7,8 @@ type IconDropdownProps = {
   trigger: React.ReactNode;
   children: React.ReactNode;
   triggerClassName?: string;
+  /** Where the menu opens relative to the trigger. Default: below. */
+  menuPlacement?: "bottom" | "top";
 };
 
 export function IconDropdown({
@@ -14,6 +16,7 @@ export function IconDropdown({
   trigger,
   children,
   triggerClassName,
+  menuPlacement = "bottom",
 }: IconDropdownProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -67,7 +70,11 @@ export function IconDropdown({
           id={menuId}
           role="menu"
           aria-label={label}
-          className="absolute right-0 z-[100] mt-2 min-w-40 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-2xl"
+          className={
+            menuPlacement === "top"
+              ? "absolute right-0 bottom-full z-[100] mb-2 min-w-40 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-2xl"
+              : "absolute top-full right-0 z-[100] mt-2 min-w-40 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-2xl"
+          }
         >
           <div
             onClick={(event) => {

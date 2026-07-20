@@ -18,11 +18,21 @@ import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
 import type { Currency } from "@/lib/money/currency";
 
+type CartDrawerTriggerArgs = {
+  open: boolean;
+  badgeCount: number;
+  label: string;
+  openDrawer: () => void;
+  prefetchDrawerView: () => void;
+};
+
 type CartDrawerProps = {
   locale: Locale;
   currency: Currency;
   dictionary: Dictionary;
   itemCount: number;
+  /** Custom trigger (e.g. mobile bottom nav). Defaults to header cart button. */
+  renderTrigger?: (args: CartDrawerTriggerArgs) => React.ReactNode;
 };
 
 const CLOSE_ANIMATION_MS = 220;
@@ -46,6 +56,7 @@ export function CartDrawer({
   currency,
   dictionary,
   itemCount,
+  renderTrigger,
 }: CartDrawerProps) {
   const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const [open, setOpen] = useState(false);
@@ -308,24 +319,34 @@ export function CartDrawer({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={openDrawer}
-        onPointerEnter={prefetchDrawerView}
-        onFocus={prefetchDrawerView}
-        className="inline-flex h-11 items-center gap-1 rounded-lg px-1 text-gray-700 transition-colors hover:text-gray-900"
-        aria-label={dictionary.nav.cart}
-        aria-expanded={open}
-      >
-        <span className="relative inline-flex h-11 w-11 items-center justify-center">
-          <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-          {badgeCount > 0 ? (
-            <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-gray-900 px-1 text-[10px] font-semibold text-white">
-              {badgeCount}
-            </span>
-          ) : null}
-        </span>
-      </button>
+      {renderTrigger ? (
+        renderTrigger({
+          open,
+          badgeCount,
+          label: dictionary.nav.cart,
+          openDrawer,
+          prefetchDrawerView,
+        })
+      ) : (
+        <button
+          type="button"
+          onClick={openDrawer}
+          onPointerEnter={prefetchDrawerView}
+          onFocus={prefetchDrawerView}
+          className="inline-flex h-11 items-center gap-1 rounded-lg px-1 text-gray-700 transition-colors hover:text-gray-900"
+          aria-label={dictionary.nav.cart}
+          aria-expanded={open}
+        >
+          <span className="relative inline-flex h-11 w-11 items-center justify-center">
+            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+            {badgeCount > 0 ? (
+              <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-gray-900 px-1 text-[10px] font-semibold text-white">
+                {badgeCount > 99 ? "99+" : badgeCount}
+              </span>
+            ) : null}
+          </span>
+        </button>
+      )}
       {panel}
     </>
   );

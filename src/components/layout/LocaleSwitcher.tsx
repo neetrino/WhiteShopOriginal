@@ -11,6 +11,7 @@ import { localeLabels, locales } from "@/lib/i18n/config";
 type LocaleSwitcherProps = {
   locale: Locale;
   label: string;
+  menuPlacement?: "bottom" | "top";
 };
 
 function replaceLocaleInPath(pathname: string, nextLocale: Locale): string {
@@ -23,12 +24,17 @@ function replaceLocaleInPath(pathname: string, nextLocale: Locale): string {
   return `/${nextLocale}`;
 }
 
-export function LocaleSwitcher({ locale, label }: LocaleSwitcherProps) {
+export function LocaleSwitcher({
+  locale,
+  label,
+  menuPlacement = "bottom",
+}: LocaleSwitcherProps) {
   const pathname = usePathname();
 
   return (
     <IconDropdown
       label={label}
+      menuPlacement={menuPlacement}
       trigger={
         <span className="inline-flex items-center gap-2 text-sm font-medium text-gray-800">
           {localeLabels[locale]}

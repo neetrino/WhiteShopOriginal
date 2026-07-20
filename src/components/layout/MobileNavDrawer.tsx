@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
+import { CurrencySwitcher } from "@/components/layout/CurrencySwitcher";
+import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { AppLink } from "@/components/ui/AppLink";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
+import type { Currency } from "@/lib/money/currency";
 import type { SessionUser } from "@/lib/auth/session";
 
 type NavItem = {
@@ -15,6 +18,7 @@ type NavItem = {
 
 type MobileNavDrawerProps = {
   locale: Locale;
+  currency: Currency;
   dictionary: Dictionary;
   user: SessionUser | null;
   navItems: readonly NavItem[];
@@ -22,6 +26,7 @@ type MobileNavDrawerProps = {
 
 export function MobileNavDrawer({
   locale,
+  currency,
   dictionary,
   user,
   navItems,
@@ -64,7 +69,7 @@ export function MobileNavDrawer({
 
       {open ? (
         <div
-          className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm md:hidden"
           role="dialog"
           aria-modal="true"
           aria-label={dictionary.nav.navigation}
@@ -88,7 +93,7 @@ export function MobileNavDrawer({
               </button>
             </div>
 
-            <nav className="flex flex-1 flex-col overflow-y-auto text-sm font-semibold uppercase tracking-wide text-gray-800">
+            <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto text-sm font-semibold uppercase tracking-wide text-gray-800">
               <div className="divide-y divide-gray-200">
                 {navItems.map((item) => (
                   <AppLink
@@ -132,11 +137,33 @@ export function MobileNavDrawer({
                   </AppLink>
                 )}
               </div>
-
-              <div className="mt-auto border-t border-gray-200 px-4 py-4 text-xs font-medium tracking-wide text-gray-500 normal-case">
-                © {year} {dictionary.brand}
-              </div>
             </nav>
+
+            <div className="shrink-0 space-y-3 overflow-visible border-t border-gray-200 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs font-medium tracking-wide text-gray-500">
+                  {dictionary.header.language}
+                </span>
+                <LocaleSwitcher
+                  locale={locale}
+                  label={dictionary.header.language}
+                  menuPlacement="top"
+                />
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs font-medium tracking-wide text-gray-500">
+                  {dictionary.header.currency}
+                </span>
+                <CurrencySwitcher
+                  currency={currency}
+                  label={dictionary.header.currency}
+                  menuPlacement="top"
+                />
+              </div>
+              <p className="pt-1 text-xs font-medium tracking-wide text-gray-500">
+                © {year} {dictionary.brand}
+              </p>
+            </div>
           </div>
         </div>
       ) : null}

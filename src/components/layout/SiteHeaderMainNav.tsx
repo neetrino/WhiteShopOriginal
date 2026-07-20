@@ -1,6 +1,4 @@
 import { AccountControls } from "@/components/layout/AccountControls";
-import { CurrencySwitcher } from "@/components/layout/CurrencySwitcher";
-import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { MobileNavDrawer } from "@/components/layout/MobileNavDrawer";
 import { AppLink } from "@/components/ui/AppLink";
 import { CartDrawer } from "@/features/cart/ui/CartDrawer";
@@ -42,51 +40,22 @@ export function SiteHeaderMainNav({
     <header className="relative z-10 border-b border-gray-200/80 bg-gradient-to-b from-gray-50 to-white shadow-sm backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-2 sm:px-4 md:px-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-2 py-4 sm:gap-4 md:py-3">
-          <div className="relative flex w-full items-center justify-between md:w-auto md:justify-start">
-            <MobileNavDrawer
-              locale={locale}
-              dictionary={dictionary}
-              user={user}
-              navItems={navItems}
-            />
-
+          <div className="flex w-full items-center justify-between md:w-auto md:justify-start md:gap-0">
             <AppLink
               href={`/${locale}`}
               prefetchPolicy="intent"
-              className="absolute left-1/2 -translate-x-1/2 text-lg font-semibold tracking-tight text-gray-900 md:static md:translate-x-0"
+              className="text-lg font-semibold tracking-tight text-gray-900"
             >
               {dictionary.brand}
             </AppLink>
 
-            <div className="flex items-center gap-1 md:hidden">
-              <WishlistHeaderLink
-                locale={locale}
-                label={dictionary.nav.wishlist}
-                count={wishlistCount}
-              />
-              <CartDrawer
-                locale={locale}
-                currency={currency}
-                dictionary={dictionary}
-                itemCount={cartItemCount}
-              />
-              <AccountControls
-                locale={locale}
-                loginLabel={dictionary.header.login}
-                logoutLabel={dictionary.header.logout}
-                profileLabel={dictionary.header.profile}
-                adminLabel={dictionary.header.admin}
-                user={user}
-              />
-              <LocaleSwitcher
-                locale={locale}
-                label={dictionary.header.language}
-              />
-              <CurrencySwitcher
-                currency={currency}
-                label={dictionary.header.currency}
-              />
-            </div>
+            <MobileNavDrawer
+              locale={locale}
+              currency={currency}
+              dictionary={dictionary}
+              user={user}
+              navItems={navItems}
+            />
           </div>
 
           <nav

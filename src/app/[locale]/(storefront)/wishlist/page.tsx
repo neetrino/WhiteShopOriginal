@@ -72,7 +72,7 @@ export default async function WishlistPage({ params }: WishlistPageProps) {
       {priced.length === 0 ? (
         <p className="text-gray-600">{dictionary.wishlist.empty}</p>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-6 lg:grid-cols-3 xl:grid-cols-4">
           {priced.map(
             ({ product, priceFormatted, compareAtFormatted }, index) => (
               <ProductCard

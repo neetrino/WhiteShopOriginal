@@ -75,7 +75,7 @@ export default async function ProductsPage({
       <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
         {dictionary.nav.products}
       </h1>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-6 lg:grid-cols-3 xl:grid-cols-4">
         {priced.map(({ product, price, compareAtFormatted }, index) => (
           <ProductCard
             key={product.id}

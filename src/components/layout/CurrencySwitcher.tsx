@@ -16,15 +16,21 @@ import {
 type CurrencySwitcherProps = {
   currency: Currency;
   label: string;
+  menuPlacement?: "bottom" | "top";
 };
 
-export function CurrencySwitcher({ currency, label }: CurrencySwitcherProps) {
+export function CurrencySwitcher({
+  currency,
+  label,
+  menuPlacement = "bottom",
+}: CurrencySwitcherProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
   return (
     <IconDropdown
       label={`${label}: ${currency}`}
+      menuPlacement={menuPlacement}
       trigger={
         <span className="inline-flex items-center gap-2 text-gray-800">
           <span className="text-base font-semibold leading-none tabular-nums">
