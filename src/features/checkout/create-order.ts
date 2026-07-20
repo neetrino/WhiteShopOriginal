@@ -2,7 +2,7 @@
 
 import { createHash } from "node:crypto";
 
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 
 import { getProviders } from "@/config/providers";
@@ -34,9 +34,10 @@ import {
   nextOrderSequence,
 } from "@/features/orders/domain/order-number";
 import {
-  computeDiscountAmount,
-  normalizePromotionCode,
-} from "@/features/promotions/domain/promotion-rules";
+  couponDiscountErrorMessage,
+  evaluateCouponDiscount,
+} from "@/features/promotions/domain/evaluate-coupon";
+import { normalizePromotionCode } from "@/features/promotions/domain/promotion-rules";
 import { resolveProductPrices } from "@/features/promotions/application/resolve-product-prices";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getCheckoutRateSnapshot } from "@/lib/fx/service";
@@ -50,6 +51,14 @@ import {
 
 function hashValue(value: string): string {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function deliveryLabel(countryCode: string, city: string | null): string {
+  const cityPart = city?.trim();
+  if (cityPart) {
+    return `${cityPart}, ${countryCode}`;
+  }
+  return countryCode;
 }
 
 export type CreateOrderResult =
@@ -84,24 +93,6 @@ export async function createOrderAction(
     return { ok: false, error: "Exchange rate unavailable. Try again shortly." };
   }
 
-  const address = {
-    recipientFirstName: input.firstName,
-    recipientLastName: input.lastName,
-    phone: input.contactPhone,
-    countryCode: "AM",
-    region: input.region,
-    city:
-      input.shippingMethod === "pickup"
-        ? (input.city?.trim() || "Yerevan")
-        : (input.city ?? ""),
-    line1:
-      input.shippingMethod === "pickup"
-        ? (input.line1?.trim() || "Store pickup")
-        : (input.line1 ?? ""),
-    line2: input.line2,
-    postalCode: input.postalCode,
-  };
-
   const contactName = `${input.firstName} ${input.lastName}`.trim();
   const scopeHash = hashValue(user?.id ?? cart.guestTokenHash ?? cart.id);
   const keyHash = hashValue(input.idempotencyKey);
@@ -115,6 +106,7 @@ export async function createOrderAction(
       email: input.contactEmail.toLowerCase(),
       shippingMethod: input.shippingMethod,
       paymentMethod: input.paymentMethod,
+      deliveryRuleId: input.deliveryRuleId ?? null,
     }),
   );
 
@@ -136,17 +128,47 @@ export async function createOrderAction(
         return existing.orderNumber;
       }
 
-      const [delivery] = await tx
-        .select()
-        .from(deliveryRules)
-        .where(
-          and(
-            eq(deliveryRules.isActive, true),
-            eq(deliveryRules.countryCode, "AM"),
-          ),
-        )
-        .orderBy(desc(deliveryRules.priority))
-        .limit(1);
+      let delivery: typeof deliveryRules.$inferSelect | null = null;
+      if (input.shippingMethod === "delivery") {
+        if (!input.deliveryRuleId) {
+          throw new Error("Delivery location is required.");
+        }
+
+        const [matched] = await tx
+          .select()
+          .from(deliveryRules)
+          .where(
+            and(
+              eq(deliveryRules.id, input.deliveryRuleId),
+              eq(deliveryRules.isActive, true),
+            ),
+          )
+          .limit(1);
+
+        if (!matched) {
+          throw new Error("Selected delivery location is unavailable.");
+        }
+
+        delivery = matched;
+      }
+
+      const address = {
+        recipientFirstName: input.firstName,
+        recipientLastName: input.lastName,
+        phone: input.contactPhone,
+        countryCode: delivery?.countryCode ?? "AM",
+        region: input.region,
+        city:
+          input.shippingMethod === "pickup"
+            ? (input.city?.trim() || "Yerevan")
+            : (delivery?.city?.trim() || input.city?.trim() || ""),
+        line1:
+          input.shippingMethod === "pickup"
+            ? (input.line1?.trim() || "Store pickup")
+            : (input.line1 ?? ""),
+        line2: input.line2,
+        postalCode: input.postalCode,
+      };
 
       let subtotal = 0;
       const lineSnapshots: Array<{
@@ -251,36 +273,17 @@ export async function createOrderAction(
           .for("update")
           .limit(1);
 
-        if (!coupon || !coupon.isActive) {
-          throw new Error("Invalid or inactive coupon.");
-        }
-
         const nowCheck = new Date();
-        if (coupon.startsAt && coupon.startsAt > nowCheck) {
-          throw new Error("Coupon is not active yet.");
-        }
-        if (coupon.endsAt && coupon.endsAt < nowCheck) {
-          throw new Error("Coupon has expired.");
-        }
-        if (
-          coupon.minimumOrderAmount !== null &&
-          subtotal < coupon.minimumOrderAmount
-        ) {
-          throw new Error("Order does not meet coupon minimum.");
-        }
-        if (
-          coupon.totalUsageLimit !== null &&
-          coupon.usedCount >= coupon.totalUsageLimit
-        ) {
-          throw new Error("Coupon usage limit reached.");
+        const evaluated = evaluateCouponDiscount(coupon, subtotal, nowCheck);
+        if (!evaluated.ok || !coupon) {
+          throw new Error(
+            couponDiscountErrorMessage(
+              evaluated.ok ? "INVALID_OR_INACTIVE" : evaluated.error,
+            ),
+          );
         }
 
-        discountAmount = computeDiscountAmount(
-          subtotal,
-          coupon.discountType,
-          coupon.discountValue,
-          coupon.maxDiscountAmount,
-        );
+        discountAmount = evaluated.discountAmount;
         appliedPromotion = coupon;
 
         await tx
@@ -337,7 +340,9 @@ export async function createOrderAction(
         deliveryLabelSnapshot:
           input.shippingMethod === "pickup"
             ? "Store pickup"
-            : "Armenia delivery",
+            : delivery
+              ? deliveryLabel(delivery.countryCode, delivery.city)
+              : "Delivery",
         deliveryEstimateSnapshot:
           input.shippingMethod === "pickup"
             ? null

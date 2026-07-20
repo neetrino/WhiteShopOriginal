@@ -36,7 +36,7 @@ function SettingsIcon() {
   );
 }
 
-/** Admin nav for capabilities that exist in this project (no brands/attributes/delivery). */
+/** Admin nav for capabilities that exist in this project (no brands/attributes). */
 export function getAdminMenuItems(locale: string): AdminMenuItem[] {
   const base = `/${locale}/admin`;
 
@@ -73,6 +73,14 @@ export function getAdminMenuItems(locale: string): AdminMenuItem[] {
       parentGroupId: "products",
       icon: (
         <MenuIcon d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+      ),
+    },
+    {
+      id: "delivery",
+      label: "Delivery",
+      href: `${base}/delivery`,
+      icon: (
+        <MenuIcon d="M8 17h8M8 17a2 2 0 11-4 0m4 0a2 2 0 104 0m8 0a2 2 0 11-4 0m4 0a2 2 0 104 0M3 9l1.5-4.5A2 2 0 016.4 3h7.2a2 2 0 011.9 1.5L17 9m-14 0h18m-18 0v6a2 2 0 002 2h1m15-8v6a2 2 0 01-2 2h-1" />
       ),
     },
     {
@@ -129,14 +137,6 @@ export function getAdminMenuItems(locale: string): AdminMenuItem[] {
       href: `${base}/messages`,
       icon: (
         <MenuIcon d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      ),
-    },
-    {
-      id: "reviews",
-      label: "Reviews",
-      href: `${base}/reviews`,
-      icon: (
-        <MenuIcon d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.98 9.72c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
       ),
     },
     {

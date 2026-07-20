@@ -24,7 +24,7 @@
 - Money՝ `bigint`/safe integer amount, ոչ floating point։ AMD base amounts-ը whole dram են։
 - Exchange rate՝ explicit precision/scale-ով PostgreSQL `numeric` և decimal-safe application library։
 - Email/promotion code՝ normalized canonical value + case-insensitive unique index։
-- UI translations-ը `src/locales/{hy,en,ru}/*.json` ֆայլերում են։
+- UI translations-ը `locales/{hy,en,ru}/*.json` ֆայլերում են։
 - Admin-managed multilingual content-ը parent entity-ի `translations JSONB`-ում է։
 - Financial, stock և audit records-ը hard delete չեն ընդունում։
 - Flexible JSONB-ը միշտ Zod schema/version ունի և business-critical relational կապերը չի փոխարինում։

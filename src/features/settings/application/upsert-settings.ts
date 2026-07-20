@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { getProviders } from "@/config/providers";
 import { auditLogs, storeSettings } from "@/db/schema";
 import { withTransaction } from "@/db/transaction";
 import { ORDER_STATUSES } from "@/features/orders/domain/order-status";
@@ -12,9 +13,33 @@ import {
   type StoreSettingKey,
 } from "@/features/settings/domain/store-settings";
 import { requireAdmin } from "@/lib/auth/policies";
+import { invalidateAmdFxQuotes } from "@/lib/fx/invalidate-quotes";
 import { createId } from "@/lib/id";
 import { isLocale, type Locale } from "@/lib/i18n/config";
+import {
+  normalizeRateDecimalString,
+  parseRateToFixed,
+} from "@/lib/money/convert";
 import { err, ok, type Result } from "@/lib/result";
+
+const positiveRateSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(32)
+  .transform((raw, ctx) => {
+    const normalized = normalizeRateDecimalString(raw);
+    try {
+      parseRateToFixed(normalized);
+      return normalized;
+    } catch {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Rate must be a positive decimal (e.g. 0.0026 or 0,2137).",
+      });
+      return z.NEVER;
+    }
+  });
 
 const upsertSchema = z.discriminatedUnion("key", [
   z.object({
@@ -65,6 +90,13 @@ const upsertSchema = z.discriminatedUnion("key", [
       percentage: z.number().int().min(1).max(100).nullable(),
     }),
   }),
+  z.object({
+    key: z.literal("store.fxRates"),
+    value: z.object({
+      usd: positiveRateSchema,
+      rub: positiveRateSchema,
+    }),
+  }),
 ]);
 
 export type UpsertStoreSettingInput = z.infer<typeof upsertSchema>;
@@ -79,7 +111,16 @@ export async function upsertStoreSettingAction(
   }
 
   const parsed = upsertSchema.safeParse(raw);
-  if (!parsed.success || !isStoreSettingKey(parsed.data.key)) {
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0]?.message;
+    return err(
+      "VALIDATION_ERROR",
+      firstIssue && firstIssue !== "Invalid input"
+        ? firstIssue
+        : "Invalid settings payload.",
+    );
+  }
+  if (!isStoreSettingKey(parsed.data.key)) {
     return err("VALIDATION_ERROR", "Invalid settings payload.");
   }
 
@@ -118,6 +159,10 @@ export async function upsertStoreSettingAction(
         correlationId: createId(),
       });
     });
+
+    if (parsed.data.key === "store.fxRates") {
+      await invalidateAmdFxQuotes(getProviders().redis.getClient());
+    }
 
     revalidatePath(`/${locale}/admin/settings`);
     revalidatePath(`/${locale}/admin`);

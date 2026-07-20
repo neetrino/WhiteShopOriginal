@@ -3,6 +3,7 @@
 import { createHash } from "node:crypto";
 
 import { and, desc, eq, gt } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 import { getProviders } from "@/config/providers";
 import { getDb } from "@/db/client";
@@ -10,13 +11,13 @@ import { contactMessages } from "@/db/schema";
 import {
   normalizeContactEmail,
   scoreContactSpam,
-  shouldRejectContactSpam,
 } from "@/features/contact/domain/contact-rules";
 import {
   submitContactSchema,
   type SubmitContactInput,
 } from "@/features/contact/schemas/contact";
 import { createId } from "@/lib/id";
+import { locales } from "@/lib/i18n/config";
 import { err, ok, type Result } from "@/lib/result";
 
 const DUPLICATE_WINDOW_MS = 10 * 60 * 1000;
@@ -24,9 +25,15 @@ const DUPLICATE_WINDOW_MS = 10 * 60 * 1000;
 const CONTACT_RATE_LIMIT = 5;
 const CONTACT_RATE_WINDOW_SECONDS = 15 * 60;
 
+function revalidateContactInbox(): void {
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/messages`);
+  }
+}
+
 /**
- * Public contact form submission with honeypot/spam scoring and
- * short-window duplicate suppression by email+subject.
+ * Public contact form submission with spam scoring and
+ * short-window duplicate suppression by email+message preview.
  */
 export async function submitContactMessageAction(
   raw: SubmitContactInput,
@@ -37,19 +44,17 @@ export async function submitContactMessageAction(
   }
 
   const data = parsed.data;
+  const message = data.message.trim();
+  /** Stored for admin inbox; form no longer collects a separate subject. */
+  const subject = message.slice(0, 160);
   const spamScore = scoreContactSpam({
     name: data.name,
     email: data.email,
     phone: data.phone,
-    subject: data.subject,
-    message: data.message,
+    subject,
+    message,
     companyWebsite: data.companyWebsite,
   });
-
-  // Honeypot / hard spam: generic success to avoid teaching bots.
-  if (shouldRejectContactSpam(spamScore)) {
-    return ok({ id: createId() });
-  }
 
   const email = normalizeContactEmail(data.email);
   const rateKey = `contact:rate:${createHash("sha256").update(email).digest("hex")}`;
@@ -68,7 +73,7 @@ export async function submitContactMessageAction(
     .where(
       and(
         eq(contactMessages.email, email),
-        eq(contactMessages.subject, data.subject.trim()),
+        eq(contactMessages.subject, subject),
         gt(contactMessages.createdAt, since),
       ),
     )
@@ -86,8 +91,8 @@ export async function submitContactMessageAction(
       name: data.name.trim(),
       email,
       phone: data.phone?.trim() || null,
-      subject: data.subject.trim(),
-      message: data.message.trim(),
+      subject,
+      message,
       status: "UNREAD",
       spamScore,
     });
@@ -97,6 +102,7 @@ export async function submitContactMessageAction(
       ex: CONTACT_RATE_WINDOW_SECONDS,
     });
 
+    revalidateContactInbox();
     return ok({ id });
   } catch {
     return err("CONTACT_SUBMIT_FAILED", "Unable to send your message.");

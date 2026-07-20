@@ -10,6 +10,7 @@ export const checkoutSchema = z
     contactPhone: z.string().trim().min(5).max(40),
     shippingMethod: z.enum(["pickup", "delivery"]),
     paymentMethod: z.enum(CHECKOUT_PAYMENT_METHODS),
+    deliveryRuleId: z.string().uuid().optional(),
     city: z.string().trim().max(80).optional(),
     line1: z.string().trim().max(160).optional(),
     line2: z.string().trim().max(160).optional(),
@@ -21,11 +22,11 @@ export const checkoutSchema = z
   })
   .superRefine((value, ctx) => {
     if (value.shippingMethod === "delivery") {
-      if (!value.city?.trim()) {
+      if (!value.deliveryRuleId) {
         ctx.addIssue({
           code: "custom",
-          path: ["city"],
-          message: "City is required for delivery.",
+          path: ["deliveryRuleId"],
+          message: "Delivery location is required.",
         });
       }
       if (!value.line1?.trim()) {

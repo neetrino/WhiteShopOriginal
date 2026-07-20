@@ -6,11 +6,13 @@ import { cache } from "react";
 import { getDb } from "@/db/client";
 import { storeSettings } from "@/db/schema";
 import {
+  parseFxRates,
   parseGlobalDiscount,
   parseIdentity,
   parseMaintenance,
   parseRevenueStatuses,
   parseStacking,
+  type StoreFxRates,
   type StoreGlobalDiscount,
   type StoreIdentity,
   type StoreMaintenance,
@@ -57,20 +59,26 @@ export const getStoreGlobalDiscount = cache(
   },
 );
 
+export const getStoreFxRates = cache(async (): Promise<StoreFxRates> => {
+  return parseFxRates(await getSettingValue("store.fxRates"));
+});
+
 export async function getAllStoreSettings(): Promise<{
   identity: StoreIdentity;
   maintenance: StoreMaintenance;
   stacking: StoreStacking;
   revenue: StoreRevenue;
+  fxRates: StoreFxRates;
   branding: Record<string, unknown>;
   social: Record<string, unknown>;
 }> {
-  const [identity, maintenance, stacking, revenue, branding, social] =
+  const [identity, maintenance, stacking, revenue, fxRates, branding, social] =
     await Promise.all([
       getStoreIdentity(),
       getStoreMaintenance(),
       getStoreStacking(),
       getStoreRevenue(),
+      getStoreFxRates(),
       getSettingValue("store.branding"),
       getSettingValue("store.social"),
     ]);
@@ -80,6 +88,7 @@ export async function getAllStoreSettings(): Promise<{
     maintenance,
     stacking,
     revenue,
+    fxRates,
     branding: branding ?? {},
     social: social ?? {},
   };

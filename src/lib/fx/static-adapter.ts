@@ -1,15 +1,22 @@
-import type { Currency } from "@/lib/money/currency";
+import { DEFAULT_RATES_FROM_AMD, type RatesFromAmd } from "@/lib/fx/default-rates";
 import type { ExchangeRateAdapter, ExchangeRateQuote } from "@/lib/fx/types";
+import type { Currency } from "@/lib/money/currency";
 
-const STATIC_RATES_FROM_AMD: Record<Exclude<Currency, "AMD">, string> = {
-  USD: "0.0026",
-  RUB: "0.24",
+export type StaticExchangeRateAdapterOptions = {
+  /** Loads admin-maintained rates; defaults used when omitted. */
+  getRatesFromAmd?: () => Promise<RatesFromAmd>;
 };
 
-/** Admin-maintained static rates placeholder until live FX source is chosen. */
-export function createStaticExchangeRateAdapter(): ExchangeRateAdapter {
+/** Admin-maintained rates (store settings) with static defaults as fallback. */
+export function createStaticExchangeRateAdapter(
+  options: StaticExchangeRateAdapterOptions = {},
+): ExchangeRateAdapter {
+  const getRatesFromAmd =
+    options.getRatesFromAmd ??
+    (async (): Promise<RatesFromAmd> => DEFAULT_RATES_FROM_AMD);
+
   return {
-    name: "static-admin-rates",
+    name: options.getRatesFromAmd ? "admin-store-rates" : "static-admin-rates",
     async getRate(base, quote): Promise<ExchangeRateQuote> {
       if (base === quote) {
         return {
@@ -22,12 +29,13 @@ export function createStaticExchangeRateAdapter(): ExchangeRateAdapter {
       }
 
       if (base === "AMD" && quote !== "AMD") {
+        const rates = await getRatesFromAmd();
         return {
           base,
           quote,
-          rate: STATIC_RATES_FROM_AMD[quote],
+          rate: rates[quote],
           asOf: new Date(),
-          source: "static",
+          source: options.getRatesFromAmd ? "store.settings" : "static",
         };
       }
 

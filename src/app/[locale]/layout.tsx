@@ -24,7 +24,7 @@ export default async function LocaleLayout({
   const locale: Locale = rawLocale;
 
   return (
-    <div lang={locale} className="min-h-full bg-gray-50">
+    <div lang={locale} className="flex min-h-dvh flex-1 flex-col bg-gray-50">
       {children}
     </div>
   );

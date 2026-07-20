@@ -12,4 +12,13 @@ describe("memory redis adapter", () => {
     await expect(redis.del("k")).resolves.toBe(1);
     await expect(redis.get("k")).resolves.toBeNull();
   });
+
+  it("getdel returns the value once and removes the key", async () => {
+    const redis = createMemoryRedisAdapter().getClient();
+
+    await redis.set("token", "user-1", { ex: 60 });
+    await expect(redis.getdel("token")).resolves.toBe("user-1");
+    await expect(redis.getdel("token")).resolves.toBeNull();
+    await expect(redis.get("token")).resolves.toBeNull();
+  });
 });

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getEnv } from "@/config/env";
+import { getStoreFxRates } from "@/features/settings/application/queries";
 import { createStubEmailAdapter } from "@/lib/email/stub-adapter";
 import type { EmailAdapter } from "@/lib/email/types";
 import { createStaticExchangeRateAdapter } from "@/lib/fx/static-adapter";
@@ -61,7 +62,12 @@ export function getProviders(): AppProviders {
     storage: createStorageAdapter(),
     email: createStubEmailAdapter(),
     payment: createCodPaymentAdapter(),
-    exchangeRates: createStaticExchangeRateAdapter(),
+    exchangeRates: createStaticExchangeRateAdapter({
+      getRatesFromAmd: async () => {
+        const rates = await getStoreFxRates();
+        return { USD: rates.usd, RUB: rates.rub };
+      },
+    }),
   };
 
   return cachedProviders;

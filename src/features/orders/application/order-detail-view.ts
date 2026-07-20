@@ -12,7 +12,6 @@ export type AdminOrderDetailItemView = {
   title: string;
   sku: string;
   imageUrl: string | null;
-  colorSize: string;
   quantity: number;
   unitPriceAmount: number;
   lineTotalAmount: number;
@@ -32,6 +31,7 @@ export type AdminOrderDetailView = {
   discountAmount: number;
   totalAmount: number;
   deliveryLabel: string | null;
+  couponCode: string | null;
   isPickup: boolean;
   storeName: string;
   shippingMethod: string;
@@ -77,7 +77,7 @@ export function toAdminOrderDetailView(
   storeName: string,
 ): AdminOrderDetailView {
   const { order, items, payments } = detail;
-  const isPickup = order.deliveryAmount === 0;
+  const isPickup = order.deliveryLabelSnapshot === "Store pickup";
   const latestPayment = payments[0] ?? null;
 
   return {
@@ -93,6 +93,7 @@ export function toAdminOrderDetailView(
     discountAmount: order.discountAmount,
     totalAmount: order.totalAmount,
     deliveryLabel: order.deliveryLabelSnapshot,
+    couponCode: order.promotionCodeSnapshot,
     isPickup,
     storeName,
     shippingMethod: isPickup
@@ -113,7 +114,6 @@ export function toAdminOrderDetailView(
       imageUrl: item.productImageKeySnapshot
         ? mediaPublicUrl(item.productImageKeySnapshot)
         : null,
-      colorSize: "—",
       quantity: item.quantity,
       unitPriceAmount: item.unitBaseAmount,
       lineTotalAmount: item.lineTotalAmount,

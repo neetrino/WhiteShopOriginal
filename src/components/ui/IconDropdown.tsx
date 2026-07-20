@@ -70,11 +70,30 @@ export function IconDropdown({
           className="absolute right-0 z-[100] mt-2 min-w-40 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-2xl"
         >
           <div
-            onClick={() => setOpen(false)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                setOpen(false);
+            onClick={(event) => {
+              // Closing unmounts menu children. Form submits (e.g. logout)
+              // must finish first; the following redirect navigates away.
+              const target = event.target;
+              if (
+                target instanceof Element &&
+                target.closest("form, button[type='submit']")
+              ) {
+                return;
               }
+              setOpen(false);
+            }}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== " ") {
+                return;
+              }
+              const target = event.target;
+              if (
+                target instanceof Element &&
+                target.closest("form, button[type='submit']")
+              ) {
+                return;
+              }
+              setOpen(false);
             }}
           >
             {children}

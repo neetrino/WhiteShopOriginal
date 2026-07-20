@@ -13,6 +13,11 @@ describe("exchange rate parsing", () => {
     expect(parseRateToFixed("0.24")).toBe(24_000_000n);
   });
 
+  it("accepts European comma decimals", () => {
+    expect(parseRateToFixed("0,2137")).toBe(21_370_000n);
+    expect(parseRateToFixed("1,5")).toBe(150_000_000n);
+  });
+
   it("rejects non-positive rates", () => {
     expect(() => parseRateToFixed("0")).toThrow(/positive/);
     expect(() => parseRateToFixed("-1")).toThrow(/Invalid/);

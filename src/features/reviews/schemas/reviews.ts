@@ -18,10 +18,14 @@ export const submitReviewSchema = z.object({
 
 export type SubmitReviewInput = z.infer<typeof submitReviewSchema>;
 
-export const moderateReviewSchema = z.object({
+export const updateReviewSchema = z.object({
   reviewId: z.string().uuid(),
-  status: z.enum(["APPROVED", "REJECTED"]),
-  reason: z.string().max(500).optional(),
+  rating: z
+    .number()
+    .int()
+    .min(REVIEW_RATING_MIN)
+    .max(REVIEW_RATING_MAX),
+  comment: z.string().max(REVIEW_COMMENT_MAX_LENGTH).optional(),
 });
 
-export type ModerateReviewInput = z.infer<typeof moderateReviewSchema>;
+export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;

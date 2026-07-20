@@ -17,20 +17,17 @@ type PersonalInformationFormProps = {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
   labels: {
     title: string;
     firstName: string;
     lastName: string;
     email: string;
-    phone: string;
     cancel: string;
     save: string;
     saving: string;
     firstNamePlaceholder: string;
     lastNamePlaceholder: string;
     emailPlaceholder: string;
-    phonePlaceholder: string;
   };
 };
 
@@ -41,7 +38,6 @@ export function PersonalInformationForm({
   firstName,
   lastName,
   email,
-  phone,
   labels,
 }: PersonalInformationFormProps) {
   const action = updateProfileAction.bind(null, locale);
@@ -50,15 +46,14 @@ export function PersonalInformationForm({
     firstName,
     lastName,
     email,
-    phone,
   });
 
   useEffect(() => {
-    setValues({ firstName, lastName, email, phone });
-  }, [firstName, lastName, email, phone]);
+    setValues({ firstName, lastName, email });
+  }, [firstName, lastName, email]);
 
   function resetToSaved(): void {
-    setValues({ firstName, lastName, email, phone });
+    setValues({ firstName, lastName, email });
   }
 
   return (
@@ -123,21 +118,6 @@ export function PersonalInformationForm({
             placeholder={labels.emailPlaceholder}
             className={FIELD_CLASS}
             autoComplete="email"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
-          {labels.phone}
-          <input
-            name="phone"
-            type="tel"
-            value={values.phone}
-            onChange={(event) =>
-              setValues((prev) => ({ ...prev, phone: event.target.value }))
-            }
-            placeholder={labels.phonePlaceholder}
-            className={FIELD_CLASS}
-            autoComplete="tel"
           />
         </label>
 

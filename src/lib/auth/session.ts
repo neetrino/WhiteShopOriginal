@@ -72,6 +72,11 @@ export async function destroySession(): Promise<void> {
   });
 }
 
+/** Revokes every session for the user (e.g. after password reset). */
+export async function revokeAllSessions(userId: string): Promise<void> {
+  await getDb().delete(sessions).where(eq(sessions.userId, userId));
+}
+
 /**
  * Revokes every session for the user except the caller's current browser session.
  * Used after credential changes so other devices must sign in again.
