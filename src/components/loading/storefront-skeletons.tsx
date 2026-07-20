@@ -14,7 +14,8 @@ export function CatalogGridSkeleton() {
   return (
     <div className={`${pulse} space-y-6`} aria-busy="true" aria-live="polite">
       <Block className="h-9 w-48" />
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-6 lg:grid-cols-3 xl:grid-cols-4">
+        <Block className="aspect-[4/3] rounded-lg" />
         <Block className="aspect-[4/3] rounded-lg" />
         <Block className="aspect-[4/3] rounded-lg" />
         <Block className="aspect-[4/3] rounded-lg" />

@@ -7,8 +7,15 @@ export default defineConfig({
     include: ["src/**/*.test.ts", "tests/unit/**/*.test.ts"],
   },
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
+    alias: [
+      {
+        find: "@/locales",
+        replacement: path.resolve(__dirname, "./locales"),
+      },
+      {
+        find: "@",
+        replacement: path.resolve(__dirname, "./src"),
+      },
+    ],
   },
 });

@@ -9,11 +9,23 @@ export const EXCHANGE_RATE_SCALE = 8;
 const RATE_FACTOR = 10n ** BigInt(EXCHANGE_RATE_SCALE);
 
 /**
+ * Normalizes admin/locale decimal input to a canonical rate string.
+ * Accepts European comma decimals (`0,2137` → `0.2137`).
+ */
+export function normalizeRateDecimalString(rate: string): string {
+  const trimmed = rate.trim().replace(/\s/g, "");
+  if (/^\d+,\d+$/.test(trimmed)) {
+    return trimmed.replace(",", ".");
+  }
+  return trimmed;
+}
+
+/**
  * Parses a positive decimal rate string into fixed-point bigint at EXCHANGE_RATE_SCALE.
  * Example: "0.0026" → 260000n (0.0026 * 10^8).
  */
 export function parseRateToFixed(rate: string): bigint {
-  const trimmed = rate.trim();
+  const trimmed = normalizeRateDecimalString(rate);
   if (!/^\d+(\.\d+)?$/.test(trimmed)) {
     throw new Error(`Invalid exchange rate: ${rate}`);
   }

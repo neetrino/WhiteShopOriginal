@@ -29,7 +29,6 @@ export default async function ContactPage({ params }: ContactPageProps) {
               name: dictionary.contact.name,
               email: dictionary.contact.email,
               phone: dictionary.contact.phone,
-              subject: dictionary.contact.subject,
               message: dictionary.contact.message,
               submit: dictionary.contact.submit,
               success: dictionary.contact.success,

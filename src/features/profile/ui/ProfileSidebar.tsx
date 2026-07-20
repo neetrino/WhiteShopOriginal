@@ -42,11 +42,6 @@ export function ProfileSidebar({
           <div className="rounded-xl border border-gray-200/60 bg-white/70 px-3.5 py-2.5 text-left text-xs font-medium break-words text-gray-700 shadow-sm sm:text-sm">
             {user.email}
           </div>
-          {user.phone ? (
-            <div className="rounded-xl border border-gray-200/60 bg-white/70 px-3 py-2.5 text-left text-xs font-medium text-gray-700 shadow-sm sm:text-sm">
-              {user.phone}
-            </div>
-          ) : null}
         </div>
       </div>
 

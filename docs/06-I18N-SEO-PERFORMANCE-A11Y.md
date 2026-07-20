@@ -15,18 +15,20 @@
 ## 2. Translation file contract
 
 ```text
-src/locales/
+locales/
   hy/
     common.json
     home.json
-    products.json
-    product.json
+    contact.json
+    about.json
     auth.json
     profile.json
     checkout.json
-    admin.json
-    validation.json
-    policies.json
+    cart.json
+    product.json
+    blog.json
+    catalog.json
+    wishlist.json
   en/
     ...same namespaces
   ru/

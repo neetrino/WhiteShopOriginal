@@ -6,6 +6,8 @@ export type RedisClient = {
     options?: { ex?: number; nx?: boolean },
   ): Promise<"OK" | null>;
   del(key: string): Promise<number>;
+  /** Atomically reads and deletes a key (single-use token consume). */
+  getdel(key: string): Promise<string | null>;
 };
 
 export type RedisAdapter = {

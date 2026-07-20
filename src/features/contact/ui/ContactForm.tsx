@@ -8,7 +8,6 @@ type ContactFormCopy = {
   name: string;
   email: string;
   phone: string;
-  subject: string;
   message: string;
   submit: string;
   success: string;
@@ -40,7 +39,7 @@ export function ContactForm({ copy }: ContactFormProps) {
 
   return (
     <form
-      className="relative space-y-6"
+      className="space-y-6"
       onSubmit={(event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -51,9 +50,7 @@ export function ContactForm({ copy }: ContactFormProps) {
             name: String(formData.get("name") ?? ""),
             email: String(formData.get("email") ?? ""),
             phone: String(formData.get("phone") ?? "") || undefined,
-            subject: String(formData.get("subject") ?? ""),
             message: String(formData.get("message") ?? ""),
-            companyWebsite: String(formData.get("companyWebsite") ?? ""),
           });
 
           if (!result.ok) {
@@ -65,21 +62,6 @@ export function ContactForm({ copy }: ContactFormProps) {
         });
       }}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden"
-      >
-        <label>
-          Company website
-          <input
-            type="text"
-            name="companyWebsite"
-            tabIndex={-1}
-            autoComplete="off"
-          />
-        </label>
-      </div>
-
       <label className="block text-sm font-medium text-gray-900">
         <span className="mb-2 block">{copy.name}</span>
         <input
@@ -108,17 +90,6 @@ export function ContactForm({ copy }: ContactFormProps) {
         <input
           name="phone"
           maxLength={40}
-          className={fieldClassName}
-          disabled={isPending}
-        />
-      </label>
-
-      <label className="block text-sm font-medium text-gray-900">
-        <span className="mb-2 block">{copy.subject}</span>
-        <input
-          name="subject"
-          required
-          maxLength={160}
           className={fieldClassName}
           disabled={isPending}
         />

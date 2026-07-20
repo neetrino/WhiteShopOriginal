@@ -191,7 +191,8 @@ async function seed(): Promise<void> {
     .insert(schema.deliveryRules)
     .values({
       id: seedIds.deliveryArmenia,
-      countryCode: "AM",
+      countryCode: "Armenia",
+      city: "Yerevan",
       priceAmount: 1500,
       freeThresholdAmount: 50000,
       estimatedDaysMin: 1,
@@ -203,7 +204,10 @@ async function seed(): Promise<void> {
       target: schema.deliveryRules.id,
       set: {
         isActive: true,
+        countryCode: "Armenia",
+        city: "Yerevan",
         priceAmount: 1500,
+        freeThresholdAmount: 50000,
         updatedAt: now,
       },
     });

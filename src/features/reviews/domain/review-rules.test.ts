@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildReviewAggregate,
-  canModerateReview,
+  canEditOwnReview,
   isReviewEligibleOrderStatus,
   isValidReviewRating,
   sanitizeReviewComment,
@@ -29,11 +29,10 @@ describe("review rules", () => {
     expect(isReviewEligibleOrderStatus("REFUNDED")).toBe(false);
   });
 
-  it("allows only pending → approved/rejected moderation", () => {
-    expect(canModerateReview("PENDING", "APPROVED")).toBe(true);
-    expect(canModerateReview("PENDING", "REJECTED")).toBe(true);
-    expect(canModerateReview("APPROVED", "REJECTED")).toBe(false);
-    expect(canModerateReview("PENDING", "PENDING")).toBe(false);
+  it("allows owners to edit reviews in any moderation state", () => {
+    expect(canEditOwnReview("PENDING")).toBe(true);
+    expect(canEditOwnReview("APPROVED")).toBe(true);
+    expect(canEditOwnReview("REJECTED")).toBe(true);
   });
 
   it("builds aggregates from approved ratings", () => {

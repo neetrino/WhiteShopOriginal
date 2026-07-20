@@ -47,6 +47,20 @@ export function createMemoryRedisAdapter(): RedisAdapter {
     async del(key) {
       return store.delete(key) ? 1 : 0;
     },
+    async getdel(key) {
+      const entry = store.get(key);
+      if (!entry) {
+        return null;
+      }
+
+      if (entry.expiresAt !== null && Date.now() >= entry.expiresAt) {
+        store.delete(key);
+        return null;
+      }
+
+      store.delete(key);
+      return entry.value;
+    },
   };
 
   return {

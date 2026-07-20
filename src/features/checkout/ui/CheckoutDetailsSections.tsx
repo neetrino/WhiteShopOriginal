@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/Card";
 import type { CheckoutPaymentMethod } from "@/features/checkout/domain/payment-methods";
 import { CheckoutPaymentMethods } from "@/features/checkout/ui/CheckoutPaymentMethods";
+import type { CheckoutDeliveryOption } from "@/features/delivery/application/queries";
 
 const FIELD_CLASS =
   "h-11 w-full rounded-lg border border-gray-200 px-3 text-gray-900 outline-none transition focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:bg-gray-50";
@@ -21,6 +22,8 @@ type CheckoutDetailsLabels = {
   phone: string;
   city: string;
   address: string;
+  deliveryLocation: string;
+  selectLocation: string;
   phonePlaceholder: string;
   cityPlaceholder: string;
   addressPlaceholder: string;
@@ -42,8 +45,9 @@ type CheckoutDetailsSectionsProps = {
   pending: boolean;
   shippingMethod: "pickup" | "delivery";
   onShippingMethodChange: (method: "pickup" | "delivery") => void;
-  city: string;
-  onCityChange: (city: string) => void;
+  deliveryOptions: CheckoutDeliveryOption[];
+  deliveryRuleId: string;
+  onDeliveryRuleChange: (ruleId: string) => void;
   paymentMethod: CheckoutPaymentMethod;
   onPaymentMethodChange: (method: CheckoutPaymentMethod) => void;
   paymentOptions: PaymentOption[];
@@ -59,8 +63,9 @@ export function CheckoutDetailsSections({
   pending,
   shippingMethod,
   onShippingMethodChange,
-  city,
-  onCityChange,
+  deliveryOptions,
+  deliveryRuleId,
+  onDeliveryRuleChange,
   paymentMethod,
   onPaymentMethodChange,
   paymentOptions,
@@ -169,7 +174,7 @@ export function CheckoutDetailsSections({
               checked={shippingMethod === "delivery"}
               onChange={() => onShippingMethodChange("delivery")}
               className="mr-4"
-              disabled={pending}
+              disabled={pending || deliveryOptions.length === 0}
             />
             <div className="flex-1">
               <div className="font-medium text-gray-900">{labels.delivery}</div>
@@ -188,17 +193,22 @@ export function CheckoutDetailsSections({
           </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
-              {labels.city}
-              <input
-                name="city"
+              {labels.deliveryLocation}
+              <select
+                name="deliveryRuleId"
                 required
-                value={city}
-                onChange={(event) => onCityChange(event.target.value)}
-                placeholder={labels.cityPlaceholder}
-                disabled={pending}
+                value={deliveryRuleId}
+                onChange={(event) => onDeliveryRuleChange(event.target.value)}
+                disabled={pending || deliveryOptions.length === 0}
                 className={FIELD_CLASS}
-                autoComplete="address-level2"
-              />
+              >
+                <option value="">{labels.selectLocation}</option>
+                {deliveryOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </label>
             <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
               {labels.address}

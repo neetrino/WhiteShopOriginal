@@ -23,18 +23,6 @@ import {
   paymentStatusBadgeClass,
 } from "@/features/admin/ui/status-badge";
 import { getAdminOrderByNumber } from "@/features/orders/application/queries";
-import {
-  getEligibleOrderStatuses,
-  isOrderStatus,
-} from "@/features/orders/domain/order-status";
-import {
-  getEligiblePaymentStatuses,
-  isPaymentStatus,
-} from "@/features/orders/domain/payment-status";
-import { ChangeOrderStatusForm } from "@/features/orders/ui/ChangeOrderStatusForm";
-import { ChangePaymentStatusForm } from "@/features/orders/ui/ChangePaymentStatusForm";
-import { ArchiveOrderButton } from "@/features/orders/ui/ArchiveOrderButton";
-import { AddOrderNoteForm } from "@/features/orders/ui/AddOrderNoteForm";
 import { isLocale } from "@/lib/i18n/config";
 
 type AdminOrderDetailPageProps = {
@@ -58,17 +46,8 @@ export default async function AdminOrderDetailPage({
     notFound();
   }
 
-  const { order, items, events, payments: paymentRows } = detail;
-  const currentStatus = isOrderStatus(order.status) ? order.status : null;
-  const eligible = currentStatus ? getEligibleOrderStatuses(currentStatus) : [];
-  const currentPaymentStatus = isPaymentStatus(order.paymentStatus)
-    ? order.paymentStatus
-    : null;
-  const eligiblePayments = currentPaymentStatus
-    ? getEligiblePaymentStatuses(currentPaymentStatus)
-    : [];
+  const { order, items, events } = detail;
   const address = order.shippingAddress;
-  const latestPayment = paymentRows[0] ?? null;
 
   return (
     <section>
@@ -127,10 +106,18 @@ export default async function AdminOrderDetailPage({
             Subtotal: {formatMoney(order.subtotalAmount, order.baseCurrency)}
           </p>
           <p className="text-sm text-gray-700">
-            Delivery: {formatMoney(order.deliveryAmount, order.baseCurrency)}
+            Delivery
+            {order.deliveryLabelSnapshot
+              ? ` (${order.deliveryLabelSnapshot})`
+              : ""}
+            : {formatMoney(order.deliveryAmount, order.baseCurrency)}
           </p>
           <p className="text-sm text-gray-700">
-            Discount: {formatMoney(order.discountAmount, order.baseCurrency)}
+            Coupon discount
+            {order.promotionCodeSnapshot
+              ? ` (${order.promotionCodeSnapshot})`
+              : ""}
+            : {formatMoney(order.discountAmount, order.baseCurrency)}
           </p>
           <p className="mt-2 text-sm font-semibold text-gray-900">
             Total: {formatMoney(order.totalAmount, order.baseCurrency)}
@@ -139,11 +126,6 @@ export default async function AdminOrderDetailPage({
             Placed{" "}
             {order.placedAt.toISOString().slice(0, 16).replace("T", " ")} UTC
           </p>
-          {order.deliveryLabelSnapshot ? (
-            <p className="mt-1 text-sm text-gray-600">
-              {order.deliveryLabelSnapshot}
-            </p>
-          ) : null}
         </Card>
       </div>
 
@@ -181,55 +163,6 @@ export default async function AdminOrderDetailPage({
           </table>
         </div>
       </Card>
-
-      <div className="mb-6 grid gap-4 md:grid-cols-2">
-        <div>
-          <h2 className={`mb-3 ${ADMIN_SECTION_TITLE}`}>Change order status</h2>
-          {currentStatus ? (
-            <ChangeOrderStatusForm
-              locale={locale}
-              orderNumber={order.orderNumber}
-              currentStatus={currentStatus}
-              eligibleStatuses={eligible}
-            />
-          ) : (
-            <p className="text-sm text-red-700">Unknown order status.</p>
-          )}
-        </div>
-
-        <div>
-          <h2 className={`mb-3 ${ADMIN_SECTION_TITLE}`}>
-            Change payment status
-          </h2>
-          {latestPayment ? (
-            <p className="mb-3 text-sm text-gray-600">
-              {latestPayment.provider} · {latestPayment.method} · attempt{" "}
-              {latestPayment.attemptNumber}
-            </p>
-          ) : (
-            <p className="mb-3 text-sm text-gray-600">No payment row yet.</p>
-          )}
-          {currentPaymentStatus ? (
-            <ChangePaymentStatusForm
-              locale={locale}
-              orderNumber={order.orderNumber}
-              currentStatus={currentPaymentStatus}
-              eligibleStatuses={eligiblePayments}
-            />
-          ) : (
-            <p className="text-sm text-red-700">Unknown payment status.</p>
-          )}
-        </div>
-      </div>
-
-      <div className="mb-6 grid gap-4 md:grid-cols-2">
-        <ArchiveOrderButton
-          locale={locale}
-          orderNumber={order.orderNumber}
-          isArchived={order.isArchived}
-        />
-        <AddOrderNoteForm locale={locale} orderNumber={order.orderNumber} />
-      </div>
 
       <Card className="p-6">
         <h2 className={`mb-4 ${ADMIN_SECTION_TITLE}`}>History</h2>

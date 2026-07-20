@@ -26,7 +26,6 @@ export function OrderDetailsDrawerItems({
             <tr>
               <th className={ADMIN_TABLE_TH}>Product</th>
               <th className={ADMIN_TABLE_TH}>SKU</th>
-              <th className={ADMIN_TABLE_TH}>Color / Size</th>
               <th className={ADMIN_TABLE_TH}>Qty</th>
               <th className={ADMIN_TABLE_TH}>Price</th>
               <th className={ADMIN_TABLE_TH}>Total</th>
@@ -47,7 +46,6 @@ export function OrderDetailsDrawerItems({
                   </div>
                 </td>
                 <td className={ADMIN_TABLE_TD}>{item.sku}</td>
-                <td className={ADMIN_TABLE_TD}>{item.colorSize}</td>
                 <td className={ADMIN_TABLE_TD}>{item.quantity}</td>
                 <td className={ADMIN_TABLE_TD}>
                   {formatOrderDrawerMoney(item.unitPriceAmount, item.currency)}

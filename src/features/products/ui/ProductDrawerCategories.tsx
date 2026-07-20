@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { ChevronDown } from "lucide-react";
+import { useId, useState, useTransition } from "react";
 
 import {
   ADMIN_INPUT,
@@ -27,10 +28,20 @@ export function ProductDrawerCategories({
   onCategoriesChange,
   onSelectedChange,
 }: ProductDrawerCategoriesProps) {
+  const listId = useId();
+  const [open, setOpen] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const selectedTitles = categories
+    .filter((category) => selectedIds.includes(category.id))
+    .map((category) => category.title);
+  const triggerLabel =
+    selectedTitles.length === 0
+      ? "Select categories"
+      : selectedTitles.join(", ");
 
   function toggleCategory(id: string): void {
     if (selectedIds.includes(id)) {
@@ -66,39 +77,70 @@ export function ProductDrawerCategories({
       onSelectedChange([...selectedIds, created.id]);
       setNewTitle("");
       setShowAdd(false);
+      setOpen(true);
     });
   }
 
   return (
     <div>
       <span className={ADMIN_LABEL}>Categories</span>
-      <div className="mt-1 max-h-40 space-y-2 overflow-y-auto rounded-xl border border-gray-200 px-3 py-2">
-        {categories.length === 0 ? (
-          <p className="text-sm text-gray-500">No categories yet.</p>
-        ) : (
-          categories.map((category) => (
-            <label
-              key={category.id}
-              className="flex items-center gap-2 text-sm text-gray-800"
-            >
-              <input
-                type="checkbox"
-                checked={selectedIds.includes(category.id)}
-                disabled={disabled || isPending}
-                onChange={() => toggleCategory(category.id)}
-                className="h-4 w-4 rounded border-gray-300"
-              />
-              <span>{category.title}</span>
-            </label>
-          ))
-        )}
+      <div className="mt-1">
+        <button
+          type="button"
+          disabled={disabled || isPending}
+          aria-expanded={open}
+          aria-controls={listId}
+          onClick={() => setOpen((value) => !value)}
+          className={`${ADMIN_INPUT} flex items-center justify-between gap-2 text-left disabled:opacity-50`}
+        >
+          <span
+            className={`min-w-0 flex-1 truncate ${
+              selectedTitles.length === 0 ? "text-gray-400" : "text-gray-900"
+            }`}
+          >
+            {triggerLabel}
+          </span>
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 text-gray-400 transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
+            aria-hidden
+          />
+        </button>
+
+        {open ? (
+          <div
+            id={listId}
+            className="mt-1 max-h-40 space-y-2 overflow-y-auto rounded-xl border border-gray-200 px-3 py-2"
+          >
+            {categories.length === 0 ? (
+              <p className="text-sm text-gray-500">No categories yet.</p>
+            ) : (
+              categories.map((category) => (
+                <label
+                  key={category.id}
+                  className="flex items-center gap-2 text-sm text-gray-800"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(category.id)}
+                    disabled={disabled || isPending}
+                    onChange={() => toggleCategory(category.id)}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <span>{category.title}</span>
+                </label>
+              ))
+            )}
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-2">
         <button
           type="button"
           disabled={disabled || isPending}
-          onClick={() => setShowAdd((open) => !open)}
+          onClick={() => setShowAdd((value) => !value)}
           className="inline-flex items-center rounded-xl border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-gray-400 hover:bg-gray-50 disabled:opacity-50"
         >
           + Add category

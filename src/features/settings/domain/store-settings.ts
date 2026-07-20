@@ -1,4 +1,9 @@
 import { ORDER_STATUSES, type OrderStatus } from "@/features/orders/domain/order-status";
+import { DEFAULT_RATES_FROM_AMD } from "@/lib/fx/default-rates";
+import {
+  normalizeRateDecimalString,
+  parseRateToFixed,
+} from "@/lib/money/convert";
 
 export const STORE_SETTING_KEYS = [
   "store.identity",
@@ -8,6 +13,7 @@ export const STORE_SETTING_KEYS = [
   "store.stacking",
   "store.revenue",
   "store.globalDiscount",
+  "store.fxRates",
 ] as const;
 
 export type StoreSettingKey = (typeof STORE_SETTING_KEYS)[number];
@@ -47,6 +53,29 @@ export type StoreGlobalDiscount = {
   /** Store-wide percentage discount (1–100), or null when disabled. */
   percentage: number | null;
 };
+
+/** Quote major units per 1 AMD (e.g. usd: "0.0026" → 1 AMD = 0.0026 USD). */
+export type StoreFxRates = {
+  usd: string;
+  rub: string;
+};
+
+export const DEFAULT_FX_RATES: StoreFxRates = {
+  usd: DEFAULT_RATES_FROM_AMD.USD,
+  rub: DEFAULT_RATES_FROM_AMD.RUB,
+};
+
+function isPositiveRateString(value: unknown): value is string {
+  if (typeof value !== "string") {
+    return false;
+  }
+  try {
+    parseRateToFixed(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export const DEFAULT_REVENUE_STATUSES: OrderStatus[] = [
   "CONFIRMED",
@@ -145,5 +174,21 @@ export function parseIdentity(value: unknown): StoreIdentity {
         : "support@example.com",
     phone:
       typeof record.phone === "string" ? record.phone.trim().slice(0, 40) : undefined,
+  };
+}
+
+export function parseFxRates(value: unknown): StoreFxRates {
+  if (!value || typeof value !== "object") {
+    return { ...DEFAULT_FX_RATES };
+  }
+
+  const record = value as Record<string, unknown>;
+  return {
+    usd: isPositiveRateString(record.usd)
+      ? normalizeRateDecimalString(record.usd)
+      : DEFAULT_FX_RATES.usd,
+    rub: isPositiveRateString(record.rub)
+      ? normalizeRateDecimalString(record.rub)
+      : DEFAULT_FX_RATES.rub,
   };
 }

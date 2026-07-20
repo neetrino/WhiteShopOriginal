@@ -11,6 +11,9 @@ export function createStubEmailAdapter(): EmailAdapter {
         id,
         to: message.to,
         subject: message.subject,
+        ...(process.env.NODE_ENV !== "production"
+          ? { text: message.text }
+          : {}),
       });
       return { id };
     },

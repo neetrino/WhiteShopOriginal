@@ -343,7 +343,7 @@ Feature-ը `Done` է միայն եթե՝
 1. Real PostgreSQL persistence/query-ը աշխատում է։
 2. Server validation և authorization-ը կան։
 3. Loading/error/empty/success/disabled states-ը կան։
-4. UI chrome dictionaries-ը (`src/locales`) լրացված են բոլոր supported locale-ների համար; admin-managed content-ի համար լրացված է առնվազն այն locale-ը, որով feature-ը publish է արվում (`DEC-017`)։
+4. UI chrome dictionaries-ը (`locales/`) լրացված են բոլոր supported locale-ների համար; admin-managed content-ի համար լրացված է առնվազն այն locale-ը, որով feature-ը publish է արվում (`DEC-017`)։
 5. Mobile/desktop և հիմնական keyboard flow-ը ստուգված են։
 6. Relevant unit/integration/E2E tests-ը անցնում են։
 7. Typecheck, lint և build regression չկա։

@@ -4,6 +4,7 @@ import {
 } from "@/features/products/ui/ProductReviewRating";
 import { ProductWriteReviewCta } from "@/features/products/ui/ProductWriteReviewCta";
 import type { ProductReviewsView } from "@/features/reviews/application/queries";
+import { buildReviewAggregate } from "@/features/reviews/domain/review-rules";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -28,12 +29,20 @@ export function ProductReviewsSection({
   isSignedIn,
   labels,
 }: ProductReviewsSectionProps) {
-  const { aggregate, reviews } = reviewsView;
+  const { reviews, viewerReview } = reviewsView;
+
+  // Public aggregate is approved-only; fold the viewer's pending/rejected
+  // rating into the PDP summary so their submission updates the header.
+  const ratings = reviews.map((review) => review.rating);
+  if (viewerReview && viewerReview.moderationStatus !== "APPROVED") {
+    ratings.push(viewerReview.rating);
+  }
+  const aggregate = buildReviewAggregate(ratings);
   const isEmpty = aggregate.count === 0;
 
   return (
-    <section className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(10rem,14rem)_1fr] md:gap-12">
+    <section className="flex w-full flex-col gap-8">
+      <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-[minmax(10rem,14rem)_1fr] md:gap-12">
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
             {labels.reviews}
@@ -51,11 +60,11 @@ export function ProductReviewsSection({
       </div>
 
       {reviews.length > 0 ? (
-        <ul className="flex flex-col gap-3">
+        <ul className="flex w-full flex-col gap-3">
           {reviews.map((review) => (
             <li
               key={review.id}
-              className="rounded-lg border border-gray-200 bg-white p-4"
+              className="w-full rounded-lg border border-gray-200 bg-white p-4"
             >
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-sm font-medium text-gray-900">
@@ -78,9 +87,22 @@ export function ProductReviewsSection({
         canSubmit={reviewsView.canSubmit}
         isSignedIn={isSignedIn}
         existingReviewId={reviewsView.existingReviewId}
+        viewerReview={reviewsView.viewerReview}
         showEmptyPrompt={isEmpty}
         labels={{
           writeReview: labels.writeReview,
+          writeReviewTitle: labels.writeReviewTitle,
+          editReview: labels.editReview,
+          editReviewTitle: labels.editReviewTitle,
+          ratingLabel: labels.ratingLabel,
+          yourReviewLabel: labels.yourReviewLabel,
+          reviewPlaceholder: labels.reviewPlaceholder,
+          submitReview: labels.submitReview,
+          submittingReview: labels.submittingReview,
+          saveReview: labels.saveReview,
+          savingReview: labels.savingReview,
+          cancelReview: labels.cancelReview,
+          reviewPending: labels.reviewPending,
           emptyPrompt: labels.emptyPrompt,
           alreadyReviewed: labels.alreadyReviewed,
           reviewsUnlock: labels.reviewsUnlock,

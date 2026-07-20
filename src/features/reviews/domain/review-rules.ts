@@ -48,16 +48,9 @@ export function isReviewEligibleOrderStatus(status: string): boolean {
   return (REVIEW_ELIGIBLE_ORDER_STATUSES as readonly string[]).includes(status);
 }
 
-/** Admin may only moderate from PENDING → APPROVED|REJECTED. */
-export function canModerateReview(
-  from: ReviewModerationStatus,
-  to: ReviewModerationStatus,
-): boolean {
-  if (from !== "PENDING") {
-    return false;
-  }
-
-  return to === "APPROVED" || to === "REJECTED";
+/** Owner may edit their review in any moderation state. */
+export function canEditOwnReview(status: ReviewModerationStatus): boolean {
+  return isReviewModerationStatus(status);
 }
 
 export type RatingDistribution = {

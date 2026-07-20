@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 import { getDb } from "@/db/client";
 import { orderItems, orders, products, reviews, users } from "@/db/schema";
@@ -18,12 +18,18 @@ export type PublicReview = {
   authorName: string;
 };
 
+export type ViewerReview = PublicReview & {
+  moderationStatus: string;
+};
+
 export type ProductReviewsView = {
   reviews: PublicReview[];
   aggregate: ReviewAggregate;
   canSubmit: boolean;
   eligibleOrderItemId: string | null;
   existingReviewId: string | null;
+  /** Viewer's own review (including PENDING), for PDP author visibility. */
+  viewerReview: ViewerReview | null;
 };
 
 async function findEligibleOrderItem(
@@ -94,24 +100,44 @@ export async function getProductReviewsView(
       canSubmit: false,
       eligibleOrderItemId: null,
       existingReviewId: null,
+      viewerReview: null,
     };
   }
 
   const [existing] = await getDb()
-    .select({ id: reviews.id })
+    .select({
+      id: reviews.id,
+      rating: reviews.rating,
+      comment: reviews.comment,
+      createdAt: reviews.createdAt,
+      moderationStatus: reviews.moderationStatus,
+      firstName: users.firstName,
+      lastName: users.lastName,
+    })
     .from(reviews)
+    .innerJoin(users, eq(reviews.userId, users.id))
     .where(
       and(eq(reviews.userId, viewerUserId), eq(reviews.productId, productId)),
     )
     .limit(1);
 
   if (existing) {
+    const viewerReview: ViewerReview = {
+      id: existing.id,
+      rating: existing.rating,
+      comment: existing.comment,
+      createdAt: existing.createdAt,
+      authorName: `${existing.firstName} ${existing.lastName.charAt(0)}.`,
+      moderationStatus: existing.moderationStatus,
+    };
+
     return {
       reviews: publicReviews,
       aggregate,
       canSubmit: false,
       eligibleOrderItemId: null,
       existingReviewId: existing.id,
+      viewerReview,
     };
   }
 
@@ -125,51 +151,6 @@ export async function getProductReviewsView(
     canSubmit: true,
     eligibleOrderItemId: eligible?.orderItemId ?? null,
     existingReviewId: null,
+    viewerReview: null,
   };
-}
-
-export type AdminReviewRow = {
-  id: string;
-  rating: number;
-  comment: string | null;
-  moderationStatus: string;
-  createdAt: Date;
-  productSku: string;
-  productTitle: string;
-  authorEmail: string;
-};
-
-/** Pending-first moderation queue for admin. */
-export async function listAdminReviews(): Promise<AdminReviewRow[]> {
-  const rows = await getDb()
-    .select({
-      id: reviews.id,
-      rating: reviews.rating,
-      comment: reviews.comment,
-      moderationStatus: reviews.moderationStatus,
-      createdAt: reviews.createdAt,
-      productSku: products.sku,
-      productTitle: products.translations,
-      authorEmail: users.email,
-    })
-    .from(reviews)
-    .innerJoin(products, eq(reviews.productId, products.id))
-    .innerJoin(users, eq(reviews.userId, users.id))
-    .where(inArray(reviews.moderationStatus, ["PENDING", "APPROVED", "REJECTED"]))
-    .orderBy(desc(reviews.createdAt))
-    .limit(100);
-
-  return rows.map((row) => ({
-    id: row.id,
-    rating: row.rating,
-    comment: row.comment,
-    moderationStatus: row.moderationStatus,
-    createdAt: row.createdAt,
-    productSku: row.productSku,
-    productTitle:
-      row.productTitle.en?.title ??
-      row.productTitle.hy?.title ??
-      row.productSku,
-    authorEmail: row.authorEmail,
-  }));
 }
