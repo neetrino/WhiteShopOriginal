@@ -2,15 +2,16 @@
 
 import {
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
+  type AnimationEvent,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
-export const SIDE_SHEET_ANIMATION_MS = 280;
+/** Must match `.animate-side-sheet-panel-*` duration in globals.css. */
+export const SIDE_SHEET_ANIMATION_MS = 300;
 
 type SideSheetProps = {
   open: boolean;
@@ -29,7 +30,7 @@ type SideSheetProps = {
 
 /**
  * Full-viewport-height side sheet docked to the left/right edge.
- * Portaled to `document.body` so admin overflow shells cannot clip or re-contain `fixed`.
+ * Open/close use the same 300ms keyframe motion (mirrored slide).
  */
 export function SideSheet({
   open,
@@ -44,51 +45,37 @@ export function SideSheet({
 }: SideSheetProps) {
   const [mounted, setMounted] = useState(false);
   const [rendered, setRendered] = useState(false);
-  const [entered, setEntered] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const backdropRef = useRef<HTMLButtonElement>(null);
+  const [exiting, setExiting] = useState(false);
+  const [displayChildren, setDisplayChildren] = useState(children);
+  const [displayAriaLabel, setDisplayAriaLabel] = useState(ariaLabel);
+  const exitDoneRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    if (!open) return;
+    setDisplayChildren(children);
+    setDisplayAriaLabel(ariaLabel);
+  }, [open, children, ariaLabel]);
+
+  useEffect(() => {
     if (open) {
-      setEntered(false);
+      exitDoneRef.current = false;
+      setExiting(false);
       setRendered(true);
       return;
     }
 
-    setEntered(false);
-    const timer = setTimeout(() => setRendered(false), SIDE_SHEET_ANIMATION_MS);
-    return () => clearTimeout(timer);
-  }, [open]);
+    if (!rendered) return;
 
-  useLayoutEffect(() => {
-    if (!open || !rendered) {
-      return;
-    }
+    setExiting(true);
+    const timer = window.setTimeout(() => {
+      finishExit();
+    }, SIDE_SHEET_ANIMATION_MS);
 
-    const panel = panelRef.current;
-    const backdrop = backdropRef.current;
-    if (panel) {
-      void panel.getBoundingClientRect();
-    }
-    if (backdrop) {
-      void backdrop.getBoundingClientRect();
-    }
-
-    let frame2 = 0;
-    const frame1 = requestAnimationFrame(() => {
-      frame2 = requestAnimationFrame(() => {
-        setEntered(true);
-      });
-    });
-
-    return () => {
-      cancelAnimationFrame(frame1);
-      cancelAnimationFrame(frame2);
-    };
+    return () => window.clearTimeout(timer);
   }, [open, rendered]);
 
   useEffect(() => {
@@ -108,10 +95,24 @@ export function SideSheet({
     };
   }, [rendered, onClose]);
 
+  function finishExit(): void {
+    if (exitDoneRef.current) return;
+    exitDoneRef.current = true;
+    setRendered(false);
+    setExiting(false);
+  }
+
+  function handlePanelAnimationEnd(
+    event: AnimationEvent<HTMLDivElement>,
+  ): void {
+    if (event.target !== event.currentTarget) return;
+    if (!event.animationName.includes("side-sheet-panel-out")) return;
+    finishExit();
+  }
+
   if (!mounted || !rendered) return null;
 
   const isRight = side === "right";
-  const closedTransform = isRight ? "translate-x-full" : "-translate-x-full";
   const edgeClass = isRight ? "right-0" : "left-0";
   const panelRadius = isRight
     ? "rounded-l-[var(--radius)]"
@@ -119,29 +120,35 @@ export function SideSheet({
   const closePosition = isRight ? "right-full" : "left-full";
   const CloseChevron = isRight ? ChevronLeft : ChevronRight;
 
+  const backdropClass = exiting
+    ? "animate-sheet-backdrop-out"
+    : "animate-sheet-backdrop-in";
+  const panelMotionClass = exiting
+    ? isRight
+      ? "animate-side-sheet-panel-out-right"
+      : "animate-side-sheet-panel-out-left"
+    : isRight
+      ? "animate-side-sheet-panel-in-right"
+      : "animate-side-sheet-panel-in-left";
+
   return createPortal(
     <div
       className={`fixed inset-0 ${zIndexClassName}`}
       role="dialog"
       aria-modal="true"
-      aria-label={ariaLabel}
+      aria-label={displayAriaLabel}
     >
       <button
-        ref={backdropRef}
         type="button"
-        className={`absolute inset-0 bg-black/40 transition-opacity ease-out ${
+        className={`absolute inset-0 bg-black/40 ${
           backdropBlur ? "backdrop-blur-sm" : ""
-        } ${entered ? "opacity-100" : "opacity-0"}`}
-        style={{ transitionDuration: `${SIDE_SHEET_ANIMATION_MS}ms` }}
+        } ${backdropClass}`}
         aria-label="Close"
         onClick={onClose}
       />
       <div
-        ref={panelRef}
-        className={`fixed inset-y-0 ${edgeClass} z-[1] flex h-dvh max-h-dvh transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          entered ? "translate-x-0" : closedTransform
-        } ${panelClassName}`}
-        style={{ transitionDuration: `${SIDE_SHEET_ANIMATION_MS}ms` }}
+        className={`fixed inset-y-0 ${edgeClass} z-[1] flex h-dvh max-h-dvh ${panelMotionClass} ${panelClassName}`}
+        onAnimationEnd={handlePanelAnimationEnd}
       >
         {closeVariant === "edge-tab" ? (
           <button
@@ -174,7 +181,7 @@ export function SideSheet({
           className={`flex h-full min-h-0 w-full flex-col overflow-hidden bg-white shadow-2xl ${panelRadius}`}
           onClick={(event) => event.stopPropagation()}
         >
-          {children}
+          {displayChildren}
         </div>
       </div>
     </div>,

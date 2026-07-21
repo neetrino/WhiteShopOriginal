@@ -128,6 +128,126 @@ body {
   }
 }
 
+/* Sheets — identical duration + easing for open and close */
+@keyframes sheet-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes bottom-sheet-panel-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes bottom-sheet-panel-out {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes side-sheet-panel-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes side-sheet-panel-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes side-sheet-panel-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes side-sheet-panel-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-sheet-backdrop-in {
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both sheet-backdrop-in;
+}
+
+.animate-sheet-backdrop-out {
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both sheet-backdrop-out;
+}
+
+.animate-bottom-sheet-panel-in {
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both bottom-sheet-panel-in;
+}
+
+.animate-bottom-sheet-panel-out {
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both bottom-sheet-panel-out;
+}
+
+.animate-side-sheet-panel-in-right {
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both side-sheet-panel-in-right;
+}
+
+.animate-side-sheet-panel-out-right {
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both
+    side-sheet-panel-out-right;
+}
+
+.animate-side-sheet-panel-in-left {
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both side-sheet-panel-in-left;
+}
+
+.animate-side-sheet-panel-out-left {
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both side-sheet-panel-out-left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-sheet-backdrop-in,
+  .animate-sheet-backdrop-out,
+  .animate-bottom-sheet-panel-in,
+  .animate-bottom-sheet-panel-out,
+  .animate-side-sheet-panel-in-right,
+  .animate-side-sheet-panel-out-right,
+  .animate-side-sheet-panel-in-left,
+  .animate-side-sheet-panel-out-left {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}
+
 /**
  * MaMarie-style profile desktop shell:
  * lock viewport height, hide footer, scroll only the content column.
@@ -152,5 +272,20 @@ body {
 
   .storefront-shell:has(.profile-desktop-page) .storefront-footer {
     display: none;
+  }
+}
+
+/**
+ * MaMarie-style mobile profile page: slightly cooler canvas behind hub cards.
+ * Bottom navbar clearance stays via storefront `pb-24` — do not change nav.
+ */
+@media (max-width: 1023px) {
+  .storefront-shell:has(.profile-mobile-page) .storefront-main {
+    padding-top: 0.5rem;
+  }
+
+  .profile-mobile-tab-sheet-scroll {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 }
