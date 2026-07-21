@@ -298,4 +298,28 @@ body {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
   }
+
+  /* Dashboard + orders: more inset from the sheet edges. */
+  .profile-mobile-tab-sheet-scroll:has(> div > .profile-sheet-keep-frame) {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  /**
+   * Form sheets: flush outer cards + compact horizontal inset.
+   * Dashboard + orders (`.profile-sheet-keep-frame`) keep their own padding/frames.
+   */
+  .profile-mobile-tab-sheet-scroll
+    > div
+    > *:not(.profile-sheet-keep-frame)
+    > .rounded-2xl,
+  .profile-mobile-tab-sheet-scroll
+    > div
+    > *:not(.profile-sheet-keep-frame)
+    > .rounded-lg {
+    border-width: 0;
+    box-shadow: none;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
 }

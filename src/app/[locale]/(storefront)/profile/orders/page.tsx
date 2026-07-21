@@ -78,7 +78,7 @@ export default async function OrdersPage({
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
-    <section className="space-y-6">
+    <section className="profile-sheet-keep-frame space-y-6">
       <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
         {dictionary.profile.orders}
       </h1>

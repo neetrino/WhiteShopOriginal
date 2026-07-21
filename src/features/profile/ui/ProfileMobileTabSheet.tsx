@@ -282,7 +282,7 @@ export function ProfileMobileTabSheet({
         </div>
         <div
           ref={scrollAreaRef}
-          className={`profile-mobile-tab-sheet-scroll min-h-0 flex-1 overscroll-contain px-5 pt-1 ${
+          className={`profile-mobile-tab-sheet-scroll min-h-0 flex-1 overscroll-contain px-3 pt-1 ${
             isDragging || phase === "exit-drag"
               ? "touch-none overflow-hidden"
               : "overflow-y-auto"
