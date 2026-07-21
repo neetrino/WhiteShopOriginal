@@ -6,7 +6,9 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import {
+  ConfirmDialog,
+} from "@/components/ui/ConfirmDialog";
 import { ADMIN_INPUT } from "@/features/admin/ui/admin-form-classes";
 import {
   ADMIN_BADGE,
@@ -109,11 +111,17 @@ export function AdminUsersView({
 
   function confirmDeleteSelected(): void {
     const userIds = [...selected];
-    runAction(async () => {
-      const result = await bulkAnonymizeUsersAction(locale, { userIds });
-      if (!result.ok) throw new Error(result.error.message);
-      setSelected(new Set());
-      setConfirmOpen(false);
+    startTransition(async () => {
+      setError(null);
+      try {
+        const result = await bulkAnonymizeUsersAction(locale, { userIds });
+        if (!result.ok) throw new Error(result.error.message);
+        setSelected(new Set());
+        setConfirmOpen(false);
+        router.refresh();
+      } catch (caught) {
+        setError(caught instanceof Error ? caught.message : "Action failed.");
+      }
     });
   }
 

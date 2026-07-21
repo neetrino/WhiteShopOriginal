@@ -105,15 +105,21 @@ export function AdminProductsTable({
   function confirmDelete(): void {
     if (!pendingDelete) return;
     const productIds = pendingDelete.productIds;
-    runAction(async () => {
-      const result = await softDeleteProductsAction(locale, { productIds });
-      if (!result.ok) throw new Error(result.error.message);
-      setSelected((prev) => {
-        const next = new Set(prev);
-        for (const id of productIds) next.delete(id);
-        return next;
-      });
-      setPendingDelete(null);
+    startTransition(async () => {
+      setError(null);
+      try {
+        const result = await softDeleteProductsAction(locale, { productIds });
+        if (!result.ok) throw new Error(result.error.message);
+        setSelected((prev) => {
+          const next = new Set(prev);
+          for (const id of productIds) next.delete(id);
+          return next;
+        });
+        setPendingDelete(null);
+        router.refresh();
+      } catch (caught) {
+        setError(caught instanceof Error ? caught.message : "Action failed.");
+      }
     });
   }
 

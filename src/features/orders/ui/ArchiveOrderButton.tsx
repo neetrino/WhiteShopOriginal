@@ -5,7 +5,9 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import {
+  ConfirmDialog,
+} from "@/components/ui/ConfirmDialog";
 import { ADMIN_SECTION_TITLE } from "@/features/admin/ui/admin-form-classes";
 import { archiveOrderAction } from "@/features/orders/application/archive-order";
 

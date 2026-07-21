@@ -44,7 +44,11 @@ export function HeroSlideControls({
         setError(result.error?.message ?? "Action failed.");
         return;
       }
-      if (options?.closeConfirm) setConfirmOpen(false);
+      if (options?.closeConfirm) {
+        setConfirmOpen(false);
+        router.refresh();
+        return;
+      }
       router.refresh();
     });
   }

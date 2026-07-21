@@ -5,7 +5,9 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import {
+  ConfirmDialog,
+} from "@/components/ui/ConfirmDialog";
 import {
   ADMIN_TABLE,
   ADMIN_TABLE_CARD,

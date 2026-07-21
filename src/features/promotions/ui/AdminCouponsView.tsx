@@ -99,12 +99,18 @@ export function AdminCouponsView({ locale, coupons }: AdminCouponsViewProps) {
   function confirmDelete(): void {
     if (!pendingDelete) return;
     const promoId = pendingDelete.id;
-    runAction(async () => {
-      const result = await deletePromotionAction(locale, promoId);
-      if (!result.ok) {
-        throw new Error(result.error.message);
+    startTransition(async () => {
+      setError(null);
+      try {
+        const result = await deletePromotionAction(locale, promoId);
+        if (!result.ok) {
+          throw new Error(result.error.message);
+        }
+        setPendingDelete(null);
+        router.refresh();
+      } catch (caught) {
+        setError(caught instanceof Error ? caught.message : "Action failed.");
       }
-      setPendingDelete(null);
     });
   }
 

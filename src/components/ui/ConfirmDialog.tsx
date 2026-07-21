@@ -2,14 +2,14 @@
 
 import {
   useEffect,
-  useLayoutEffect,
-  useRef,
   useState,
+  type AnimationEvent,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 
-export const CONFIRM_DIALOG_ANIMATION_MS = 280;
+/** Keep mounted through exit keyframes (Mobee dialog out is 280ms; fallback 320ms). */
+const CONFIRM_DIALOG_EXIT_MS = 320;
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -31,7 +31,8 @@ export function deleteConfirmDescription(
 }
 
 /**
- * Centered confirmation modal: rounded white card, cancel outline + red confirm.
+ * Centered confirmation modal with Mobee-style keyframe open/close:
+ * backdrop fade + panel rise/scale in, mirrored settle-out on dismiss.
  */
 export function ConfirmDialog({
   open,
@@ -45,47 +46,40 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const [mounted, setMounted] = useState(false);
   const [rendered, setRendered] = useState(false);
-  const [entered, setEntered] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const backdropRef = useRef<HTMLButtonElement>(null);
+  const [exiting, setExiting] = useState(false);
+  const [displayTitle, setDisplayTitle] = useState(title);
+  const [displayDescription, setDisplayDescription] = useState(description);
+  const [displayConfirmLabel, setDisplayConfirmLabel] = useState(confirmLabel);
+  const [displayCancelLabel, setDisplayCancelLabel] = useState(cancelLabel);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    if (!open) return;
+    setDisplayTitle(title);
+    setDisplayDescription(description);
+    setDisplayConfirmLabel(confirmLabel);
+    setDisplayCancelLabel(cancelLabel);
+  }, [open, title, description, confirmLabel, cancelLabel]);
+
+  useEffect(() => {
     if (open) {
-      setEntered(false);
+      setExiting(false);
       setRendered(true);
       return;
     }
 
-    setEntered(false);
-    const timer = setTimeout(
-      () => setRendered(false),
-      CONFIRM_DIALOG_ANIMATION_MS,
-    );
-    return () => clearTimeout(timer);
-  }, [open]);
+    if (!rendered) return;
 
-  useLayoutEffect(() => {
-    if (!open || !rendered) return;
+    setExiting(true);
+    const timer = window.setTimeout(() => {
+      setRendered(false);
+      setExiting(false);
+    }, CONFIRM_DIALOG_EXIT_MS);
 
-    // Commit the closed styles before animating open (avoids first-open skip).
-    const panel = panelRef.current;
-    const backdrop = backdropRef.current;
-    if (panel) void panel.getBoundingClientRect();
-    if (backdrop) void backdrop.getBoundingClientRect();
-
-    let frame2 = 0;
-    const frame1 = requestAnimationFrame(() => {
-      frame2 = requestAnimationFrame(() => setEntered(true));
-    });
-
-    return () => {
-      cancelAnimationFrame(frame1);
-      cancelAnimationFrame(frame2);
-    };
+    return () => window.clearTimeout(timer);
   }, [open, rendered]);
 
   useEffect(() => {
@@ -105,9 +99,27 @@ export function ConfirmDialog({
     };
   }, [rendered, isPending, onClose]);
 
+  function finishExit(): void {
+    setRendered(false);
+    setExiting(false);
+  }
+
+  function handlePanelAnimationEnd(
+    event: AnimationEvent<HTMLDivElement>,
+  ): void {
+    if (event.target !== event.currentTarget) return;
+    if (!event.animationName.includes("confirm-dialog-panel-out")) return;
+    finishExit();
+  }
+
   if (!mounted || !rendered) return null;
 
-  const ease = "cubic-bezier(0.22, 1, 0.36, 1)";
+  const backdropClass = exiting
+    ? "animate-confirm-dialog-backdrop-out"
+    : "animate-confirm-dialog-backdrop-in";
+  const panelClass = exiting
+    ? "animate-confirm-dialog-panel-out"
+    : "animate-confirm-dialog-panel-in";
 
   return createPortal(
     <div
@@ -118,44 +130,29 @@ export function ConfirmDialog({
       aria-describedby="confirm-dialog-description"
     >
       <button
-        ref={backdropRef}
         type="button"
-        className={`absolute inset-0 bg-black/40 transition-opacity ${
-          entered ? "opacity-100" : "opacity-0"
-        }`}
-        style={{
-          transitionDuration: `${CONFIRM_DIALOG_ANIMATION_MS}ms`,
-          transitionTimingFunction: ease,
-        }}
-        aria-label={cancelLabel}
+        className={`absolute inset-0 bg-black/40 ${backdropClass}`}
+        aria-label={displayCancelLabel}
         disabled={isPending}
         onClick={() => {
           if (!isPending) onClose();
         }}
       />
       <div
-        ref={panelRef}
-        className={`relative z-[1] w-full max-w-md rounded-3xl bg-white p-6 shadow-xl transition-[opacity,transform] sm:p-7 ${
-          entered
-            ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-3 scale-[0.96] opacity-0"
-        }`}
-        style={{
-          transitionDuration: `${CONFIRM_DIALOG_ANIMATION_MS}ms`,
-          transitionTimingFunction: ease,
-        }}
+        className={`relative z-[1] w-full max-w-md rounded-3xl bg-white p-6 shadow-xl sm:p-7 ${panelClass}`}
+        onAnimationEnd={handlePanelAnimationEnd}
       >
         <h2
           id="confirm-dialog-title"
           className="text-xl font-semibold text-gray-900"
         >
-          {title}
+          {displayTitle}
         </h2>
         <p
           id="confirm-dialog-description"
           className="mt-3 text-sm leading-relaxed text-gray-600"
         >
-          {description}
+          {displayDescription}
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-end gap-3">
           <button
@@ -164,7 +161,7 @@ export function ConfirmDialog({
             onClick={onClose}
             className="inline-flex h-10 items-center justify-center rounded-full border border-gray-200 bg-white px-5 text-sm font-medium text-gray-800 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
-            {cancelLabel}
+            {displayCancelLabel}
           </button>
           <button
             type="button"
@@ -172,7 +169,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             className="inline-flex h-10 items-center justify-center rounded-full bg-red-600 px-5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
           >
-            {isPending ? "…" : confirmLabel}
+            {isPending ? "…" : displayConfirmLabel}
           </button>
         </div>
       </div>
