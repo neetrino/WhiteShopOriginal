@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useTransition } from "react";
-import { Minus, Plus, ShoppingCart, X } from "lucide-react";
+import { ArrowRight, Minus, Plus, ShoppingCart, X } from "lucide-react";
 
 import { AppLink } from "@/components/ui/AppLink";
 import { SideSheet } from "@/components/ui/SideSheet";
@@ -53,6 +53,7 @@ export function CartDrawer({
   const [pending, startTransition] = useTransition();
   const labels = dictionary.cartDrawer;
   const badgeCount = view?.itemCount ?? itemCount;
+  const hasItems = Boolean(view && view.items.length > 0);
 
   function prefetchDrawerView(): void {
     if (view || loadingView || open) {
@@ -104,95 +105,132 @@ export function CartDrawer({
         open={open}
         onClose={closeDrawer}
         ariaLabel={labels.title}
-        panelClassName="w-full max-w-md"
+        panelClassName="w-[87%] max-w-[420px]"
         zIndexClassName="z-[200]"
+        backdropBlur
       >
-        <div className="px-6 pt-6 pb-4">
-          <h2 className="text-2xl font-semibold tracking-tight text-gray-900">
+        <div className="border-b border-gray-100 px-6 py-5">
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">
             {labels.title}
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            {loadingView && !view
-              ? labels.loading
-              : formatItemCount(badgeCount, labels)}
-          </p>
+          {hasItems ? (
+            <p className="mt-1 text-sm text-gray-500">
+              {formatItemCount(badgeCount, labels)}
+            </p>
+          ) : null}
         </div>
 
         <div
-          className={`min-h-0 flex-1 overflow-y-auto px-6 ${pending || loadingView ? "opacity-70" : ""}`}
+          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 ${
+            pending || loadingView ? "opacity-70" : ""
+          }`}
         >
           {loadingView && !view ? (
-            <p className="py-10 text-sm text-gray-500">{labels.loading}</p>
+            <div className="space-y-3">
+              <div className="h-24 animate-pulse rounded-[20px] bg-gray-100" />
+              <div className="h-24 animate-pulse rounded-[20px] bg-gray-100" />
+            </div>
           ) : !view || view.items.length === 0 ? (
-            <p className="py-10 text-sm text-gray-500">{labels.empty}</p>
+            <div className="flex h-full min-h-[280px] flex-col items-center justify-center px-2 text-center">
+              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                <ShoppingCart className="h-12 w-12" aria-hidden />
+              </div>
+              <p className="mt-5 text-xl font-bold text-gray-900">
+                {labels.empty}
+              </p>
+              <p className="mt-2 max-w-[20rem] text-sm leading-relaxed text-gray-500">
+                {labels.emptyDescription}
+              </p>
+              <AppLink
+                href={`/${locale}/products`}
+                prefetchPolicy="intent"
+                onClick={closeDrawer}
+                className="relative mt-6 inline-flex min-h-[50px] w-full max-w-sm items-center rounded-full bg-gray-900 py-1.5 pr-1.5 pl-5 text-sm font-semibold text-white transition-colors hover:bg-black"
+              >
+                <span className="pointer-events-none absolute inset-0 flex items-center justify-center px-12">
+                  {labels.emptyCta}
+                </span>
+                <span className="relative ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15">
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </span>
+              </AppLink>
+            </div>
           ) : (
-            <ul className="divide-y divide-gray-100">
+            <ul className="space-y-3">
               {view.items.map((item) => (
-                <li key={item.id} className="flex gap-4 py-5">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
-                    {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.title}
-                        fill
-                        sizes="80px"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
-                        —
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate text-base text-gray-900">
-                          {item.title}
-                        </p>
-                        <p className="mt-1 text-base font-semibold text-gray-900">
-                          {item.unitPriceFormatted}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeCartItem(item.id)}
-                        className="shrink-0 text-gray-400 transition-colors hover:text-gray-700"
-                        aria-label={labels.removeItem}
-                        disabled={pending}
-                      >
-                        <X className="h-4 w-4" aria-hidden="true" />
-                      </button>
+                <li
+                  key={item.id}
+                  className="rounded-[20px] border border-gray-200 bg-white p-3 shadow-sm"
+                >
+                  <div className="flex gap-3">
+                    <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-gray-100 bg-gray-50">
+                      {item.imageUrl ? (
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.title}
+                          fill
+                          sizes="96px"
+                          className="object-contain p-1"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
+                          —
+                        </div>
+                      )}
                     </div>
 
-                    <div className="mt-auto flex justify-end pt-3">
-                      <div className="inline-flex items-center gap-3 rounded-xl bg-gray-900 px-3 py-1.5 text-white">
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="line-clamp-2 text-sm font-medium text-gray-900">
+                            {item.title}
+                          </p>
+                          <p className="mt-1 text-sm font-semibold text-gray-900">
+                            {item.lineTotalFormatted}
+                          </p>
+                          <p className="mt-0.5 text-xs text-gray-500">
+                            {item.unitPriceFormatted} × {item.quantity}
+                          </p>
+                        </div>
                         <button
                           type="button"
-                          onClick={() =>
-                            changeQuantity(item.id, item.quantity - 1)
-                          }
-                          className="flex h-6 w-6 items-center justify-center text-white/90 transition-opacity hover:opacity-80"
-                          aria-label={labels.decreaseQuantity}
+                          onClick={() => removeCartItem(item.id)}
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                          aria-label={labels.removeItem}
                           disabled={pending}
                         >
-                          <Minus className="h-3.5 w-3.5" aria-hidden="true" />
+                          <X className="h-4 w-4" aria-hidden />
                         </button>
-                        <span className="min-w-4 text-center text-sm font-medium tabular-nums">
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            changeQuantity(item.id, item.quantity + 1)
-                          }
-                          className="flex h-6 w-6 items-center justify-center text-white/90 transition-opacity hover:opacity-80"
-                          aria-label={labels.increaseQuantity}
-                          disabled={pending}
-                        >
-                          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-                        </button>
+                      </div>
+
+                      <div className="mt-auto flex justify-end pt-3">
+                        <div className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-sky-50/70 px-1 py-0.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              changeQuantity(item.id, item.quantity - 1)
+                            }
+                            className="flex h-7 w-7 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-white"
+                            aria-label={labels.decreaseQuantity}
+                            disabled={pending}
+                          >
+                            <Minus className="h-3.5 w-3.5" aria-hidden />
+                          </button>
+                          <span className="min-w-5 text-center text-sm font-medium tabular-nums text-gray-900">
+                            {item.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              changeQuantity(item.id, item.quantity + 1)
+                            }
+                            className="flex h-7 w-7 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-white"
+                            aria-label={labels.increaseQuantity}
+                            disabled={pending}
+                          >
+                            <Plus className="h-3.5 w-3.5" aria-hidden />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -202,7 +240,7 @@ export function CartDrawer({
           )}
         </div>
 
-        <div className="border-t border-gray-200 px-6 pt-5 pb-6">
+        <div className="border-t border-gray-200 px-6 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
           <dl className="space-y-2 text-sm">
             <div className="flex items-center justify-between text-gray-600">
               <dt>{labels.subtotal}</dt>
@@ -216,17 +254,17 @@ export function CartDrawer({
                 {view?.shippingFormatted ?? "—"}
               </dd>
             </div>
-            <div className="flex items-center justify-between pt-1 text-base font-semibold text-gray-900">
+            <div className="flex items-center justify-between pt-1 text-base font-bold text-gray-900">
               <dt>{labels.total}</dt>
               <dd className="tabular-nums">{view?.totalFormatted ?? "—"}</dd>
             </div>
           </dl>
 
-          {view && view.items.length > 0 ? (
+          {hasItems ? (
             <AppLink
               href={`/${locale}/checkout`}
               prefetchPolicy="intent"
-              className="mt-5 flex w-full items-center justify-center rounded-full bg-gray-900 px-4 py-3.5 text-sm font-semibold tracking-wide text-white uppercase transition-colors hover:bg-black"
+              className="mt-5 flex min-h-[50px] w-full items-center justify-center rounded-full bg-gray-900 px-4 text-sm font-semibold text-white transition-colors hover:bg-black"
               onClick={closeDrawer}
             >
               {labels.checkout}

@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 export const SIDE_SHEET_ANIMATION_MS = 280;
 
@@ -21,6 +21,10 @@ type SideSheetProps = {
   panelClassName?: string;
   side?: "left" | "right";
   zIndexClassName?: string;
+  /** External circle (default) or MaMarie-style edge tab. */
+  closeVariant?: "circle" | "edge-tab";
+  /** Soften backdrop (cart-style). */
+  backdropBlur?: boolean;
 };
 
 /**
@@ -35,6 +39,8 @@ export function SideSheet({
   panelClassName = "w-full max-w-md",
   side = "right",
   zIndexClassName = "z-50",
+  closeVariant = "circle",
+  backdropBlur = false,
 }: SideSheetProps) {
   const [mounted, setMounted] = useState(false);
   const [rendered, setRendered] = useState(false);
@@ -48,7 +54,6 @@ export function SideSheet({
 
   useEffect(() => {
     if (open) {
-      // Always start from the closed visual state before animating in.
       setEntered(false);
       setRendered(true);
       return;
@@ -64,8 +69,6 @@ export function SideSheet({
       return;
     }
 
-    // Force the browser to commit the closed transform/opacity before we
-    // flip to the open state — otherwise the first open skips the transition.
     const panel = panelRef.current;
     const backdrop = backdropRef.current;
     if (panel) {
@@ -110,11 +113,11 @@ export function SideSheet({
   const isRight = side === "right";
   const closedTransform = isRight ? "translate-x-full" : "-translate-x-full";
   const edgeClass = isRight ? "right-0" : "left-0";
-  const panelRadius = isRight ? "rounded-l-2xl" : "rounded-r-2xl";
+  const panelRadius = isRight
+    ? "rounded-l-[var(--radius)]"
+    : "rounded-r-[var(--radius)]";
   const closePosition = isRight ? "right-full" : "left-full";
-  const closeRadius = isRight
-    ? "rounded-l-full rounded-r-none"
-    : "rounded-r-full rounded-l-none";
+  const CloseChevron = isRight ? ChevronLeft : ChevronRight;
 
   return createPortal(
     <div
@@ -126,9 +129,9 @@ export function SideSheet({
       <button
         ref={backdropRef}
         type="button"
-        className={`absolute inset-0 bg-black/45 transition-opacity ease-out ${
-          entered ? "opacity-100" : "opacity-0"
-        }`}
+        className={`absolute inset-0 bg-black/40 transition-opacity ease-out ${
+          backdropBlur ? "backdrop-blur-sm" : ""
+        } ${entered ? "opacity-100" : "opacity-0"}`}
         style={{ transitionDuration: `${SIDE_SHEET_ANIMATION_MS}ms` }}
         aria-label="Close"
         onClick={onClose}
@@ -140,14 +143,33 @@ export function SideSheet({
         } ${panelClassName}`}
         style={{ transitionDuration: `${SIDE_SHEET_ANIMATION_MS}ms` }}
       >
-        <button
-          type="button"
-          onClick={onClose}
-          className={`absolute top-5 ${closePosition} z-10 flex h-10 w-10 shrink-0 items-center justify-center ${closeRadius} bg-gray-900 text-white transition-colors hover:bg-black`}
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" strokeWidth={2.5} />
-        </button>
+        {closeVariant === "edge-tab" ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className={`absolute top-1/2 ${closePosition} z-10 flex h-[38px] w-10 -translate-y-1/2 items-center justify-center bg-gray-900 text-white transition-transform hover:scale-105 ${
+              isRight
+                ? "rounded-l-full rounded-r-none"
+                : "rounded-r-full rounded-l-none"
+            }`}
+            aria-label="Close"
+          >
+            <CloseChevron className="h-4 w-4" strokeWidth={2.5} />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onClose}
+            className={`absolute top-5 ${closePosition} z-10 flex h-10 w-10 shrink-0 items-center justify-center bg-gray-900 text-white transition-colors hover:bg-black ${
+              isRight
+                ? "rounded-l-full rounded-r-none"
+                : "rounded-r-full rounded-l-none"
+            }`}
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" strokeWidth={2.5} />
+          </button>
+        )}
         <div
           className={`flex h-full min-h-0 w-full flex-col overflow-hidden bg-white shadow-2xl ${panelRadius}`}
           onClick={(event) => event.stopPropagation()}

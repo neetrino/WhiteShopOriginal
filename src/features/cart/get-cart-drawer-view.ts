@@ -20,6 +20,7 @@ export type CartDrawerItemView = {
   quantity: number;
   imageUrl: string | null;
   unitPriceFormatted: string;
+  lineTotalFormatted: string;
 };
 
 export type CartDrawerView = {
@@ -112,6 +113,12 @@ export async function getCartDrawerView(
       imageUrl: images.get(product.id) ?? null,
       unitPriceFormatted: formatConvertedAmount(
         unitAmount,
+        quote.rate,
+        currency,
+        locale,
+      ),
+      lineTotalFormatted: formatConvertedAmount(
+        unitAmount * item.quantity,
         quote.rate,
         currency,
         locale,
