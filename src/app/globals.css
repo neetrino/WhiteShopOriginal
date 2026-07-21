@@ -277,11 +277,21 @@ body {
 
 /**
  * MaMarie-style mobile profile page: slightly cooler canvas behind hub cards.
- * Bottom navbar clearance stays via storefront `pb-24` — do not change nav.
+ * Hide the storefront top header — profile hub is the chrome on mobile.
+ * Hide the storefront bottom tab bar — profile has its own hub chrome.
  */
 @media (max-width: 1023px) {
+  .storefront-shell:has(.profile-mobile-page) .site-header {
+    display: none;
+  }
+
   .storefront-shell:has(.profile-mobile-page) .storefront-main {
     padding-top: 0.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .storefront-shell:has(.profile-mobile-page) .mobile-bottom-nav {
+    display: none;
   }
 
   .profile-mobile-tab-sheet-scroll {

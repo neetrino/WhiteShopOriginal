@@ -121,12 +121,8 @@ export function ProfileMobileHub({
             {item.icon}
           </span>
           <span
-            className={`truncate text-base ${
-              item.danger
-                ? "font-semibold text-red-500"
-                : active
-                  ? "font-medium text-gray-900"
-                  : "font-medium text-gray-800"
+            className={`truncate text-base font-medium ${
+              item.danger ? "text-red-500" : "text-gray-800"
             }`}
           >
             {item.label}
@@ -148,9 +144,7 @@ export function ProfileMobileHub({
           type="button"
           onClick={onOpenDashboard}
           aria-current={active ? "page" : undefined}
-          className={`flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-gray-50/80 ${
-            active ? "bg-gray-50" : ""
-          }`}
+          className="flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-gray-50/80"
         >
           {content}
         </button>
@@ -177,9 +171,7 @@ export function ProfileMobileHub({
         href={item.href}
         prefetchPolicy="intent"
         aria-current={active ? "page" : undefined}
-        className={`flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-gray-50/80 ${
-          active ? "bg-gray-50" : ""
-        }`}
+        className="flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-gray-50/80"
       >
         {content}
       </AppLink>
@@ -189,11 +181,11 @@ export function ProfileMobileHub({
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-4">
       <section
-        className="rounded-[var(--radius)] bg-white px-4 py-2 shadow-sm ring-1 ring-gray-200/70"
+        className="rounded-[var(--radius)] bg-white px-4 py-5 shadow-sm ring-1 ring-gray-200/70"
         aria-label={dictionary.title}
       >
-        <div className="flex items-center gap-2">
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-gray-900 text-2xl font-semibold text-white shadow-[0_0_0_3px_white]">
+        <div className="flex items-center gap-3">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gray-900 text-base font-semibold text-white shadow-[0_0_0_3px_white]">
             {user.firstName.slice(0, 1).toUpperCase()}
             {user.lastName.slice(0, 1).toUpperCase()}
           </div>
