@@ -75,16 +75,21 @@ export function AdminDeliveryView({
 
   return (
     <section>
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className={ADMIN_PAGE_TITLE}>Delivery</h1>
           <p className={`mt-1 ${ADMIN_PAGE_SUBTITLE}`}>
             Set delivery prices by country and city for checkout.
           </p>
         </div>
-        <Button type="button" size="sm" onClick={openCreate}>
-          <Plus className="mr-1.5 h-4 w-4" aria-hidden />
-          Add location
+        <Button
+          type="button"
+          size="sm"
+          onClick={openCreate}
+          className="inline-flex items-center gap-1.5"
+        >
+          <Plus className="h-4 w-4" aria-hidden />
+          Add Location
         </Button>
       </div>
 
