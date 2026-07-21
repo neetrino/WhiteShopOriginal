@@ -4,9 +4,9 @@ import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
 import { Card } from "@/components/ui/Card";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import type { OrderStatus } from "@/features/orders/domain/order-status";
 import type { PaymentStatus } from "@/features/orders/domain/payment-status";
-import { FilterSelectDropdown } from "@/features/orders/ui/FilterSelectDropdown";
 
 const FILTER_SEARCH =
   "h-11 min-w-0 flex-1 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 shadow-sm outline-none transition-colors placeholder:text-gray-400 hover:border-gray-300 focus:border-gray-300";
@@ -58,7 +58,7 @@ export function CustomerOrdersFilters({
         method="get"
         className="flex flex-nowrap items-center gap-3 p-4"
       >
-        <FilterSelectDropdown
+        <SelectDropdown
           name="status"
           ariaLabel="Order status"
           value={statusValue}
@@ -67,7 +67,7 @@ export function CustomerOrdersFilters({
           className="w-[180px] shrink-0"
           onValueChange={applyStatus}
         />
-        <FilterSelectDropdown
+        <SelectDropdown
           name="paymentStatus"
           ariaLabel="Payment status"
           value={paymentValue}

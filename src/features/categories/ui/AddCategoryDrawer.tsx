@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
@@ -207,37 +208,40 @@ export function AddCategoryDrawer({
               </span>
             </label>
 
-            <label className="block">
+            <div>
               <span className={ADMIN_LABEL}>Parent Category</span>
-              <select
+              <SelectDropdown
+                ariaLabel="Parent Category"
                 value={parentId}
-                onChange={(event) => setParentId(event.target.value)}
-                className={ADMIN_INPUT}
+                allLabel="None (Root Category)"
+                options={parentOptions.map((item) => ({
+                  label: item.title,
+                  value: item.id,
+                }))}
                 disabled={isPending}
-              >
-                <option value="">None (Root Category)</option>
-                {parentOptions.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.title}
-                  </option>
-                ))}
-              </select>
-            </label>
+                deferChange={false}
+                className="mt-1"
+                onValueChange={setParentId}
+              />
+            </div>
 
-            <label className="block">
+            <div>
               <span className={ADMIN_LABEL}>Status</span>
-              <select
+              <SelectDropdown
+                ariaLabel="Status"
                 value={status}
-                onChange={(event) =>
-                  setStatus(event.target.value as "ACTIVE" | "ARCHIVED")
-                }
-                className={ADMIN_INPUT}
+                options={[
+                  { label: "Published", value: "ACTIVE" },
+                  { label: "Archived", value: "ARCHIVED" },
+                ]}
                 disabled={isPending}
-              >
-                <option value="ACTIVE">Published</option>
-                <option value="ARCHIVED">Archived</option>
-              </select>
-            </label>
+                deferChange={false}
+                className="mt-1"
+                onValueChange={(next) =>
+                  setStatus(next as "ACTIVE" | "ARCHIVED")
+                }
+              />
+            </div>
 
             <div>
               <span className={ADMIN_LABEL}>Image</span>

@@ -3,32 +3,38 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-const MENU_ANIMATION_MS = 280;
+export const DROPDOWN_ANIMATION_MS = 280;
 
-export type FilterSelectOption = {
+export type SelectDropdownOption = {
   label: string;
   value: string;
 };
 
-type FilterSelectDropdownProps = {
-  name: string;
+type SelectDropdownProps = {
+  name?: string;
   ariaLabel: string;
   value: string;
-  allLabel: string;
-  options: ReadonlyArray<FilterSelectOption>;
+  /** When set, shows an empty-value row at the top of the list. */
+  allLabel?: string;
+  options: ReadonlyArray<SelectDropdownOption>;
   className?: string;
+  disabled?: boolean;
   onValueChange: (value: string) => void;
+  /** Wait for close animation before calling onValueChange. Default true. */
+  deferChange?: boolean;
 };
 
-export function FilterSelectDropdown({
+export function SelectDropdown({
   name,
   ariaLabel,
   value,
   allLabel,
   options,
   className = "",
+  disabled = false,
   onValueChange,
-}: FilterSelectDropdownProps) {
+  deferChange = true,
+}: SelectDropdownProps) {
   const [open, setOpen] = useState(false);
   const [elevated, setElevated] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -36,7 +42,9 @@ export function FilterSelectDropdown({
   const listId = useId();
 
   const selectedLabel =
-    options.find((option) => option.value === value)?.label ?? allLabel;
+    options.find((option) => option.value === value)?.label ??
+    allLabel ??
+    value;
 
   useEffect(() => {
     return () => {
@@ -51,7 +59,7 @@ export function FilterSelectDropdown({
       setElevated(true);
       return;
     }
-    const timer = setTimeout(() => setElevated(false), MENU_ANIMATION_MS);
+    const timer = setTimeout(() => setElevated(false), DROPDOWN_ANIMATION_MS);
     return () => clearTimeout(timer);
   }, [open]);
 
@@ -78,13 +86,17 @@ export function FilterSelectDropdown({
 
   function selectValue(next: string): void {
     setOpen(false);
+    if (!deferChange) {
+      onValueChange(next);
+      return;
+    }
     if (pendingChangeRef.current) {
       clearTimeout(pendingChangeRef.current);
     }
     pendingChangeRef.current = setTimeout(() => {
       pendingChangeRef.current = null;
       onValueChange(next);
-    }, MENU_ANIMATION_MS);
+    }, DROPDOWN_ANIMATION_MS);
   }
 
   return (
@@ -92,10 +104,11 @@ export function FilterSelectDropdown({
       ref={rootRef}
       className={`relative ${elevated ? "z-50" : "z-0"} ${className}`}
     >
-      <input type="hidden" name={name} value={value} />
+      {name ? <input type="hidden" name={name} value={value} /> : null}
       <button
         type="button"
-        className="flex h-11 w-full items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 pr-3 text-left text-sm text-gray-900 shadow-sm outline-none transition-colors hover:border-gray-300"
+        disabled={disabled}
+        className="flex h-11 w-full items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 pr-3 text-left text-sm text-gray-900 shadow-sm outline-none transition-colors hover:border-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -115,7 +128,7 @@ export function FilterSelectDropdown({
             ? "translate-y-0 grid-rows-[1fr] opacity-100"
             : "pointer-events-none -translate-y-1 grid-rows-[0fr] opacity-0"
         }`}
-        style={{ transitionDuration: `${MENU_ANIMATION_MS}ms` }}
+        style={{ transitionDuration: `${DROPDOWN_ANIMATION_MS}ms` }}
         aria-hidden={!open}
       >
         <div className="min-h-0 overflow-hidden">
@@ -125,13 +138,15 @@ export function FilterSelectDropdown({
             aria-label={ariaLabel}
             className="max-h-72 overflow-y-auto rounded-2xl border border-gray-100 bg-white py-2"
           >
-            <FilterOptionRow
-              label={allLabel}
-              selected={value === ""}
-              onSelect={() => selectValue("")}
-            />
+            {allLabel !== undefined ? (
+              <SelectDropdownOptionRow
+                label={allLabel}
+                selected={value === ""}
+                onSelect={() => selectValue("")}
+              />
+            ) : null}
             {options.map((option) => (
-              <FilterOptionRow
+              <SelectDropdownOptionRow
                 key={option.value}
                 label={option.label}
                 selected={value === option.value}
@@ -145,17 +160,17 @@ export function FilterSelectDropdown({
   );
 }
 
-type FilterOptionRowProps = {
+type SelectDropdownOptionRowProps = {
   label: string;
   selected: boolean;
   onSelect: () => void;
 };
 
-function FilterOptionRow({
+export function SelectDropdownOptionRow({
   label,
   selected,
   onSelect,
-}: FilterOptionRowProps) {
+}: SelectDropdownOptionRowProps) {
   return (
     <button
       type="button"

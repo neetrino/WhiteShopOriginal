@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, X } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
-  ADMIN_SELECT,
 } from "@/features/admin/ui/admin-form-classes";
 import {
   createPromotionAction,
@@ -204,20 +204,23 @@ export function CouponDrawer({
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <label>
+              <div>
                 <span className={ADMIN_LABEL}>Discount type</span>
-                <select
+                <SelectDropdown
+                  ariaLabel="Discount type"
                   value={discountType}
-                  onChange={(event) =>
-                    setDiscountType(event.target.value as DiscountType)
-                  }
-                  className={ADMIN_SELECT}
+                  options={[
+                    { label: "Percent off", value: "PERCENTAGE" },
+                    { label: "Fixed amount (AMD)", value: "FIXED" },
+                  ]}
                   disabled={isPending}
-                >
-                  <option value="PERCENTAGE">Percent off</option>
-                  <option value="FIXED">Fixed amount (AMD)</option>
-                </select>
-              </label>
+                  deferChange={false}
+                  className="mt-1"
+                  onValueChange={(next) =>
+                    setDiscountType(next as DiscountType)
+                  }
+                />
+              </div>
               <label>
                 <span className={ADMIN_LABEL}>Value</span>
                 <input
@@ -256,7 +259,7 @@ export function CouponDrawer({
               </label>
             </div>
 
-            <div className="rounded-xl border border-gray-300 px-4 py-3">
+            <div className="rounded-2xl border border-gray-200 px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium text-gray-900">

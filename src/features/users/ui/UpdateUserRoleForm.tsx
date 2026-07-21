@@ -5,10 +5,10 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import {
   ADMIN_LABEL,
   ADMIN_SECTION_TITLE,
-  ADMIN_SELECT,
 } from "@/features/admin/ui/admin-form-classes";
 import { updateUserRoleAction } from "@/features/users/application/update-user";
 import {
@@ -31,6 +31,8 @@ export function UpdateUserRoleForm({
 }: UpdateUserRoleFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const roleOptions = USER_ROLES.filter((role) => role !== currentRole);
+  const [role, setRole] = useState(roleOptions[0] ?? "");
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -39,12 +41,13 @@ export function UpdateUserRoleForm({
         className="flex flex-col gap-4"
         onSubmit={(event) => {
           event.preventDefault();
-          const formData = new FormData(event.currentTarget);
-          const role = String(formData.get("role") ?? "") as UserRole;
 
           startTransition(async () => {
             setError(null);
-            const result = await updateUserRoleAction(locale, { userId, role });
+            const result = await updateUserRoleAction(locale, {
+              userId,
+              role: role as UserRole,
+            });
             if (!result.ok) {
               setError(result.error.message);
               return;
@@ -57,22 +60,22 @@ export function UpdateUserRoleForm({
         <p className="text-sm text-gray-700">
           Current: <strong className="text-gray-900">{currentRole}</strong>
         </p>
-        <label>
+        <div>
           <span className={ADMIN_LABEL}>New role</span>
-          <select
+          <SelectDropdown
             name="role"
-            required
-            className={ADMIN_SELECT}
-            defaultValue={currentRole === "ADMIN" ? "CUSTOMER" : "ADMIN"}
+            ariaLabel="New role"
+            value={role}
+            options={roleOptions.map((item) => ({
+              label: item,
+              value: item,
+            }))}
             disabled={disabled || isPending}
-          >
-            {USER_ROLES.filter((role) => role !== currentRole).map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
-        </label>
+            deferChange={false}
+            className="mt-1"
+            onValueChange={setRole}
+          />
+        </div>
         {error ? <p className="text-sm text-red-700">{error}</p> : null}
         <Button type="submit" size="sm" disabled={disabled || isPending}>
           {isPending ? "Updating…" : "Update role"}

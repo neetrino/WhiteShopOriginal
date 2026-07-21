@@ -5,10 +5,10 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
-  ADMIN_SELECT,
   ADMIN_TEXTAREA,
 } from "@/features/admin/ui/admin-form-classes";
 import {
@@ -309,21 +309,24 @@ export function BlogPostDrawer({
                     Shown on the post. Leave empty to use today when publishing.
                   </span>
                 </label>
-                <label className="block">
+                <div>
                   <span className={ADMIN_LABEL}>Status</span>
-                  <select
+                  <SelectDropdown
+                    ariaLabel="Status"
                     value={status}
-                    onChange={(event) =>
-                      setStatus(event.target.value as BlogPostStatus)
-                    }
-                    className={ADMIN_SELECT}
+                    options={[
+                      { label: "Draft", value: "DRAFT" },
+                      { label: "Published", value: "PUBLISHED" },
+                      { label: "Archived", value: "ARCHIVED" },
+                    ]}
                     disabled={isPending}
-                  >
-                    <option value="DRAFT">Draft</option>
-                    <option value="PUBLISHED">Published</option>
-                    <option value="ARCHIVED">Archived</option>
-                  </select>
-                </label>
+                    deferChange={false}
+                    className="mt-1"
+                    onValueChange={(next) =>
+                      setStatus(next as BlogPostStatus)
+                    }
+                  />
+                </div>
               </div>
             </div>
 
