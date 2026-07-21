@@ -19,49 +19,53 @@ export function OrderDetailsDrawerSummary({
   detail,
 }: OrderDetailsDrawerSummaryProps) {
   return (
-    <div className="grid gap-8 border-b border-gray-200 px-6 py-5 md:grid-cols-2">
-      <section>
-        <h3 className="mb-4 text-base font-semibold text-gray-900">Summary</h3>
-        <dl className="space-y-3 text-sm">
-          <DetailRow label="Order #:" value={detail.orderNumber} />
-          <DetailRow
-            label="Total:"
-            value={formatOrderDrawerMoney(
-              detail.totalAmount,
-              detail.baseCurrency,
-            )}
-          />
-          <DetailRow
-            label="Status:"
-            value={
-              <span
-                className={`${ADMIN_BADGE} ${orderStatusBadgeClass(detail.status)}`}
-              >
-                {formatOrderStatusLabel(detail.status)}
-              </span>
-            }
-          />
-          <DetailRow
-            label="Payment:"
-            value={
-              <span
-                className={`${ADMIN_BADGE} ${paymentStatusBadgeClass(detail.paymentStatus)}`}
-              >
-                {formatOrderStatusLabel(detail.paymentStatus)}
-              </span>
-            }
-          />
-        </dl>
-      </section>
+    <div className="rounded-2xl border border-gray-200 px-5 py-4">
+      <div className="grid gap-8 md:grid-cols-2">
+        <section>
+          <h3 className="mb-4 text-base font-semibold text-gray-900">Summary</h3>
+          <dl className="space-y-3 text-sm">
+            <DetailRow label="Order #:" value={detail.orderNumber} />
+            <DetailRow
+              label="Total:"
+              value={formatOrderDrawerMoney(
+                detail.totalAmount,
+                detail.baseCurrency,
+              )}
+            />
+            <DetailRow
+              label="Status:"
+              value={
+                <span
+                  className={`${ADMIN_BADGE} ${orderStatusBadgeClass(detail.status)}`}
+                >
+                  {formatOrderStatusLabel(detail.status)}
+                </span>
+              }
+            />
+            <DetailRow
+              label="Payment:"
+              value={
+                <span
+                  className={`${ADMIN_BADGE} ${paymentStatusBadgeClass(detail.paymentStatus)}`}
+                >
+                  {formatOrderStatusLabel(detail.paymentStatus)}
+                </span>
+              }
+            />
+          </dl>
+        </section>
 
-      <section>
-        <h3 className="mb-4 text-base font-semibold text-gray-900">Customer</h3>
-        <dl className="space-y-3 text-sm">
-          <DetailRow label="Name:" value={detail.contactName} />
-          <DetailRow label="Phone Number:" value={detail.contactPhone} />
-          <DetailRow label="Email:" value={detail.contactEmail} />
-        </dl>
-      </section>
+        <section>
+          <h3 className="mb-4 text-base font-semibold text-gray-900">
+            Customer
+          </h3>
+          <dl className="space-y-3 text-sm">
+            <DetailRow label="Name:" value={detail.contactName} />
+            <DetailRow label="Phone Number:" value={detail.contactPhone} />
+            <DetailRow label="Email:" value={detail.contactEmail} />
+          </dl>
+        </section>
+      </div>
     </div>
   );
 }

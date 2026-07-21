@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import { CurrencySwitcher } from "@/components/layout/CurrencySwitcher";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { AppLink } from "@/components/ui/AppLink";
+import { SideSheet } from "@/components/ui/SideSheet";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
 import type { Currency } from "@/lib/money/currency";
@@ -35,25 +36,14 @@ export function MobileNavDrawer({
   const year = new Date().getFullYear();
 
   useEffect(() => {
-    if (!open) {
-      return;
+    const media = window.matchMedia("(min-width: 768px)");
+    function closeOnDesktop(): void {
+      if (media.matches) setOpen(false);
     }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function handleEscape(event: KeyboardEvent): void {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open]);
+    closeOnDesktop();
+    media.addEventListener("change", closeOnDesktop);
+    return () => media.removeEventListener("change", closeOnDesktop);
+  }, []);
 
   return (
     <>
@@ -67,30 +57,16 @@ export function MobileNavDrawer({
         <Menu className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
       </button>
 
-      {open ? (
-        <div
-          className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm md:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label={dictionary.nav.navigation}
-          onClick={() => setOpen(false)}
-        >
-          <div
-            className="flex h-full min-h-screen w-1/2 min-w-[16rem] max-w-full flex-col bg-white shadow-2xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+      <SideSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        ariaLabel={dictionary.nav.navigation}
+        panelClassName="w-1/2 min-w-[16rem] max-w-full"
+      >
+          <div className="border-b border-gray-200 px-5 py-4">
               <p className="text-lg font-semibold text-gray-900">
                 {dictionary.nav.navigation}
               </p>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-900"
-                aria-label={dictionary.nav.closeMenu}
-              >
-                <X className="h-5 w-5" aria-hidden="true" />
-              </button>
             </div>
 
             <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto text-sm font-semibold uppercase tracking-wide text-gray-800">
@@ -164,9 +140,7 @@ export function MobileNavDrawer({
                 {dictionary.footer.copyright.replace("{year}", String(year))}
               </p>
             </div>
-          </div>
-        </div>
-      ) : null}
+        </SideSheet>
     </>
   );
 }

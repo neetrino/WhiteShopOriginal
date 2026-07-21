@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
+import { SideSheet } from "@/components/ui/SideSheet";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
@@ -63,32 +64,6 @@ export function CouponDrawer({
   useEffect(() => {
     if (!open) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function handleEscape(event: KeyboardEvent): void {
-      if (event.key === "Escape") onClose();
-    }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open, onClose]);
-
-  useEffect(() => {
-    if (!open) {
-      setName("");
-      setCode("");
-      setDiscountType("PERCENTAGE");
-      setValue("10");
-      setQuantity("1");
-      setExpiresAt("");
-      setError(null);
-      return;
-    }
-
     if (coupon) {
       setName(coupon.code ?? "");
       setCode(coupon.code ?? "");
@@ -101,35 +76,28 @@ export function CouponDrawer({
       );
       setExpiresAt(toDateTimeLocal(coupon.endsAt));
       setError(null);
+    } else {
+      setName("");
+      setCode("");
+      setDiscountType("PERCENTAGE");
+      setValue("10");
+      setQuantity("1");
+      setExpiresAt("");
+      setError(null);
     }
   }, [open, coupon]);
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/40"
-      role="dialog"
-      aria-modal="true"
-      aria-label={isEdit ? "Edit coupon" : "New coupon"}
-      onClick={onClose}
+    <SideSheet
+      open={open}
+      onClose={onClose}
+      ariaLabel={isEdit ? "Edit coupon" : "New coupon"}
+      panelClassName="w-full max-w-md"
     >
-      <div
-        className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+        <div className="border-b border-gray-200 px-5 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
             {isEdit ? "Edit coupon" : "New coupon"}
           </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
         <form
@@ -295,7 +263,6 @@ export function CouponDrawer({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </SideSheet>
   );
 }

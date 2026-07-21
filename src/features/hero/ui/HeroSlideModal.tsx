@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
-
 import { Button } from "@/components/ui/Button";
+import { SideSheet } from "@/components/ui/SideSheet";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
@@ -28,32 +27,22 @@ export function HeroSlideModal({
   onClose,
   slide = null,
 }: HeroSlideModalProps) {
-  useEffect(() => {
-    if (!open) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function handleEscape(event: KeyboardEvent): void {
-      if (event.key === "Escape") onClose();
-    }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
+  const isEdit = slide != null;
 
   return (
-    <HeroSlideDrawerForm
-      key={slide?.id ?? "create"}
-      locale={locale}
+    <SideSheet
+      open={open}
       onClose={onClose}
-      slide={slide}
-    />
+      ariaLabel={isEdit ? "Edit hero slide" : "Create hero slide"}
+      panelClassName="w-full max-w-lg"
+    >
+      <HeroSlideDrawerForm
+        key={slide?.id ?? "create"}
+        locale={locale}
+        onClose={onClose}
+        slide={slide}
+      />
+    </SideSheet>
   );
 }
 
@@ -84,29 +73,11 @@ function HeroSlideDrawerForm({
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/40"
-      role="dialog"
-      aria-modal="true"
-      aria-label={isEdit ? "Edit hero slide" : "Create hero slide"}
-      onClick={onClose}
-    >
-      <div
-        className="flex h-full w-full max-w-lg flex-col bg-white shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+    <>
+        <div className="border-b border-gray-200 px-5 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
             {isEdit ? "Edit hero slide" : "Create hero slide"}
           </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
         <form
@@ -246,7 +217,6 @@ function HeroSlideDrawerForm({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </>
   );
 }
