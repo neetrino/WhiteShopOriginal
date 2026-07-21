@@ -1,12 +1,15 @@
 import { Phone } from "lucide-react";
 
-import { CurrencySwitcher } from "@/components/layout/CurrencySwitcher";
-import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
+import { LocaleCurrencySwitcher } from "@/components/layout/LocaleCurrencySwitcher";
 import {
   FacebookIcon,
   InstagramIcon,
   LinkedInIcon,
 } from "@/components/layout/SocialIcons";
+import {
+  SITE_HEADER_ACTIONS_RAIL,
+  SITE_HEADER_INNER,
+} from "@/components/layout/site-header-classes";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
 import type { Currency } from "@/lib/money/currency";
@@ -23,8 +26,8 @@ export function SiteHeaderTopBar({
   dictionary,
 }: SiteHeaderTopBarProps) {
   return (
-    <div className="relative z-20 hidden border-b border-gray-200 bg-white md:block">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="relative z-50 hidden border-b border-gray-200 bg-white md:block">
+      <div className={SITE_HEADER_INNER}>
         <div className="flex flex-col gap-3 py-3 text-sm text-gray-700 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             <div className="flex items-center gap-2 text-gray-700">
@@ -62,11 +65,12 @@ export function SiteHeaderTopBar({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-            <LocaleSwitcher locale={locale} label={dictionary.header.language} />
-            <CurrencySwitcher
+          <div className={`${SITE_HEADER_ACTIONS_RAIL} ml-auto justify-center`}>
+            <LocaleCurrencySwitcher
+              locale={locale}
               currency={currency}
-              label={dictionary.header.currency}
+              currencyLabel={dictionary.header.currency}
+              languageLabel={dictionary.header.language}
             />
           </div>
         </div>
