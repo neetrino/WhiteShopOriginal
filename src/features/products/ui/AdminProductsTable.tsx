@@ -7,6 +7,10 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import {
+  ConfirmDialog,
+  deleteConfirmDescription,
+} from "@/components/ui/ConfirmDialog";
+import {
   ADMIN_TABLE,
   ADMIN_TABLE_CARD,
   ADMIN_TABLE_CHECKBOX,
@@ -50,6 +54,11 @@ export function AdminProductsTable({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [pendingDelete, setPendingDelete] = useState<{
+    kind: "single" | "bulk";
+    productIds: string[];
+    label: string;
+  } | null>(null);
 
   const allIds = products.map((product) => product.id);
   const allSelected =
@@ -82,12 +91,29 @@ export function AdminProductsTable({
 
   function deleteSelected(): void {
     if (selected.size === 0) return;
+    const count = selected.size;
+    setPendingDelete({
+      kind: "bulk",
+      productIds: [...selected],
+      label:
+        count === 1
+          ? "selected product"
+          : `${count} selected products`,
+    });
+  }
+
+  function confirmDelete(): void {
+    if (!pendingDelete) return;
+    const productIds = pendingDelete.productIds;
     runAction(async () => {
-      const result = await softDeleteProductsAction(locale, {
-        productIds: [...selected],
-      });
+      const result = await softDeleteProductsAction(locale, { productIds });
       if (!result.ok) throw new Error(result.error.message);
-      setSelected(new Set());
+      setSelected((prev) => {
+        const next = new Set(prev);
+        for (const id of productIds) next.delete(id);
+        return next;
+      });
+      setPendingDelete(null);
     });
   }
 
@@ -100,6 +126,7 @@ export function AdminProductsTable({
         <Button
           type="button"
           size="sm"
+          variant="danger"
           disabled={isPending || selected.size === 0}
           onClick={deleteSelected}
         >
@@ -186,16 +213,10 @@ export function AdminProductsTable({
                       })
                     }
                     onDelete={() =>
-                      runAction(async () => {
-                        const result = await softDeleteProductsAction(locale, {
-                          productIds: [product.id],
-                        });
-                        if (!result.ok) throw new Error(result.error.message);
-                        setSelected((prev) => {
-                          const next = new Set(prev);
-                          next.delete(product.id);
-                          return next;
-                        });
+                      setPendingDelete({
+                        kind: "single",
+                        productIds: [product.id],
+                        label: product.title,
                       })
                     }
                     onVisibility={() =>
@@ -214,6 +235,23 @@ export function AdminProductsTable({
           </div>
         )}
       </Card>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete"
+        description={
+          pendingDelete?.kind === "bulk"
+            ? `Are you sure you want to delete ${pendingDelete.label}? This action cannot be undone.`
+            : pendingDelete
+              ? deleteConfirmDescription("product", pendingDelete.label)
+              : ""
+        }
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setPendingDelete(null);
+        }}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

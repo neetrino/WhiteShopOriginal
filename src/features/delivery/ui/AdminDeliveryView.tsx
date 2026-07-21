@@ -7,6 +7,10 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import {
+  ConfirmDialog,
+  deleteConfirmDescription,
+} from "@/components/ui/ConfirmDialog";
+import {
   ADMIN_PAGE_SUBTITLE,
   ADMIN_PAGE_TITLE,
 } from "@/features/admin/ui/admin-form-classes";
@@ -43,6 +47,8 @@ export function AdminDeliveryView({
     useState<AdminDeliveryLocation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [pendingDelete, setPendingDelete] =
+    useState<AdminDeliveryLocation | null>(null);
 
   function openCreate(): void {
     setEditingLocation(null);
@@ -59,18 +65,22 @@ export function AdminDeliveryView({
     setEditingLocation(null);
   }
 
-  function onDelete(location: AdminDeliveryLocation): void {
-    if (!window.confirm(`Remove delivery for ${location.city}?`)) {
-      return;
-    }
+  function requestDelete(location: AdminDeliveryLocation): void {
+    setPendingDelete(location);
+  }
+
+  function confirmDelete(): void {
+    if (!pendingDelete) return;
+    const locationId = pendingDelete.id;
 
     startTransition(async () => {
       setError(null);
-      const result = await deleteDeliveryLocationAction(locale, location.id);
+      const result = await deleteDeliveryLocationAction(locale, locationId);
       if (!result.ok) {
         setError(result.error.message);
         return;
       }
+      setPendingDelete(null);
       router.refresh();
     });
   }
@@ -149,9 +159,9 @@ export function AdminDeliveryView({
                         </button>
                         <button
                           type="button"
-                          onClick={() => onDelete(location)}
+                          onClick={() => requestDelete(location)}
                           disabled={isPending}
-                          className="rounded-lg p-2 text-gray-500 hover:bg-red-50 hover:text-red-700"
+                          className="rounded-lg p-2 text-red-600 hover:bg-red-50 hover:text-red-700"
                           aria-label={`Delete ${location.city}`}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -171,6 +181,21 @@ export function AdminDeliveryView({
         open={drawerOpen}
         onClose={closeDrawer}
         location={editingLocation}
+      />
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete"
+        description={
+          pendingDelete
+            ? deleteConfirmDescription("delivery location", pendingDelete.city)
+            : ""
+        }
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setPendingDelete(null);
+        }}
+        onConfirm={confirmDelete}
       />
     </section>
   );

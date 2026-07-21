@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
@@ -31,8 +37,10 @@ export function SideSheet({
   zIndexClassName = "z-50",
 }: SideSheetProps) {
   const [mounted, setMounted] = useState(false);
-  const [rendered, setRendered] = useState(open);
+  const [rendered, setRendered] = useState(false);
   const [entered, setEntered] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -40,21 +48,45 @@ export function SideSheet({
 
   useEffect(() => {
     if (open) {
+      // Always start from the closed visual state before animating in.
+      setEntered(false);
       setRendered(true);
-      let frame2 = 0;
-      const frame1 = requestAnimationFrame(() => {
-        frame2 = requestAnimationFrame(() => setEntered(true));
-      });
-      return () => {
-        cancelAnimationFrame(frame1);
-        cancelAnimationFrame(frame2);
-      };
+      return;
     }
 
     setEntered(false);
     const timer = setTimeout(() => setRendered(false), SIDE_SHEET_ANIMATION_MS);
     return () => clearTimeout(timer);
   }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open || !rendered) {
+      return;
+    }
+
+    // Force the browser to commit the closed transform/opacity before we
+    // flip to the open state — otherwise the first open skips the transition.
+    const panel = panelRef.current;
+    const backdrop = backdropRef.current;
+    if (panel) {
+      void panel.getBoundingClientRect();
+    }
+    if (backdrop) {
+      void backdrop.getBoundingClientRect();
+    }
+
+    let frame2 = 0;
+    const frame1 = requestAnimationFrame(() => {
+      frame2 = requestAnimationFrame(() => {
+        setEntered(true);
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(frame1);
+      cancelAnimationFrame(frame2);
+    };
+  }, [open, rendered]);
 
   useEffect(() => {
     if (!rendered) return;
@@ -92,6 +124,7 @@ export function SideSheet({
       aria-label={ariaLabel}
     >
       <button
+        ref={backdropRef}
         type="button"
         className={`absolute inset-0 bg-black/45 transition-opacity ease-out ${
           entered ? "opacity-100" : "opacity-0"
@@ -101,6 +134,7 @@ export function SideSheet({
         onClick={onClose}
       />
       <div
+        ref={panelRef}
         className={`fixed inset-y-0 ${edgeClass} z-[1] flex h-dvh max-h-dvh transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] ${
           entered ? "translate-x-0" : closedTransform
         } ${panelClassName}`}

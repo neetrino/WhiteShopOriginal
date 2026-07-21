@@ -2,10 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Check, Copy, Pencil, Trash2 } from "lucide-react";
+import { Check, Copy, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import {
+  ConfirmDialog,
+  deleteConfirmDescription,
+} from "@/components/ui/ConfirmDialog";
 import {
   ADMIN_PAGE_SUBTITLE,
   ADMIN_PAGE_TITLE,
@@ -60,6 +64,10 @@ export function AdminCouponsView({ locale, coupons }: AdminCouponsViewProps) {
     useState<AdminPromotionListItem | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [pendingDelete, setPendingDelete] = useState<{
+    id: string;
+    code: string;
+  } | null>(null);
 
   function openCreate(): void {
     setEditingCoupon(null);
@@ -88,6 +96,18 @@ export function AdminCouponsView({ locale, coupons }: AdminCouponsViewProps) {
     });
   }
 
+  function confirmDelete(): void {
+    if (!pendingDelete) return;
+    const promoId = pendingDelete.id;
+    runAction(async () => {
+      const result = await deletePromotionAction(locale, promoId);
+      if (!result.ok) {
+        throw new Error(result.error.message);
+      }
+      setPendingDelete(null);
+    });
+  }
+
   return (
     <section>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -97,8 +117,14 @@ export function AdminCouponsView({ locale, coupons }: AdminCouponsViewProps) {
             Create, edit, or remove discount codes for checkout.
           </p>
         </div>
-        <Button type="button" size="sm" onClick={openCreate}>
-          Add promo code
+        <Button
+          type="button"
+          size="sm"
+          onClick={openCreate}
+          className="inline-flex items-center gap-1.5"
+        >
+          <Plus className="h-4 w-4" aria-hidden />
+          Add Promo Code
         </Button>
       </div>
 
@@ -189,17 +215,12 @@ export function AdminCouponsView({ locale, coupons }: AdminCouponsViewProps) {
                         <button
                           type="button"
                           disabled={isPending}
-                          className="rounded p-1.5 text-red-500 hover:bg-red-50"
+                          className="rounded p-1.5 text-red-600 hover:bg-red-50"
                           aria-label={`Delete ${promo.code}`}
                           onClick={() =>
-                            runAction(async () => {
-                              const result = await deletePromotionAction(
-                                locale,
-                                promo.id,
-                              );
-                              if (!result.ok) {
-                                throw new Error(result.error.message);
-                              }
+                            setPendingDelete({
+                              id: promo.id,
+                              code: promo.code ?? "promo",
                             })
                           }
                         >
@@ -220,6 +241,21 @@ export function AdminCouponsView({ locale, coupons }: AdminCouponsViewProps) {
         open={drawerOpen}
         onClose={closeDrawer}
         coupon={editingCoupon}
+      />
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete"
+        description={
+          pendingDelete
+            ? deleteConfirmDescription("promo code", pendingDelete.code)
+            : ""
+        }
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setPendingDelete(null);
+        }}
+        onConfirm={confirmDelete}
       />
     </section>
   );

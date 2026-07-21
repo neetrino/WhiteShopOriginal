@@ -5,6 +5,7 @@ import { useState, useTransition, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   createCustomerAddressAction,
   deleteCustomerAddressAction,
@@ -69,6 +70,7 @@ export function ProfileAddressesView({
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   function resetForm(): void {
     setForm(emptyForm);
@@ -121,9 +123,12 @@ export function ProfileAddressesView({
   }
 
   function onDelete(addressId: string): void {
-    if (!window.confirm(labels.deleteConfirm)) {
-      return;
-    }
+    setPendingDeleteId(addressId);
+  }
+
+  function confirmDelete(): void {
+    if (!pendingDeleteId) return;
+    const addressId = pendingDeleteId;
 
     setError(null);
     setMessage(null);
@@ -134,6 +139,7 @@ export function ProfileAddressesView({
         return;
       }
       setMessage("Address deleted.");
+      setPendingDeleteId(null);
       if (editingId === addressId) {
         setShowForm(false);
         resetForm();
@@ -301,6 +307,19 @@ export function ProfileAddressesView({
           )}
         </div>
       </Card>
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title={labels.delete}
+        description={labels.deleteConfirm}
+        confirmLabel={labels.delete}
+        cancelLabel={labels.cancel}
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setPendingDeleteId(null);
+        }}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

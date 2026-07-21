@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ADMIN_INPUT } from "@/features/admin/ui/admin-form-classes";
 import {
   ADMIN_BADGE,
@@ -75,6 +76,7 @@ export function AdminUsersView({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const allIds = users.map((user) => user.id);
   const allSelected =
@@ -102,6 +104,16 @@ export function AdminUsersView({
       } catch (caught) {
         setError(caught instanceof Error ? caught.message : "Action failed.");
       }
+    });
+  }
+
+  function confirmDeleteSelected(): void {
+    const userIds = [...selected];
+    runAction(async () => {
+      const result = await bulkAnonymizeUsersAction(locale, { userIds });
+      if (!result.ok) throw new Error(result.error.message);
+      setSelected(new Set());
+      setConfirmOpen(false);
     });
   }
 
@@ -162,17 +174,12 @@ export function AdminUsersView({
         <Button
           type="button"
           size="sm"
-          variant="outline"
+          variant="danger"
           disabled={isPending || selected.size === 0}
-          onClick={() =>
-            runAction(async () => {
-              const result = await bulkAnonymizeUsersAction(locale, {
-                userIds: [...selected],
-              });
-              if (!result.ok) throw new Error(result.error.message);
-              setSelected(new Set());
-            })
-          }
+          onClick={() => {
+            if (selected.size === 0) return;
+            setConfirmOpen(true);
+          }}
         >
           Delete Selected
         </Button>
@@ -308,6 +315,17 @@ export function AdminUsersView({
           </div>
         )}
       </Card>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete"
+        description={`Are you sure you want to delete ${selected.size} selected user${selected.size === 1 ? "" : "s"}? This anonymizes their accounts and cannot be undone.`}
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setConfirmOpen(false);
+        }}
+        onConfirm={confirmDeleteSelected}
+      />
     </section>
   );
 }

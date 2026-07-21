@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   ADMIN_TABLE,
   ADMIN_TABLE_CARD,
@@ -58,6 +59,7 @@ export function BulkChangeOrderStatusForm({
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const allNumbers = orders.map((order) => order.orderNumber);
   const allSelected =
@@ -84,12 +86,16 @@ export function BulkChangeOrderStatusForm({
       setError("Select at least one order.");
       return;
     }
+    setConfirmOpen(true);
+  }
 
+  function confirmDelete(): void {
+    const orderNumbers = [...selected];
     startTransition(async () => {
       setError(null);
       setMessage(null);
       const result = await bulkArchiveOrdersAction(locale, {
-        orderNumbers: [...selected],
+        orderNumbers,
       });
 
       if (!result.ok) {
@@ -101,6 +107,7 @@ export function BulkChangeOrderStatusForm({
         `Deleted ${result.value.archived}, skipped ${result.value.skipped}.`,
       );
       setSelected(new Set());
+      setConfirmOpen(false);
       router.refresh();
     });
   }
@@ -114,6 +121,7 @@ export function BulkChangeOrderStatusForm({
         <Button
           type="button"
           size="sm"
+          variant="danger"
           disabled={isPending || selected.size === 0}
           onClick={deleteSelected}
         >
@@ -230,6 +238,17 @@ export function BulkChangeOrderStatusForm({
           </div>
         )}
       </Card>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete"
+        description={`Are you sure you want to delete ${selected.size} selected order${selected.size === 1 ? "" : "s"}? This action cannot be undone.`}
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setConfirmOpen(false);
+        }}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

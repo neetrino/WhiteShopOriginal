@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ADMIN_SECTION_TITLE } from "@/features/admin/ui/admin-form-classes";
 import { archiveOrderAction } from "@/features/orders/application/archive-order";
 
@@ -22,6 +23,25 @@ export function ArchiveOrderButton({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  function runArchive(archive: boolean): void {
+    startTransition(async () => {
+      setError(null);
+      const result = await archiveOrderAction(locale, {
+        orderNumber,
+        archive,
+      });
+
+      if (!result.ok) {
+        setError(result.error.message);
+        return;
+      }
+
+      setConfirmOpen(false);
+      router.refresh();
+    });
+  }
 
   return (
     <Card className="p-6">
@@ -39,20 +59,11 @@ export function ArchiveOrderButton({
           size="sm"
           disabled={isPending}
           onClick={() => {
-            startTransition(async () => {
-              setError(null);
-              const result = await archiveOrderAction(locale, {
-                orderNumber,
-                archive: !isArchived,
-              });
-
-              if (!result.ok) {
-                setError(result.error.message);
-                return;
-              }
-
-              router.refresh();
-            });
+            if (isArchived) {
+              runArchive(false);
+              return;
+            }
+            setConfirmOpen(true);
           }}
         >
           {isPending
@@ -62,6 +73,18 @@ export function ArchiveOrderButton({
               : "Archive order"}
         </Button>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Archive"
+        description={`Are you sure you want to archive order "${orderNumber}"? It will be hidden from default admin lists.`}
+        confirmLabel="Archive"
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setConfirmOpen(false);
+        }}
+        onConfirm={() => runArchive(true)}
+      />
     </Card>
   );
 }
