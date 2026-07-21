@@ -127,3 +127,30 @@ body {
     animation-iteration-count: 1;
   }
 }
+
+/**
+ * MaMarie-style profile desktop shell:
+ * lock viewport height, hide footer, scroll only the content column.
+ */
+@media (min-width: 1024px) {
+  .storefront-shell:has(.profile-desktop-page) {
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .storefront-shell:has(.profile-desktop-page) .storefront-main {
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: 24px;
+    padding-bottom: 20px;
+  }
+
+  .storefront-shell:has(.profile-desktop-page) .storefront-footer {
+    display: none;
+  }
+}
