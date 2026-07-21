@@ -136,7 +136,7 @@ export function ProductDrawer({
       open={open}
       onClose={onClose}
       ariaLabel={isEdit ? "Edit product" : "Add new product"}
-      panelClassName="w-[min(100%,42rem)] sm:w-[70%]"
+      panelClassName="w-[min(100%,42rem)] sm:w-[40%]"
     >
         <div className="border-b border-gray-200 px-5 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
@@ -205,33 +205,34 @@ export function ProductDrawer({
           }}
         >
           <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
-            <label className="block">
-              <span className={ADMIN_LABEL}>
-                Title <span className="text-red-600">*</span>
-              </span>
-              <input
-                required
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                placeholder="Product title"
-                className={ADMIN_INPUT}
-                disabled={isPending}
-              />
-            </label>
-
-            <label className="block">
-              <span className={ADMIN_LABEL}>
-                Slug <span className="text-red-600">*</span>
-              </span>
-              <input
-                required
-                value={slug}
-                onChange={(event) => setSlug(event.target.value)}
-                placeholder="product-slug"
-                className={ADMIN_INPUT}
-                disabled={isPending}
-              />
-            </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label>
+                <span className={ADMIN_LABEL}>
+                  Title <span className="text-red-600">*</span>
+                </span>
+                <input
+                  required
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="Product title"
+                  className={ADMIN_INPUT}
+                  disabled={isPending}
+                />
+              </label>
+              <label>
+                <span className={ADMIN_LABEL}>
+                  Slug <span className="text-red-600">*</span>
+                </span>
+                <input
+                  required
+                  value={slug}
+                  onChange={(event) => setSlug(event.target.value)}
+                  placeholder="product-slug"
+                  className={ADMIN_INPUT}
+                  disabled={isPending}
+                />
+              </label>
+            </div>
 
             <label className="block">
               <span className={ADMIN_LABEL}>Description</span>
