@@ -37,7 +37,7 @@ export function SiteHeaderMainNav({
   wishlistCount,
 }: SiteHeaderMainNavProps) {
   return (
-    <header className="relative z-10 border-b border-gray-200/80 bg-gradient-to-b from-gray-50 to-white shadow-sm backdrop-blur-sm">
+    <header className="relative z-40 border-b border-gray-200/80 bg-gradient-to-b from-gray-50 to-white shadow-sm backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-2 sm:px-4 md:px-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-2 py-4 sm:gap-4 md:py-3">
           <div className="flex w-full items-center justify-between md:w-auto md:justify-start md:gap-0">
