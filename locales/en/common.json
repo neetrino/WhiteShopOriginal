@@ -30,7 +30,6 @@
     "privacyPolicy": "Privacy Policy",
     "terms": "Terms",
     "contactInfo": "Contact Information",
-    "rights": "All Rights Reserved",
-    "createdBy": "Created by NEETRINO IT COMPANY"
+    "copyright": "Copyright © {year} Neetrino IT Company. All Rights Reserved."
   }
 }

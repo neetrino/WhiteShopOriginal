@@ -161,7 +161,7 @@ export function MobileNavDrawer({
                 />
               </div>
               <p className="pt-1 text-xs font-medium tracking-wide text-gray-500">
-                © {year} {dictionary.brand}
+                {dictionary.footer.copyright.replace("{year}", String(year))}
               </p>
             </div>
           </div>

@@ -128,7 +128,7 @@ export function SiteFooter({ dictionary, locale }: SiteFooterProps) {
 
         <div className="mt-8 border-t border-gray-800 pt-8">
           <p className="text-center text-sm text-gray-300 md:text-left">
-            {`Copyright © ${year} | ${dictionary.footer.rights}, ${dictionary.footer.createdBy}`}
+            {dictionary.footer.copyright.replace("{year}", String(year))}
           </p>
         </div>
       </div>

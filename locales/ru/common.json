@@ -30,7 +30,6 @@
     "privacyPolicy": "Политика конфиденциальности",
     "terms": "Условия",
     "contactInfo": "Контактная информация",
-    "rights": "Все права защищены",
-    "createdBy": "Создано NEETRINO IT COMPANY"
+    "copyright": "Copyright © {year} Neetrino IT Company. All Rights Reserved."
   }
 }
