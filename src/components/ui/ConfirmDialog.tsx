@@ -131,7 +131,7 @@ export function ConfirmDialog({
     >
       <button
         type="button"
-        className={`absolute inset-0 bg-black/40 ${backdropClass}`}
+        className={`absolute inset-0 cursor-pointer bg-black/40 disabled:cursor-not-allowed ${backdropClass}`}
         aria-label={displayCancelLabel}
         disabled={isPending}
         onClick={() => {
@@ -159,7 +159,7 @@ export function ConfirmDialog({
             type="button"
             disabled={isPending}
             onClick={onClose}
-            className="inline-flex h-10 items-center justify-center rounded-full border border-gray-200 bg-white px-5 text-sm font-medium text-gray-800 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white px-5 text-sm font-medium text-gray-800 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {displayCancelLabel}
           </button>
@@ -167,7 +167,7 @@ export function ConfirmDialog({
             type="button"
             disabled={isPending}
             onClick={onConfirm}
-            className="inline-flex h-10 items-center justify-center rounded-full bg-red-600 px-5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+            className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full bg-red-600 px-5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPending ? "…" : displayConfirmLabel}
           </button>
