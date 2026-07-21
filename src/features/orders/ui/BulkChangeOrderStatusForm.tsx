@@ -16,8 +16,10 @@ import {
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
   ADMIN_TABLE_TD_CHECK,
+  ADMIN_TABLE_TD_METRIC,
   ADMIN_TABLE_TH,
   ADMIN_TABLE_TH_CHECK,
+  ADMIN_TABLE_TH_METRIC,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
 import { bulkArchiveOrdersAction } from "@/features/orders/application/bulk-archive-orders";
@@ -142,9 +144,9 @@ export function BulkChangeOrderStatusForm({
                 </th>
                 <th className={ADMIN_TABLE_TH}>Order</th>
                 <th className={ADMIN_TABLE_TH}>Customer</th>
-                <th className={ADMIN_TABLE_TH}>Status</th>
-                <th className={ADMIN_TABLE_TH}>Payment</th>
-                <th className={ADMIN_TABLE_TH}>Total</th>
+                <th className={ADMIN_TABLE_TH_METRIC}>Status</th>
+                <th className={ADMIN_TABLE_TH_METRIC}>Payment</th>
+                <th className={ADMIN_TABLE_TH_METRIC}>Total</th>
                 <th className={ADMIN_TABLE_TH}>Placed</th>
               </tr>
             </thead>
@@ -179,7 +181,7 @@ export function BulkChangeOrderStatusForm({
                     <p className="text-sm text-gray-900">{order.contactName}</p>
                     <p className="text-xs text-gray-500">{order.contactEmail}</p>
                   </td>
-                  <td className={ADMIN_TABLE_TD}>
+                  <td className={ADMIN_TABLE_TD_METRIC}>
                     <AdminInlineStatusSelect
                       locale={locale}
                       orderNumber={order.orderNumber}
@@ -188,7 +190,7 @@ export function BulkChangeOrderStatusForm({
                       disabled={isPending || order.isArchived}
                     />
                   </td>
-                  <td className={ADMIN_TABLE_TD}>
+                  <td className={ADMIN_TABLE_TD_METRIC}>
                     <AdminInlineStatusSelect
                       locale={locale}
                       orderNumber={order.orderNumber}
@@ -197,7 +199,7 @@ export function BulkChangeOrderStatusForm({
                       disabled={isPending || order.isArchived}
                     />
                   </td>
-                  <td className={ADMIN_TABLE_TD}>
+                  <td className={ADMIN_TABLE_TD_METRIC}>
                     <span className="font-medium text-gray-900">
                       {formatMoney(order.totalAmount, order.baseCurrency)}
                     </span>

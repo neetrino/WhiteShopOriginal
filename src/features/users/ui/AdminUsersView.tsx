@@ -19,8 +19,10 @@ import {
   ADMIN_TABLE_STATE_INSET,
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
+  ADMIN_TABLE_TD_CENTER,
   ADMIN_TABLE_TD_CHECK,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_TH_CHECK,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
@@ -198,10 +200,10 @@ export function AdminUsersView({
                   </th>
                   <th className={ADMIN_TABLE_TH}>User</th>
                   <th className={ADMIN_TABLE_TH}>Contact</th>
-                  <th className={ADMIN_TABLE_TH}>Orders</th>
-                  <th className={ADMIN_TABLE_TH}>Roles</th>
-                  <th className={ADMIN_TABLE_TH}>Status</th>
-                  <th className={ADMIN_TABLE_TH}>Created</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Orders</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Roles</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Status</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Created</th>
                 </tr>
               </thead>
               <tbody className={ADMIN_TABLE_TBODY}>
@@ -241,12 +243,12 @@ export function AdminUsersView({
                           {user.phone ?? "—"}
                         </p>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
+                      <td className={ADMIN_TABLE_TD_CENTER}>
                         <span className="font-medium text-gray-900">
                           {user.orderCount}
                         </span>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
+                      <td className={ADMIN_TABLE_TD_CENTER}>
                         <span
                           className={`${ADMIN_BADGE} ${
                             user.role === "ADMIN"
@@ -257,7 +259,7 @@ export function AdminUsersView({
                           {user.role.toLowerCase()}
                         </span>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
+                      <td className={ADMIN_TABLE_TD_CENTER}>
                         <button
                           type="button"
                           role="switch"
@@ -277,7 +279,7 @@ export function AdminUsersView({
                               }
                             })
                           }
-                          className={`relative h-5 w-9 rounded-full transition-colors disabled:opacity-40 ${
+                          className={`relative mx-auto block h-5 w-9 rounded-full transition-colors disabled:opacity-40 ${
                             isActive ? "bg-green-500" : "bg-gray-300"
                           }`}
                           aria-label={
@@ -293,7 +295,7 @@ export function AdminUsersView({
                           />
                         </button>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
+                      <td className={ADMIN_TABLE_TD_CENTER}>
                         <span className="text-sm text-gray-600">
                           {formatCreated(user.createdAt)}
                         </span>

@@ -18,7 +18,9 @@ import {
   ADMIN_TABLE_STATE_INSET,
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
+  ADMIN_TABLE_TD_CENTER,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
 import { deleteDeliveryLocationAction } from "@/features/delivery/application/manage-delivery";
@@ -107,25 +109,25 @@ export function AdminDeliveryView({
               <thead className={ADMIN_TABLE_THEAD}>
                 <tr>
                   <th className={ADMIN_TABLE_TH}>Country</th>
-                  <th className={ADMIN_TABLE_TH}>City</th>
-                  <th className={ADMIN_TABLE_TH}>Price</th>
-                  <th className={ADMIN_TABLE_TH}>Free from</th>
-                  <th className={ADMIN_TABLE_TH}>Actions</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>City</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Price</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Free from</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Actions</th>
                 </tr>
               </thead>
               <tbody className={ADMIN_TABLE_TBODY}>
                 {locations.map((location) => (
                   <tr key={location.id} className={ADMIN_TABLE_ROW}>
                     <td className={ADMIN_TABLE_TD}>{location.country}</td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       <span className="font-medium text-gray-900">
                         {location.city}
                       </span>
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       {formatMoneyAmount(location.priceAmount, "AMD", locale)}
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       {location.freeThresholdAmount != null
                         ? formatMoneyAmount(
                             location.freeThresholdAmount,
@@ -134,8 +136,8 @@ export function AdminDeliveryView({
                           )
                         : "—"}
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
-                      <div className="flex items-center gap-1">
+                    <td className={ADMIN_TABLE_TD_CENTER}>
+                      <div className="inline-flex items-center justify-center gap-1">
                         <button
                           type="button"
                           onClick={() => openEdit(location)}

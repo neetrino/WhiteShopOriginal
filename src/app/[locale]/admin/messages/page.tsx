@@ -18,7 +18,9 @@ import {
   ADMIN_TABLE_STATE_INSET,
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
+  ADMIN_TABLE_TD_CENTER,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
 import { ADMIN_BADGE } from "@/features/admin/ui/status-badge";
@@ -127,7 +129,7 @@ export default async function AdminMessagesPage({
                 <tr>
                   <th className={ADMIN_TABLE_TH}>Subject</th>
                   <th className={ADMIN_TABLE_TH}>From</th>
-                  <th className={ADMIN_TABLE_TH}>Status</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Status</th>
                   <th className={ADMIN_TABLE_TH}>Received</th>
                 </tr>
               </thead>
@@ -146,7 +148,7 @@ export default async function AdminMessagesPage({
                       <p className="text-sm text-gray-900">{message.name}</p>
                       <p className="text-xs text-gray-500">{message.email}</p>
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       <span
                         className={`${ADMIN_BADGE} ${contactStatusBadgeClass(message.status)}`}
                       >

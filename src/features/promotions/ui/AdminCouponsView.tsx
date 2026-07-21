@@ -18,7 +18,9 @@ import {
   ADMIN_TABLE_STATE_INSET,
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
+  ADMIN_TABLE_TD_CENTER,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
 import {
@@ -113,13 +115,13 @@ export function AdminCouponsView({ locale, coupons }: AdminCouponsViewProps) {
               <thead className={ADMIN_TABLE_THEAD}>
                 <tr>
                   <th className={ADMIN_TABLE_TH}>Code</th>
-                  <th className={ADMIN_TABLE_TH}>Type</th>
-                  <th className={ADMIN_TABLE_TH}>Value</th>
-                  <th className={ADMIN_TABLE_TH}>Usage limit</th>
-                  <th className={ADMIN_TABLE_TH}>Used</th>
-                  <th className={ADMIN_TABLE_TH}>Active</th>
-                  <th className={ADMIN_TABLE_TH}>Valid until</th>
-                  <th className={ADMIN_TABLE_TH}>Actions</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Type</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Value</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Usage limit</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Used</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Active</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Valid until</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Actions</th>
                 </tr>
               </thead>
               <tbody className={ADMIN_TABLE_TBODY}>
@@ -130,33 +132,33 @@ export function AdminCouponsView({ locale, coupons }: AdminCouponsViewProps) {
                         {promo.code}
                       </span>
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       {typeLabel(promo.discountType)}
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       {valueLabel(promo.discountType, promo.discountValue)}
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       {promo.totalUsageLimit ?? "—"}
                     </td>
-                    <td className={ADMIN_TABLE_TD}>{promo.usedCount}</td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>{promo.usedCount}</td>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       {promo.isActive ? (
                         <Check
-                          className="h-4 w-4 text-gray-900"
+                          className="mx-auto h-4 w-4 text-gray-900"
                           aria-label="Active"
                         />
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       <span className="text-sm text-gray-700">
                         {formatValidUntil(promo.endsAt, locale)}
                       </span>
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
-                      <div className="flex items-center gap-1">
+                    <td className={ADMIN_TABLE_TD_CENTER}>
+                      <div className="inline-flex items-center justify-center gap-1">
                         <button
                           type="button"
                           className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"

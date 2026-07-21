@@ -18,7 +18,9 @@ import {
   ADMIN_TABLE_STATE_INSET,
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
+  ADMIN_TABLE_TD_CENTER,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
 import {
@@ -193,7 +195,7 @@ export function AdminCategoriesView({
                   <th className={ADMIN_TABLE_TH}>Image</th>
                   <th className={ADMIN_TABLE_TH}>Category Title</th>
                   <th className={ADMIN_TABLE_TH}>Category</th>
-                  <th className={ADMIN_TABLE_TH}>Actions</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Actions</th>
                 </tr>
               </thead>
               <tbody className={ADMIN_TABLE_TBODY}>
@@ -270,8 +272,8 @@ export function AdminCategoriesView({
                           {category.parentTitle ?? "None (Root Category)"}
                         </span>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
-                        <div className="flex items-center gap-1">
+                      <td className={ADMIN_TABLE_TD_CENTER}>
+                        <div className="inline-flex items-center justify-center gap-1">
                           <button
                             type="button"
                             className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
