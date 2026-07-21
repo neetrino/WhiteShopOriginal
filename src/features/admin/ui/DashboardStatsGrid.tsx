@@ -29,16 +29,16 @@ function StatCard({
   iconPath: string;
 }) {
   return (
-    <Link href={href} className="block">
-      <Card className="p-6 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-        <div className="flex items-center justify-between">
-          <div>
+    <Link href={href} className="block h-full">
+      <Card className="flex h-full p-6 transition-all duration-200 hover:scale-105 hover:shadow-lg">
+        <div className="flex w-full items-center justify-between gap-3">
+          <div className="min-w-0">
             <p className="text-sm font-medium text-gray-600">{label}</p>
             <p className="mt-1 text-2xl font-bold text-gray-900">{value}</p>
-            {hint ? <p className="mt-1 text-xs text-gray-500">{hint}</p> : null}
+            <p className="mt-1 min-h-4 text-xs text-gray-500">{hint ?? "\u00a0"}</p>
           </div>
           <div
-            className={`flex h-12 w-12 items-center justify-center rounded-full ${iconBg}`}
+            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${iconBg}`}
           >
             <svg
               className={`h-6 w-6 ${iconColor}`}
