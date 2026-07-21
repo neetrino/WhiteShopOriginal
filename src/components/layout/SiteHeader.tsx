@@ -62,7 +62,10 @@ async function SiteHeaderMainNavAsync({
  */
 export function SiteHeader({ locale, currency, dictionary }: SiteHeaderProps) {
   return (
-    <div className="site-header relative z-40 shrink-0">
+    <div
+      className="site-header sticky top-0 z-[80] shrink-0 md:relative"
+      data-site-header
+    >
       <SiteHeaderTopBar
         locale={locale}
         currency={currency}

@@ -9,7 +9,7 @@ import type { OrderStatus } from "@/features/orders/domain/order-status";
 import type { PaymentStatus } from "@/features/orders/domain/payment-status";
 
 const FILTER_SEARCH =
-  "h-11 min-w-0 flex-1 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 shadow-sm outline-none transition-colors placeholder:text-gray-400 hover:border-gray-300 focus:border-gray-300";
+  "h-11 w-full min-w-0 shrink-0 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 shadow-sm outline-none transition-colors placeholder:text-gray-400 hover:border-gray-300 focus:border-gray-300 lg:flex-1 lg:shrink";
 
 const ORDER_STATUS_FILTERS = [
   { label: "Pending", value: "PENDING" },
@@ -56,7 +56,7 @@ export function CustomerOrdersFilters({
       <form
         ref={formRef}
         method="get"
-        className="flex flex-nowrap items-center gap-3 p-4"
+        className="flex flex-col gap-3 p-4 lg:flex-row lg:flex-nowrap lg:items-center"
       >
         <SelectDropdown
           name="status"
@@ -64,7 +64,7 @@ export function CustomerOrdersFilters({
           value={statusValue}
           allLabel="All statuses"
           options={ORDER_STATUS_FILTERS}
-          className="w-[180px] shrink-0"
+          className="w-full lg:w-[180px] lg:shrink-0"
           onValueChange={applyStatus}
         />
         <SelectDropdown
@@ -73,7 +73,7 @@ export function CustomerOrdersFilters({
           value={paymentValue}
           allLabel="All payment statuses"
           options={PAYMENT_STATUS_FILTERS}
-          className="w-[200px] shrink-0"
+          className="w-full lg:w-[200px] lg:shrink-0"
           onValueChange={applyPayment}
         />
         <input

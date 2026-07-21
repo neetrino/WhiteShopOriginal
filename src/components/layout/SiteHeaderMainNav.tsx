@@ -1,4 +1,5 @@
 import { AccountControls } from "@/components/layout/AccountControls";
+import { LocaleCurrencySwitcher } from "@/components/layout/LocaleCurrencySwitcher";
 import { MobileNavDrawer } from "@/components/layout/MobileNavDrawer";
 import {
   SITE_HEADER_ACTIONS_RAIL,
@@ -53,13 +54,19 @@ export function SiteHeaderMainNav({
               {dictionary.brand}
             </AppLink>
 
-            <MobileNavDrawer
+          <div className="flex items-center gap-2 md:hidden">
+            <LocaleCurrencySwitcher
               locale={locale}
               currency={currency}
+              currencyLabel={dictionary.header.currency}
+              languageLabel={dictionary.header.language}
+            />
+            <MobileNavDrawer
+              locale={locale}
               dictionary={dictionary}
-              user={user}
               navItems={navItems}
             />
+          </div>
           </div>
 
           <nav
