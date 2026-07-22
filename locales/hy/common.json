@@ -11,7 +11,8 @@
     "wishlist": "Ցանկեր",
     "openMenu": "Բացել մենյուն",
     "closeMenu": "Փակել մենյուն",
-    "navigation": "Նավիգացիա"
+    "navigation": "Նավիգացիա",
+    "shopNow": "Գնել հիմա"
   },
   "header": {
     "language": "Լեզու",
@@ -30,7 +31,6 @@
     "privacyPolicy": "Գաղտնիության քաղաքականություն",
     "terms": "Պայմաններ",
     "contactInfo": "Կապի տվյալներ",
-    "rights": "Բոլոր իրավունքները պաշտպանված են",
-    "createdBy": "Ստեղծված է NEETRINO IT COMPANY-ի կողմից"
+    "copyright": "Copyright © {year} Neetrino IT Company. All Rights Reserved."
   }
 }

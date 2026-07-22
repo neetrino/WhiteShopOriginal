@@ -7,6 +7,10 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import {
+  ConfirmDialog,
+  deleteConfirmDescription,
+} from "@/components/ui/ConfirmDialog";
+import {
   ADMIN_PAGE_SUBTITLE,
   ADMIN_PAGE_TITLE,
 } from "@/features/admin/ui/admin-form-classes";
@@ -18,7 +22,9 @@ import {
   ADMIN_TABLE_STATE_INSET,
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
+  ADMIN_TABLE_TD_CENTER,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
 import { deleteDeliveryLocationAction } from "@/features/delivery/application/manage-delivery";
@@ -41,6 +47,8 @@ export function AdminDeliveryView({
     useState<AdminDeliveryLocation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [pendingDelete, setPendingDelete] =
+    useState<AdminDeliveryLocation | null>(null);
 
   function openCreate(): void {
     setEditingLocation(null);
@@ -57,34 +65,43 @@ export function AdminDeliveryView({
     setEditingLocation(null);
   }
 
-  function onDelete(location: AdminDeliveryLocation): void {
-    if (!window.confirm(`Remove delivery for ${location.city}?`)) {
-      return;
-    }
+  function requestDelete(location: AdminDeliveryLocation): void {
+    setPendingDelete(location);
+  }
+
+  function confirmDelete(): void {
+    if (!pendingDelete) return;
+    const locationId = pendingDelete.id;
 
     startTransition(async () => {
       setError(null);
-      const result = await deleteDeliveryLocationAction(locale, location.id);
+      const result = await deleteDeliveryLocationAction(locale, locationId);
       if (!result.ok) {
         setError(result.error.message);
         return;
       }
+      setPendingDelete(null);
       router.refresh();
     });
   }
 
   return (
     <section>
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className={ADMIN_PAGE_TITLE}>Delivery</h1>
           <p className={`mt-1 ${ADMIN_PAGE_SUBTITLE}`}>
             Set delivery prices by country and city for checkout.
           </p>
         </div>
-        <Button type="button" size="sm" onClick={openCreate}>
-          <Plus className="mr-1.5 h-4 w-4" aria-hidden />
-          Add location
+        <Button
+          type="button"
+          size="sm"
+          onClick={openCreate}
+          className="inline-flex items-center gap-1.5"
+        >
+          <Plus className="h-4 w-4" aria-hidden />
+          Add Location
         </Button>
       </div>
 
@@ -102,25 +119,25 @@ export function AdminDeliveryView({
               <thead className={ADMIN_TABLE_THEAD}>
                 <tr>
                   <th className={ADMIN_TABLE_TH}>Country</th>
-                  <th className={ADMIN_TABLE_TH}>City</th>
-                  <th className={ADMIN_TABLE_TH}>Price</th>
-                  <th className={ADMIN_TABLE_TH}>Free from</th>
-                  <th className={ADMIN_TABLE_TH}>Actions</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>City</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Price</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Free from</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Actions</th>
                 </tr>
               </thead>
               <tbody className={ADMIN_TABLE_TBODY}>
                 {locations.map((location) => (
                   <tr key={location.id} className={ADMIN_TABLE_ROW}>
                     <td className={ADMIN_TABLE_TD}>{location.country}</td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       <span className="font-medium text-gray-900">
                         {location.city}
                       </span>
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       {formatMoneyAmount(location.priceAmount, "AMD", locale)}
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={ADMIN_TABLE_TD_CENTER}>
                       {location.freeThresholdAmount != null
                         ? formatMoneyAmount(
                             location.freeThresholdAmount,
@@ -129,8 +146,8 @@ export function AdminDeliveryView({
                           )
                         : "—"}
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
-                      <div className="flex items-center gap-1">
+                    <td className={ADMIN_TABLE_TD_CENTER}>
+                      <div className="inline-flex items-center justify-center gap-1">
                         <button
                           type="button"
                           onClick={() => openEdit(location)}
@@ -142,9 +159,9 @@ export function AdminDeliveryView({
                         </button>
                         <button
                           type="button"
-                          onClick={() => onDelete(location)}
+                          onClick={() => requestDelete(location)}
                           disabled={isPending}
-                          className="rounded-lg p-2 text-gray-500 hover:bg-red-50 hover:text-red-700"
+                          className="rounded-lg p-2 text-red-600 hover:bg-red-50 hover:text-red-700"
                           aria-label={`Delete ${location.city}`}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -164,6 +181,21 @@ export function AdminDeliveryView({
         open={drawerOpen}
         onClose={closeDrawer}
         location={editingLocation}
+      />
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete"
+        description={
+          pendingDelete
+            ? deleteConfirmDescription("delivery location", pendingDelete.city)
+            : ""
+        }
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setPendingDelete(null);
+        }}
+        onConfirm={confirmDelete}
       />
     </section>
   );

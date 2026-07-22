@@ -132,7 +132,7 @@ export function AdminProductRow({
             type="button"
             disabled={disabled}
             onClick={onDelete}
-            className="rounded p-1.5 text-red-500 hover:bg-red-50"
+            className="rounded p-1.5 text-red-600 hover:bg-red-50"
             aria-label={`Delete ${product.title}`}
           >
             <Trash2 className="h-4 w-4" />

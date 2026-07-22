@@ -5,6 +5,10 @@ import { useState, useTransition } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 
 import {
+  ConfirmDialog,
+  deleteConfirmDescription,
+} from "@/components/ui/ConfirmDialog";
+import {
   deleteHeroSlideAction,
   toggleHeroSlideAction,
 } from "@/features/hero/application/manage-hero";
@@ -27,15 +31,22 @@ export function HeroSlideControls({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   function run(
     action: () => Promise<{ ok: boolean; error?: { message: string } }>,
+    options?: { closeConfirm?: boolean },
   ): void {
     startTransition(async () => {
       setError(null);
       const result = await action();
       if (!result.ok) {
         setError(result.error?.message ?? "Action failed.");
+        return;
+      }
+      if (options?.closeConfirm) {
+        setConfirmOpen(false);
+        router.refresh();
         return;
       }
       router.refresh();
@@ -57,10 +68,8 @@ export function HeroSlideControls({
         <button
           type="button"
           disabled={isPending}
-          onClick={() =>
-            run(() => deleteHeroSlideAction(locale, { slideId }))
-          }
-          className="rounded p-1.5 text-red-500 hover:bg-red-50 disabled:opacity-50"
+          onClick={() => setConfirmOpen(true)}
+          className="rounded p-1.5 text-red-600 hover:bg-red-50 disabled:opacity-50"
           aria-label={`Delete ${slideTitle}`}
         >
           <Trash2 className="h-4 w-4" />
@@ -91,6 +100,21 @@ export function HeroSlideControls({
         </button>
       </div>
       {error ? <p className="text-xs text-red-700">{error}</p> : null}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete"
+        description={deleteConfirmDescription("slide", slideTitle)}
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setConfirmOpen(false);
+        }}
+        onConfirm={() =>
+          run(() => deleteHeroSlideAction(locale, { slideId }), {
+            closeConfirm: true,
+          })
+        }
+      />
     </div>
   );
 }

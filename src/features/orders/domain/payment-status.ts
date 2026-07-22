@@ -13,13 +13,13 @@ export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 /** Admin orders table dropdown options (label → DB status). */
 export const ADMIN_PAYMENT_STATUS_OPTIONS = [
   { value: "CAPTURED", label: "Paid" },
-  { value: "PENDING", label: "pending" },
+  { value: "PENDING", label: "Pending" },
   { value: "FAILED", label: "Failed" },
 ] as const satisfies ReadonlyArray<{ value: PaymentStatus; label: string }>;
 
 /**
  * Admin-driven payment transitions (COD and manual corrections).
- * Admin list allows free moves among Paid / pending / Failed.
+ * Admin list allows free moves among Paid / Pending / Failed.
  */
 const TRANSITIONS: Record<PaymentStatus, readonly PaymentStatus[]> = {
   PENDING: ["CAPTURED", "FAILED", "AUTHORIZED", "CANCELLED"],
@@ -31,8 +31,8 @@ const TRANSITIONS: Record<PaymentStatus, readonly PaymentStatus[]> = {
 };
 
 const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
-  PENDING: "pending",
-  AUTHORIZED: "pending",
+  PENDING: "Pending",
+  AUTHORIZED: "Pending",
   CAPTURED: "Paid",
   FAILED: "Failed",
   REFUNDED: "Failed",

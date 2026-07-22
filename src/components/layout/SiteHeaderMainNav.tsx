@@ -1,5 +1,10 @@
 import { AccountControls } from "@/components/layout/AccountControls";
+import { LocaleCurrencySwitcher } from "@/components/layout/LocaleCurrencySwitcher";
 import { MobileNavDrawer } from "@/components/layout/MobileNavDrawer";
+import {
+  SITE_HEADER_ACTIONS_RAIL,
+  SITE_HEADER_INNER,
+} from "@/components/layout/site-header-classes";
 import { AppLink } from "@/components/ui/AppLink";
 import { CartDrawer } from "@/features/cart/ui/CartDrawer";
 import { WishlistHeaderLink } from "@/features/wishlist/ui/WishlistHeaderLink";
@@ -37,8 +42,8 @@ export function SiteHeaderMainNav({
   wishlistCount,
 }: SiteHeaderMainNavProps) {
   return (
-    <header className="relative z-10 border-b border-gray-200/80 bg-gradient-to-b from-gray-50 to-white shadow-sm backdrop-blur-sm">
-      <div className="mx-auto max-w-7xl px-2 sm:px-4 md:px-6 lg:px-8">
+    <header className="relative z-40 border-b border-gray-200/80 bg-gradient-to-b from-gray-50 to-white shadow-sm backdrop-blur-sm">
+      <div className={SITE_HEADER_INNER}>
         <div className="flex flex-wrap items-center gap-2 py-4 sm:gap-4 md:py-3">
           <div className="flex w-full items-center justify-between md:w-auto md:justify-start md:gap-0">
             <AppLink
@@ -49,13 +54,19 @@ export function SiteHeaderMainNav({
               {dictionary.brand}
             </AppLink>
 
-            <MobileNavDrawer
+          <div className="flex items-center gap-2 md:hidden">
+            <LocaleCurrencySwitcher
               locale={locale}
               currency={currency}
+              currencyLabel={dictionary.header.currency}
+              languageLabel={dictionary.header.language}
+            />
+            <MobileNavDrawer
+              locale={locale}
               dictionary={dictionary}
-              user={user}
               navItems={navItems}
             />
+          </div>
           </div>
 
           <nav
@@ -74,7 +85,9 @@ export function SiteHeaderMainNav({
             ))}
           </nav>
 
-          <div className="ml-auto hidden items-center gap-2 md:flex">
+          <div
+            className={`${SITE_HEADER_ACTIONS_RAIL} ml-auto hidden justify-center gap-2 md:flex`}
+          >
             <AccountControls
               locale={locale}
               loginLabel={dictionary.header.login}

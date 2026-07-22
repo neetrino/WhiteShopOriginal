@@ -2,9 +2,8 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
-
 import { Button } from "@/components/ui/Button";
+import { SideSheet } from "@/components/ui/SideSheet";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
@@ -86,42 +85,6 @@ export function ProductDrawer({
   useEffect(() => {
     if (!open) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function handleEscape(event: KeyboardEvent): void {
-      if (event.key === "Escape") onClose();
-    }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open, onClose]);
-
-  useEffect(() => {
-    if (!open) {
-      setTitle("");
-      setSlug("");
-      setDescription("");
-      setImages((current) => {
-        for (const image of current) {
-          if (image.file) URL.revokeObjectURL(image.previewUrl);
-        }
-        return [];
-      });
-      setRemovedImageIds([]);
-      setCategories(initialCategories);
-      setCategoryIds([]);
-      setPriceAmount("");
-      setCompareAtAmount("");
-      setSku("");
-      setStockOnHand("");
-      setError(null);
-      return;
-    }
-
     setCategories(initialCategories);
     if (product) {
       setTitle(product.title);
@@ -168,32 +131,17 @@ export function ProductDrawer({
     setImages(next);
   }
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/40"
-      role="dialog"
-      aria-modal="true"
-      aria-label={isEdit ? "Edit product" : "Add new product"}
-      onClick={onClose}
+    <SideSheet
+      open={open}
+      onClose={onClose}
+      ariaLabel={isEdit ? "Edit product" : "Add new product"}
+      panelClassName="w-[min(100%,42rem)] sm:w-[40%]"
     >
-      <div
-        className="flex h-full w-[70%] flex-col bg-white shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+        <div className="border-b border-gray-200 px-5 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
             {isEdit ? "Edit product" : "Add new product"}
           </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
         <form
@@ -257,33 +205,34 @@ export function ProductDrawer({
           }}
         >
           <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
-            <label className="block">
-              <span className={ADMIN_LABEL}>
-                Title <span className="text-red-600">*</span>
-              </span>
-              <input
-                required
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                placeholder="Product title"
-                className={ADMIN_INPUT}
-                disabled={isPending}
-              />
-            </label>
-
-            <label className="block">
-              <span className={ADMIN_LABEL}>
-                Slug <span className="text-red-600">*</span>
-              </span>
-              <input
-                required
-                value={slug}
-                onChange={(event) => setSlug(event.target.value)}
-                placeholder="product-slug"
-                className={ADMIN_INPUT}
-                disabled={isPending}
-              />
-            </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label>
+                <span className={ADMIN_LABEL}>
+                  Title <span className="text-red-600">*</span>
+                </span>
+                <input
+                  required
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="Product title"
+                  className={ADMIN_INPUT}
+                  disabled={isPending}
+                />
+              </label>
+              <label>
+                <span className={ADMIN_LABEL}>
+                  Slug <span className="text-red-600">*</span>
+                </span>
+                <input
+                  required
+                  value={slug}
+                  onChange={(event) => setSlug(event.target.value)}
+                  placeholder="product-slug"
+                  className={ADMIN_INPUT}
+                  disabled={isPending}
+                />
+              </label>
+            </div>
 
             <label className="block">
               <span className={ADMIN_LABEL}>Description</span>
@@ -394,7 +343,6 @@ export function ProductDrawer({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </SideSheet>
   );
 }

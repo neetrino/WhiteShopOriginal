@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition, type FormEvent } from "react";
 
 import { Card } from "@/components/ui/Card";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
@@ -78,21 +79,21 @@ export function AnalyticsPeriodCard({
         </p>
       </div>
 
-      <label className="block max-w-md">
-        <span className={ADMIN_LABEL}>period</span>
-        <select
-          className={ADMIN_INPUT}
+      <div className="max-w-md">
+        <span className={ADMIN_LABEL}>Period</span>
+        <SelectDropdown
+          ariaLabel="Period"
           value={selectedPreset}
+          options={ANALYTICS_PERIOD_PRESETS.map((option) => ({
+            label: analyticsPeriodLabel(option),
+            value: option,
+          }))}
           disabled={pending}
-          onChange={(event) => onPeriodChange(event.target.value)}
-        >
-          {ANALYTICS_PERIOD_PRESETS.map((option) => (
-            <option key={option} value={option}>
-              {analyticsPeriodLabel(option)}
-            </option>
-          ))}
-        </select>
-      </label>
+          deferChange={false}
+          className="mt-1"
+          onValueChange={onPeriodChange}
+        />
+      </div>
 
       {selectedPreset === "custom" ? (
         <form

@@ -5,9 +5,9 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import {
   ADMIN_LABEL,
-  ADMIN_SELECT,
   ADMIN_TEXTAREA,
 } from "@/features/admin/ui/admin-form-classes";
 import { changePaymentStatusAction } from "@/features/orders/application/change-payment-status";
@@ -28,6 +28,7 @@ export function ChangePaymentStatusForm({
 }: ChangePaymentStatusFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [toStatus, setToStatus] = useState(eligibleStatuses[0] ?? "");
   const [isPending, startTransition] = useTransition();
 
   if (eligibleStatuses.length === 0) {
@@ -45,7 +46,6 @@ export function ChangePaymentStatusForm({
         onSubmit={(event) => {
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
-          const toStatus = String(formData.get("toStatus") ?? "");
           const noteRaw = String(formData.get("note") ?? "").trim();
 
           startTransition(async () => {
@@ -68,22 +68,22 @@ export function ChangePaymentStatusForm({
         <p className="text-sm text-gray-700">
           Current: <strong className="text-gray-900">{currentStatus}</strong>
         </p>
-        <label>
+        <div>
           <span className={ADMIN_LABEL}>New payment status</span>
-          <select
+          <SelectDropdown
             name="toStatus"
-            required
-            className={ADMIN_SELECT}
-            defaultValue={eligibleStatuses[0]}
+            ariaLabel="New payment status"
+            value={toStatus}
+            options={eligibleStatuses.map((status) => ({
+              label: status,
+              value: status,
+            }))}
             disabled={isPending}
-          >
-            {eligibleStatuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </label>
+            deferChange={false}
+            className="mt-1"
+            onValueChange={setToStatus}
+          />
+        </div>
         <label>
           <span className={ADMIN_LABEL}>Note (optional)</span>
           <textarea

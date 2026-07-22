@@ -84,14 +84,14 @@ export function ProductDrawerCategories({
   return (
     <div>
       <span className={ADMIN_LABEL}>Categories</span>
-      <div className="mt-1">
+      <div className={`relative mt-1 ${open ? "z-50" : "z-0"}`}>
         <button
           type="button"
           disabled={disabled || isPending}
           aria-expanded={open}
           aria-controls={listId}
           onClick={() => setOpen((value) => !value)}
-          className={`${ADMIN_INPUT} flex items-center justify-between gap-2 text-left disabled:opacity-50`}
+          className={`${ADMIN_INPUT} flex items-center justify-between gap-2 pr-3 text-left disabled:opacity-50`}
         >
           <span
             className={`min-w-0 flex-1 truncate ${
@@ -101,39 +101,73 @@ export function ProductDrawerCategories({
             {triggerLabel}
           </span>
           <ChevronDown
-            className={`h-4 w-4 shrink-0 text-gray-400 transition-transform ${
+            className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
               open ? "rotate-180" : ""
             }`}
             aria-hidden
           />
         </button>
 
-        {open ? (
-          <div
-            id={listId}
-            className="mt-1 max-h-40 space-y-2 overflow-y-auto rounded-xl border border-gray-200 px-3 py-2"
-          >
-            {categories.length === 0 ? (
-              <p className="text-sm text-gray-500">No categories yet.</p>
-            ) : (
-              categories.map((category) => (
-                <label
-                  key={category.id}
-                  className="flex items-center gap-2 text-sm text-gray-800"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(category.id)}
-                    disabled={disabled || isPending}
-                    onChange={() => toggleCategory(category.id)}
-                    className="h-4 w-4 rounded border-gray-300"
-                  />
-                  <span>{category.title}</span>
-                </label>
-              ))
-            )}
+        <div
+          className={`absolute top-[calc(100%+0.5rem)] left-0 z-[100] grid w-full transition-[grid-template-rows,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            open
+              ? "translate-y-0 grid-rows-[1fr] opacity-100"
+              : "pointer-events-none -translate-y-1 grid-rows-[0fr] opacity-0"
+          }`}
+          aria-hidden={!open}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div
+              id={listId}
+              className="max-h-56 overflow-y-auto rounded-2xl border border-gray-100 bg-white py-2"
+            >
+              {categories.length === 0 ? (
+                <p className="px-4 py-2.5 text-sm text-gray-500">
+                  No categories yet.
+                </p>
+              ) : (
+                categories.map((category) => {
+                  const selected = selectedIds.includes(category.id);
+                  return (
+                    <button
+                      key={category.id}
+                      type="button"
+                      disabled={disabled || isPending}
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-800 hover:bg-gray-50 disabled:opacity-50"
+                      onClick={() => toggleCategory(category.id)}
+                    >
+                      <span
+                        className={
+                          selected
+                            ? "flex h-4 w-4 shrink-0 items-center justify-center rounded border border-gray-900 bg-gray-900 text-white"
+                            : "flex h-4 w-4 shrink-0 rounded border border-gray-300 bg-white"
+                        }
+                        aria-hidden
+                      >
+                        {selected ? (
+                          <svg
+                            viewBox="0 0 12 12"
+                            className="h-3 w-3"
+                            fill="none"
+                          >
+                            <path
+                              d="M2.5 6.2 4.8 8.5 9.5 3.5"
+                              stroke="currentColor"
+                              strokeWidth="1.6"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        ) : null}
+                      </span>
+                      <span className="min-w-0 truncate">{category.title}</span>
+                    </button>
+                  );
+                })
+              )}
+            </div>
           </div>
-        ) : null}
+        </div>
       </div>
 
       <div className="mt-2">

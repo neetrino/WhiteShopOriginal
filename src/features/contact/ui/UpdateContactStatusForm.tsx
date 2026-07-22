@@ -5,10 +5,8 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import {
-  ADMIN_LABEL,
-  ADMIN_SELECT,
-} from "@/features/admin/ui/admin-form-classes";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
+import { ADMIN_LABEL } from "@/features/admin/ui/admin-form-classes";
 import { updateContactStatusAction } from "@/features/contact/application/update-contact-status";
 import type { ContactStatus } from "@/features/contact/domain/contact-rules";
 
@@ -27,6 +25,7 @@ export function UpdateContactStatusForm({
 }: UpdateContactStatusFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState(eligibleStatuses[0] ?? "");
   const [isPending, startTransition] = useTransition();
 
   if (eligibleStatuses.length === 0) {
@@ -41,14 +40,12 @@ export function UpdateContactStatusForm({
         className="flex flex-col gap-4"
         onSubmit={(event) => {
           event.preventDefault();
-          const formData = new FormData(event.currentTarget);
-          const status = String(formData.get("status") ?? "") as ContactStatus;
 
           startTransition(async () => {
             setError(null);
             const result = await updateContactStatusAction(locale, {
               messageId,
-              status,
+              status: status as ContactStatus,
             });
             if (!result.ok) {
               setError(result.error.message);
@@ -61,22 +58,22 @@ export function UpdateContactStatusForm({
         <p className="text-sm text-gray-700">
           Current: <strong className="text-gray-900">{currentStatus}</strong>
         </p>
-        <label>
+        <div>
           <span className={ADMIN_LABEL}>New status</span>
-          <select
+          <SelectDropdown
             name="status"
-            required
-            className={ADMIN_SELECT}
-            defaultValue={eligibleStatuses[0]}
+            ariaLabel="New status"
+            value={status}
+            options={eligibleStatuses.map((item) => ({
+              label: item,
+              value: item,
+            }))}
             disabled={isPending}
-          >
-            {eligibleStatuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </label>
+            deferChange={false}
+            className="mt-1"
+            onValueChange={setStatus}
+          />
+        </div>
         {error ? <p className="text-sm text-red-700">{error}</p> : null}
         <Button type="submit" size="sm" disabled={isPending}>
           {isPending ? "Updating…" : "Update status"}

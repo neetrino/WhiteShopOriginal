@@ -2,13 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { X } from "lucide-react";
-
 import { Button } from "@/components/ui/Button";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
+import { SideSheet } from "@/components/ui/SideSheet";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
-  ADMIN_SELECT,
   ADMIN_TEXTAREA,
 } from "@/features/admin/ui/admin-form-classes";
 import {
@@ -117,21 +116,34 @@ export function BlogPostDrawer({
   useEffect(() => {
     if (!open) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function handleEscape(event: KeyboardEvent): void {
-      if (event.key === "Escape") onClose();
+    if (post) {
+      setActiveLocale(
+        (locales.find((loc) => post.translations[loc]?.title) as
+          | Locale
+          | undefined) ?? "en",
+      );
+      setDrafts(draftsFromTranslations(post.translations));
+      setStatus(post.status);
+      setPublishedAt(post.publishedAt ?? "");
+      setImageFile(null);
+      setImagePreview(post.coverUrl ?? null);
+      setRemoveExistingImage(false);
+      setError(null);
+    } else {
+      setActiveLocale("en");
+      setDrafts({
+        hy: emptyDraft(),
+        en: emptyDraft(),
+        ru: emptyDraft(),
+      });
+      setStatus("DRAFT");
+      setPublishedAt("");
+      setImageFile(null);
+      setImagePreview(null);
+      setRemoveExistingImage(false);
+      setError(null);
     }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
+  }, [open, post]);
 
   const draft = drafts[activeLocale];
 
@@ -143,29 +155,16 @@ export function BlogPostDrawer({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/40"
-      role="dialog"
-      aria-modal="true"
-      aria-label={isEdit ? "Edit blog post" : "Add blog post"}
-      onClick={onClose}
+    <SideSheet
+      open={open}
+      onClose={onClose}
+      ariaLabel={isEdit ? "Edit blog post" : "Add blog post"}
+      panelClassName="w-full max-w-lg"
     >
-      <div
-        className="flex h-full w-full max-w-lg flex-col bg-white shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+        <div className="border-b border-gray-200 px-5 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
             {isEdit ? "Edit blog post" : "Add blog post"}
           </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
         <form
@@ -309,21 +308,24 @@ export function BlogPostDrawer({
                     Shown on the post. Leave empty to use today when publishing.
                   </span>
                 </label>
-                <label className="block">
+                <div>
                   <span className={ADMIN_LABEL}>Status</span>
-                  <select
+                  <SelectDropdown
+                    ariaLabel="Status"
                     value={status}
-                    onChange={(event) =>
-                      setStatus(event.target.value as BlogPostStatus)
-                    }
-                    className={ADMIN_SELECT}
+                    options={[
+                      { label: "Draft", value: "DRAFT" },
+                      { label: "Published", value: "PUBLISHED" },
+                      { label: "Archived", value: "ARCHIVED" },
+                    ]}
                     disabled={isPending}
-                  >
-                    <option value="DRAFT">Draft</option>
-                    <option value="PUBLISHED">Published</option>
-                    <option value="ARCHIVED">Archived</option>
-                  </select>
-                </label>
+                    deferChange={false}
+                    className="mt-1"
+                    onValueChange={(next) =>
+                      setStatus(next as BlogPostStatus)
+                    }
+                  />
+                </div>
               </div>
             </div>
 
@@ -401,7 +403,6 @@ export function BlogPostDrawer({
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </SideSheet>
   );
 }

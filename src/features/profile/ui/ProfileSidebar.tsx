@@ -19,10 +19,10 @@ export function ProfileSidebar({
 
   return (
     <aside
-      className="flex max-h-[min(100vh-6rem,56rem)] w-full flex-col overflow-y-auto overscroll-contain rounded-2xl border border-gray-300/60 bg-gradient-to-b from-gray-100/95 to-gray-50/90 shadow-inner sm:rounded-xl lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)]"
+      className="flex w-full flex-col rounded-[var(--radius)] border border-gray-300/60 bg-gradient-to-b from-gray-100/95 to-gray-50/90 shadow-inner lg:h-full lg:min-h-0 lg:overflow-hidden"
       aria-label={dictionary.title}
     >
-      <div className="border-b border-gray-300/50 bg-gray-50/50 p-4 sm:p-5">
+      <div className="shrink-0 border-b border-gray-300/50 bg-gray-50/50 p-4 sm:p-5">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-gray-900 text-xl font-semibold text-white shadow-md">
             {user.firstName.slice(0, 1).toUpperCase()}
@@ -39,17 +39,19 @@ export function ProfileSidebar({
         </div>
 
         <div className="mt-5 flex flex-col gap-2">
-          <div className="rounded-xl border border-gray-200/60 bg-white/70 px-3.5 py-2.5 text-left text-xs font-medium break-words text-gray-700 shadow-sm sm:text-sm">
+          <div className="rounded-[var(--radius)] border border-gray-200/60 bg-white/70 px-3.5 py-2.5 text-left text-xs font-medium break-words text-gray-700 shadow-sm sm:text-sm">
             {user.email}
           </div>
         </div>
       </div>
 
-      <ProfileSidebarNav
-        locale={locale}
-        dictionary={dictionary}
-        logoutAction={logoutWithLocale}
-      />
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <ProfileSidebarNav
+          locale={locale}
+          dictionary={dictionary}
+          logoutAction={logoutWithLocale}
+        />
+      </div>
     </aside>
   );
 }

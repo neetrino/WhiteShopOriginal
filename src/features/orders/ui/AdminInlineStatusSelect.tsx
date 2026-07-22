@@ -13,6 +13,10 @@ import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
 import {
+  DROPDOWN_ANIMATION_MS,
+  SelectDropdownOptionRow,
+} from "@/components/ui/SelectDropdown";
+import {
   orderStatusBadgeClass,
   paymentStatusBadgeClass,
 } from "@/features/admin/ui/status-badge";
@@ -52,17 +56,36 @@ export function AdminInlineStatusSelect({
 }: AdminInlineStatusSelectProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [displayValue, setDisplayValue] = useState(value);
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const [isPending, startTransition] = useTransition();
   const rootRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLUListElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const pendingChangeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuId = useId();
 
   useEffect(() => {
     setDisplayValue(value);
   }, [value]);
+
+  useEffect(() => {
+    return () => {
+      if (pendingChangeRef.current) {
+        clearTimeout(pendingChangeRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      setMounted(true);
+      return;
+    }
+    const timer = setTimeout(() => setMounted(false), DROPDOWN_ANIMATION_MS);
+    return () => clearTimeout(timer);
+  }, [open]);
 
   const options =
     kind === "order"
@@ -84,19 +107,19 @@ export function AdminInlineStatusSelect({
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
     setMenuPosition({
-      top: rect.bottom + 4,
+      top: rect.bottom + 8,
       left: rect.left,
-      minWidth: Math.max(rect.width, 144),
+      minWidth: Math.max(rect.width, 176),
     });
   }
 
   useLayoutEffect(() => {
-    if (!open) {
+    if (!open && !mounted) {
       setMenuPosition(null);
       return;
     }
     updateMenuPosition();
-  }, [open]);
+  }, [open, mounted]);
 
   useEffect(() => {
     if (!open) return;
@@ -133,15 +156,13 @@ export function AdminInlineStatusSelect({
     };
   }, [open]);
 
-  function selectStatus(next: string): void {
+  function applyStatus(next: string): void {
     if (next === displayValue || isPending || disabled) {
-      setOpen(false);
       return;
     }
 
     const previous = displayValue;
     setDisplayValue(next);
-    setOpen(false);
 
     startTransition(async () => {
       setError(null);
@@ -166,55 +187,68 @@ export function AdminInlineStatusSelect({
     });
   }
 
+  function selectStatus(next: string): void {
+    setOpen(false);
+    if (pendingChangeRef.current) {
+      clearTimeout(pendingChangeRef.current);
+    }
+    pendingChangeRef.current = setTimeout(() => {
+      pendingChangeRef.current = null;
+      applyStatus(next);
+    }, DROPDOWN_ANIMATION_MS);
+  }
+
   const menu =
-    open && menuPosition
+    mounted && menuPosition
       ? createPortal(
-          <ul
+          <div
             ref={menuRef}
-            id={menuId}
-            role="listbox"
-            className="fixed z-[200] overflow-hidden rounded-md border border-gray-200 bg-white py-1 text-xs shadow-lg"
+            className={`fixed z-[200] transition-[opacity,transform] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              open
+                ? "translate-y-0 opacity-100"
+                : "pointer-events-none -translate-y-1 opacity-0"
+            }`}
             style={{
               top: menuPosition.top,
               left: menuPosition.left,
               minWidth: menuPosition.minWidth,
+              transitionDuration: `${DROPDOWN_ANIMATION_MS}ms`,
             }}
           >
-            {options.map((option) => {
-              const selected =
-                option.value === displayValue ||
-                (kind === "order" &&
-                  orderStatusLabel(displayValue) === option.label) ||
-                (kind === "payment" &&
-                  paymentStatusLabel(displayValue) === option.label);
-              return (
-                <li key={option.value} role="option" aria-selected={selected}>
-                  <button
-                    type="button"
-                    disabled={isPending}
-                    className={`flex w-full px-3 py-1.5 text-left ${
-                      selected
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-800 hover:bg-gray-100"
-                    }`}
-                    onClick={() => selectStatus(option.value)}
-                  >
-                    {option.label}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>,
+            <div
+              id={menuId}
+              role="listbox"
+              aria-label={`Change ${kind} status`}
+              className="overflow-hidden rounded-2xl border border-gray-100 bg-white py-2"
+            >
+              {options.map((option) => {
+                const selected =
+                  option.value === displayValue ||
+                  (kind === "order" &&
+                    orderStatusLabel(displayValue) === option.label) ||
+                  (kind === "payment" &&
+                    paymentStatusLabel(displayValue) === option.label);
+                return (
+                  <SelectDropdownOptionRow
+                    key={option.value}
+                    label={option.label}
+                    selected={selected}
+                    onSelect={() => selectStatus(option.value)}
+                  />
+                );
+              })}
+            </div>
+          </div>,
           document.body,
         )
       : null;
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="relative inline-block">
       <button
         type="button"
         disabled={disabled || isPending}
-        className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium disabled:opacity-50 ${badgeClassName}`}
+        className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium outline-none transition-opacity disabled:opacity-50 ${badgeClassName}`}
         aria-label={`Change ${kind} status`}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -222,7 +256,12 @@ export function AdminInlineStatusSelect({
         onClick={() => setOpen((valueOpen) => !valueOpen)}
       >
         <span>{currentLabel}</span>
-        <ChevronDown className="h-3 w-3 shrink-0 opacity-70" aria-hidden />
+        <ChevronDown
+          className={`h-3.5 w-3.5 shrink-0 opacity-70 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            open ? "rotate-180" : ""
+          }`}
+          aria-hidden
+        />
       </button>
 
       {menu}

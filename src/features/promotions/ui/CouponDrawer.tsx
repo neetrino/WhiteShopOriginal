@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
+import { SideSheet } from "@/components/ui/SideSheet";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
-  ADMIN_SELECT,
 } from "@/features/admin/ui/admin-form-classes";
 import {
   createPromotionAction,
@@ -63,32 +64,6 @@ export function CouponDrawer({
   useEffect(() => {
     if (!open) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function handleEscape(event: KeyboardEvent): void {
-      if (event.key === "Escape") onClose();
-    }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open, onClose]);
-
-  useEffect(() => {
-    if (!open) {
-      setName("");
-      setCode("");
-      setDiscountType("PERCENTAGE");
-      setValue("10");
-      setQuantity("1");
-      setExpiresAt("");
-      setError(null);
-      return;
-    }
-
     if (coupon) {
       setName(coupon.code ?? "");
       setCode(coupon.code ?? "");
@@ -101,35 +76,28 @@ export function CouponDrawer({
       );
       setExpiresAt(toDateTimeLocal(coupon.endsAt));
       setError(null);
+    } else {
+      setName("");
+      setCode("");
+      setDiscountType("PERCENTAGE");
+      setValue("10");
+      setQuantity("1");
+      setExpiresAt("");
+      setError(null);
     }
   }, [open, coupon]);
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/40"
-      role="dialog"
-      aria-modal="true"
-      aria-label={isEdit ? "Edit coupon" : "New coupon"}
-      onClick={onClose}
+    <SideSheet
+      open={open}
+      onClose={onClose}
+      ariaLabel={isEdit ? "Edit coupon" : "New coupon"}
+      panelClassName="w-full max-w-md"
     >
-      <div
-        className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+        <div className="border-b border-gray-200 px-5 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
             {isEdit ? "Edit coupon" : "New coupon"}
           </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
         <form
@@ -204,20 +172,23 @@ export function CouponDrawer({
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <label>
+              <div>
                 <span className={ADMIN_LABEL}>Discount type</span>
-                <select
+                <SelectDropdown
+                  ariaLabel="Discount type"
                   value={discountType}
-                  onChange={(event) =>
-                    setDiscountType(event.target.value as DiscountType)
-                  }
-                  className={ADMIN_SELECT}
+                  options={[
+                    { label: "Percent off", value: "PERCENTAGE" },
+                    { label: "Fixed amount (AMD)", value: "FIXED" },
+                  ]}
                   disabled={isPending}
-                >
-                  <option value="PERCENTAGE">Percent off</option>
-                  <option value="FIXED">Fixed amount (AMD)</option>
-                </select>
-              </label>
+                  deferChange={false}
+                  className="mt-1"
+                  onValueChange={(next) =>
+                    setDiscountType(next as DiscountType)
+                  }
+                />
+              </div>
               <label>
                 <span className={ADMIN_LABEL}>Value</span>
                 <input
@@ -256,7 +227,7 @@ export function CouponDrawer({
               </label>
             </div>
 
-            <div className="rounded-xl border border-gray-300 px-4 py-3">
+            <div className="rounded-2xl border border-gray-200 px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium text-gray-900">
@@ -292,7 +263,6 @@ export function CouponDrawer({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </SideSheet>
   );
 }

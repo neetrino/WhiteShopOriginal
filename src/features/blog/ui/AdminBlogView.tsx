@@ -2,10 +2,14 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import {
+  ConfirmDialog,
+  deleteConfirmDescription,
+} from "@/components/ui/ConfirmDialog";
 import {
   ADMIN_INPUT,
   ADMIN_PAGE_TITLE,
@@ -45,6 +49,10 @@ export function AdminBlogView({ locale, posts }: AdminBlogViewProps) {
   );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [pendingDelete, setPendingDelete] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -70,11 +78,13 @@ export function AdminBlogView({ locale, posts }: AdminBlogViewProps) {
     setEditingPost(null);
   }
 
-  function handleDelete(postId: string): void {
-    const confirmed = window.confirm(
-      "Delete this blog post? This cannot be undone from the admin list.",
-    );
-    if (!confirmed) return;
+  function requestDelete(postId: string, postTitle: string): void {
+    setPendingDelete({ id: postId, title: postTitle });
+  }
+
+  function confirmDelete(): void {
+    if (!pendingDelete) return;
+    const postId = pendingDelete.id;
 
     startTransition(async () => {
       setError(null);
@@ -83,6 +93,7 @@ export function AdminBlogView({ locale, posts }: AdminBlogViewProps) {
         setError(result.error.message);
         return;
       }
+      setPendingDelete(null);
       router.refresh();
     });
   }
@@ -91,8 +102,14 @@ export function AdminBlogView({ locale, posts }: AdminBlogViewProps) {
     <section>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className={ADMIN_PAGE_TITLE}>Blog</h1>
-        <Button type="button" size="sm" onClick={openCreate}>
-          Add post
+        <Button
+          type="button"
+          size="sm"
+          onClick={openCreate}
+          className="inline-flex items-center gap-1.5"
+        >
+          <Plus className="h-4 w-4" aria-hidden />
+          Add Post
         </Button>
       </div>
 
@@ -171,8 +188,8 @@ export function AdminBlogView({ locale, posts }: AdminBlogViewProps) {
                   <button
                     type="button"
                     disabled={isPending}
-                    onClick={() => handleDelete(post.id)}
-                    className="rounded p-1.5 text-red-500 hover:bg-red-50 disabled:opacity-50"
+                    onClick={() => requestDelete(post.id, post.title)}
+                    className="rounded p-1.5 text-red-600 hover:bg-red-50 disabled:opacity-50"
                     aria-label={`Delete ${post.title}`}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -193,6 +210,21 @@ export function AdminBlogView({ locale, posts }: AdminBlogViewProps) {
           post={editingPost}
         />
       ) : null}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete"
+        description={
+          pendingDelete
+            ? deleteConfirmDescription("post", pendingDelete.title)
+            : ""
+        }
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setPendingDelete(null);
+        }}
+        onConfirm={confirmDelete}
+      />
     </section>
   );
 }

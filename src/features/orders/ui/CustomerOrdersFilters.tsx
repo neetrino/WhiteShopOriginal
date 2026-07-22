@@ -1,23 +1,27 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { flushSync } from "react-dom";
+
 import { Card } from "@/components/ui/Card";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import type { OrderStatus } from "@/features/orders/domain/order-status";
 import type { PaymentStatus } from "@/features/orders/domain/payment-status";
 
-const FILTER_CONTROL =
-  "rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500";
+const FILTER_SEARCH =
+  "h-11 w-full min-w-0 shrink-0 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 shadow-sm outline-none transition-colors placeholder:text-gray-400 hover:border-gray-300 focus:border-gray-300 lg:flex-1 lg:shrink";
 
 const ORDER_STATUS_FILTERS = [
-  { label: "pending", value: "PENDING" },
-  { label: "processing", value: "PROCESSING" },
-  { label: "completed", value: "DELIVERED" },
-  { label: "cancelled", value: "CANCELLED" },
+  { label: "Pending", value: "PENDING" },
+  { label: "Processing", value: "PROCESSING" },
+  { label: "Completed", value: "DELIVERED" },
+  { label: "Cancelled", value: "CANCELLED" },
 ] as const satisfies ReadonlyArray<{ label: string; value: OrderStatus }>;
 
 const PAYMENT_STATUS_FILTERS = [
-  { label: "paid", value: "CAPTURED" },
-  { label: "pending", value: "PENDING" },
-  { label: "failed", value: "FAILED" },
+  { label: "Paid", value: "CAPTURED" },
+  { label: "Pending", value: "PENDING" },
+  { label: "Failed", value: "FAILED" },
 ] as const satisfies ReadonlyArray<{ label: string; value: PaymentStatus }>;
 
 type CustomerOrdersFiltersProps = {
@@ -33,48 +37,50 @@ export function CustomerOrdersFilters({
   paymentStatus,
   q,
 }: CustomerOrdersFiltersProps) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [statusValue, setStatusValue] = useState(status ?? "");
+  const [paymentValue, setPaymentValue] = useState(paymentStatus ?? "");
+
+  function applyStatus(next: string): void {
+    flushSync(() => setStatusValue(next));
+    formRef.current?.requestSubmit();
+  }
+
+  function applyPayment(next: string): void {
+    flushSync(() => setPaymentValue(next));
+    formRef.current?.requestSubmit();
+  }
+
   return (
-    <Card className="mb-6 overflow-hidden">
+    <Card className="mb-6 overflow-visible">
       <form
+        ref={formRef}
         method="get"
-        className="flex flex-nowrap items-center gap-3 p-4"
-        onChange={(event) => {
-          if (event.target instanceof HTMLSelectElement) {
-            event.currentTarget.requestSubmit();
-          }
-        }}
+        className="flex flex-col gap-3 p-4 lg:flex-row lg:flex-nowrap lg:items-center"
       >
-        <select
+        <SelectDropdown
           name="status"
-          defaultValue={status ?? ""}
-          className={`${FILTER_CONTROL} w-[160px] shrink-0`}
-          aria-label="Order status"
-        >
-          <option value="">All statuses</option>
-          {ORDER_STATUS_FILTERS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <select
+          ariaLabel="Order status"
+          value={statusValue}
+          allLabel="All statuses"
+          options={ORDER_STATUS_FILTERS}
+          className="w-full lg:w-[180px] lg:shrink-0"
+          onValueChange={applyStatus}
+        />
+        <SelectDropdown
           name="paymentStatus"
-          defaultValue={paymentStatus ?? ""}
-          className={`${FILTER_CONTROL} w-[180px] shrink-0`}
-          aria-label="Payment status"
-        >
-          <option value="">All payment statuses</option>
-          {PAYMENT_STATUS_FILTERS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          ariaLabel="Payment status"
+          value={paymentValue}
+          allLabel="All payment statuses"
+          options={PAYMENT_STATUS_FILTERS}
+          className="w-full lg:w-[200px] lg:shrink-0"
+          onValueChange={applyPayment}
+        />
         <input
           name="q"
           defaultValue={q ?? ""}
           placeholder="Search by order #"
-          className={`${FILTER_CONTROL} min-w-0 flex-1`}
+          className={FILTER_SEARCH}
           aria-label="Search orders"
         />
       </form>

@@ -13,7 +13,7 @@ export function SiteFooter({ dictionary, locale }: SiteFooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto hidden border-t border-gray-800 bg-black md:block">
+    <footer className="storefront-footer mt-auto hidden border-t border-gray-800 bg-black md:block">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
@@ -128,7 +128,7 @@ export function SiteFooter({ dictionary, locale }: SiteFooterProps) {
 
         <div className="mt-8 border-t border-gray-800 pt-8">
           <p className="text-center text-sm text-gray-300 md:text-left">
-            {`Copyright © ${year} | ${dictionary.footer.rights}, ${dictionary.footer.createdBy}`}
+            {dictionary.footer.copyright.replace("{year}", String(year))}
           </p>
         </div>
       </div>

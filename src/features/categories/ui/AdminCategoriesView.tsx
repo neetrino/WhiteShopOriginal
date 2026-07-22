@@ -7,6 +7,10 @@ import { ChevronRight, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import {
+  ConfirmDialog,
+  deleteConfirmDescription,
+} from "@/components/ui/ConfirmDialog";
+import {
   ADMIN_INPUT,
   ADMIN_PAGE_TITLE,
 } from "@/features/admin/ui/admin-form-classes";
@@ -18,7 +22,9 @@ import {
   ADMIN_TABLE_STATE_INSET,
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
+  ADMIN_TABLE_TD_CENTER,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
 import {
@@ -69,6 +75,10 @@ export function AdminCategoriesView({
     useState<AdminCategoryListItem | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [pendingDelete, setPendingDelete] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
   const [ordered, setOrdered] = useState(categories);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const orderedRef = useRef(ordered);
@@ -94,7 +104,14 @@ export function AdminCategoriesView({
     );
   }, [ordered, isFiltering, needle]);
 
-  function handleDelete(categoryId: string): void {
+  function requestDelete(categoryId: string, categoryTitle: string): void {
+    setPendingDelete({ id: categoryId, title: categoryTitle });
+  }
+
+  function confirmDelete(): void {
+    if (!pendingDelete) return;
+    const categoryId = pendingDelete.id;
+
     startTransition(async () => {
       setError(null);
       const result = await deleteCategoryAction(locale, categoryId);
@@ -102,6 +119,7 @@ export function AdminCategoriesView({
         setError(result.error.message);
         return;
       }
+      setPendingDelete(null);
       router.refresh();
     });
   }
@@ -193,7 +211,7 @@ export function AdminCategoriesView({
                   <th className={ADMIN_TABLE_TH}>Image</th>
                   <th className={ADMIN_TABLE_TH}>Category Title</th>
                   <th className={ADMIN_TABLE_TH}>Category</th>
-                  <th className={ADMIN_TABLE_TH}>Actions</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Actions</th>
                 </tr>
               </thead>
               <tbody className={ADMIN_TABLE_TBODY}>
@@ -270,8 +288,8 @@ export function AdminCategoriesView({
                           {category.parentTitle ?? "None (Root Category)"}
                         </span>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
-                        <div className="flex items-center gap-1">
+                      <td className={ADMIN_TABLE_TD_CENTER}>
+                        <div className="inline-flex items-center justify-center gap-1">
                           <button
                             type="button"
                             className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
@@ -286,8 +304,10 @@ export function AdminCategoriesView({
                           <button
                             type="button"
                             disabled={isPending}
-                            onClick={() => handleDelete(category.id)}
-                            className="rounded p-1.5 text-red-500 hover:bg-red-50"
+                            onClick={() =>
+                              requestDelete(category.id, category.title)
+                            }
+                            className="rounded p-1.5 text-red-600 hover:bg-red-50"
                             aria-label={`Delete ${category.title}`}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -320,6 +340,21 @@ export function AdminCategoriesView({
         }}
         categories={categories}
         category={editingCategory}
+      />
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete"
+        description={
+          pendingDelete
+            ? deleteConfirmDescription("category", pendingDelete.title)
+            : ""
+        }
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setPendingDelete(null);
+        }}
+        onConfirm={confirmDelete}
       />
     </section>
   );

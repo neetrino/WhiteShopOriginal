@@ -6,6 +6,9 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import {
+  ConfirmDialog,
+} from "@/components/ui/ConfirmDialog";
+import {
   ADMIN_TABLE,
   ADMIN_TABLE_CARD,
   ADMIN_TABLE_CHECKBOX,
@@ -16,8 +19,10 @@ import {
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
   ADMIN_TABLE_TD_CHECK,
+  ADMIN_TABLE_TD_METRIC,
   ADMIN_TABLE_TH,
   ADMIN_TABLE_TH_CHECK,
+  ADMIN_TABLE_TH_METRIC,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
 import { bulkArchiveOrdersAction } from "@/features/orders/application/bulk-archive-orders";
@@ -56,6 +61,7 @@ export function BulkChangeOrderStatusForm({
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const allNumbers = orders.map((order) => order.orderNumber);
   const allSelected =
@@ -82,12 +88,16 @@ export function BulkChangeOrderStatusForm({
       setError("Select at least one order.");
       return;
     }
+    setConfirmOpen(true);
+  }
 
+  function confirmDelete(): void {
+    const orderNumbers = [...selected];
     startTransition(async () => {
       setError(null);
       setMessage(null);
       const result = await bulkArchiveOrdersAction(locale, {
-        orderNumbers: [...selected],
+        orderNumbers,
       });
 
       if (!result.ok) {
@@ -99,6 +109,7 @@ export function BulkChangeOrderStatusForm({
         `Deleted ${result.value.archived}, skipped ${result.value.skipped}.`,
       );
       setSelected(new Set());
+      setConfirmOpen(false);
       router.refresh();
     });
   }
@@ -112,6 +123,7 @@ export function BulkChangeOrderStatusForm({
         <Button
           type="button"
           size="sm"
+          variant="danger"
           disabled={isPending || selected.size === 0}
           onClick={deleteSelected}
         >
@@ -142,9 +154,9 @@ export function BulkChangeOrderStatusForm({
                 </th>
                 <th className={ADMIN_TABLE_TH}>Order</th>
                 <th className={ADMIN_TABLE_TH}>Customer</th>
-                <th className={ADMIN_TABLE_TH}>Status</th>
-                <th className={ADMIN_TABLE_TH}>Payment</th>
-                <th className={ADMIN_TABLE_TH}>Total</th>
+                <th className={ADMIN_TABLE_TH_METRIC}>Status</th>
+                <th className={ADMIN_TABLE_TH_METRIC}>Payment</th>
+                <th className={ADMIN_TABLE_TH_METRIC}>Total</th>
                 <th className={ADMIN_TABLE_TH}>Placed</th>
               </tr>
             </thead>
@@ -179,7 +191,7 @@ export function BulkChangeOrderStatusForm({
                     <p className="text-sm text-gray-900">{order.contactName}</p>
                     <p className="text-xs text-gray-500">{order.contactEmail}</p>
                   </td>
-                  <td className={ADMIN_TABLE_TD}>
+                  <td className={ADMIN_TABLE_TD_METRIC}>
                     <AdminInlineStatusSelect
                       locale={locale}
                       orderNumber={order.orderNumber}
@@ -188,7 +200,7 @@ export function BulkChangeOrderStatusForm({
                       disabled={isPending || order.isArchived}
                     />
                   </td>
-                  <td className={ADMIN_TABLE_TD}>
+                  <td className={ADMIN_TABLE_TD_METRIC}>
                     <AdminInlineStatusSelect
                       locale={locale}
                       orderNumber={order.orderNumber}
@@ -197,7 +209,7 @@ export function BulkChangeOrderStatusForm({
                       disabled={isPending || order.isArchived}
                     />
                   </td>
-                  <td className={ADMIN_TABLE_TD}>
+                  <td className={ADMIN_TABLE_TD_METRIC}>
                     <span className="font-medium text-gray-900">
                       {formatMoney(order.totalAmount, order.baseCurrency)}
                     </span>
@@ -228,6 +240,17 @@ export function BulkChangeOrderStatusForm({
           </div>
         )}
       </Card>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete"
+        description={`Are you sure you want to delete ${selected.size} selected order${selected.size === 1 ? "" : "s"}? This action cannot be undone.`}
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setConfirmOpen(false);
+        }}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

@@ -1,12 +1,13 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import type { CheckoutPaymentMethod } from "@/features/checkout/domain/payment-methods";
 import { CheckoutPaymentMethods } from "@/features/checkout/ui/CheckoutPaymentMethods";
 import type { CheckoutDeliveryOption } from "@/features/delivery/application/queries";
 
 const FIELD_CLASS =
-  "h-11 w-full rounded-lg border border-gray-200 px-3 text-gray-900 outline-none transition focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:bg-gray-50";
+  "h-11 w-full rounded-2xl border border-gray-200 px-4 text-gray-900 shadow-sm outline-none transition-colors hover:border-gray-300 focus:border-gray-300 disabled:bg-gray-50";
 
 const RADIO_SELECTED = "border-gray-900 bg-gray-50";
 const RADIO_IDLE = "border-gray-300 hover:bg-gray-50";
@@ -192,24 +193,21 @@ export function CheckoutDetailsSections({
             {labels.shippingAddress}
           </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
+            <div className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
               {labels.deliveryLocation}
-              <select
+              <SelectDropdown
                 name="deliveryRuleId"
-                required
+                ariaLabel={labels.deliveryLocation}
                 value={deliveryRuleId}
-                onChange={(event) => onDeliveryRuleChange(event.target.value)}
+                allLabel={labels.selectLocation}
+                options={deliveryOptions.map((option) => ({
+                  label: option.label,
+                  value: option.id,
+                }))}
                 disabled={pending || deliveryOptions.length === 0}
-                className={FIELD_CLASS}
-              >
-                <option value="">{labels.selectLocation}</option>
-                {deliveryOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+                onValueChange={onDeliveryRuleChange}
+              />
+            </div>
             <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
               {labels.address}
               <input

@@ -6,6 +6,9 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import {
+  ConfirmDialog,
+} from "@/components/ui/ConfirmDialog";
 import { ADMIN_INPUT } from "@/features/admin/ui/admin-form-classes";
 import {
   ADMIN_BADGE,
@@ -19,8 +22,10 @@ import {
   ADMIN_TABLE_STATE_INSET,
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
+  ADMIN_TABLE_TD_CENTER,
   ADMIN_TABLE_TD_CHECK,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_TH_CHECK,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
@@ -73,6 +78,7 @@ export function AdminUsersView({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const allIds = users.map((user) => user.id);
   const allSelected =
@@ -96,6 +102,22 @@ export function AdminUsersView({
       setError(null);
       try {
         await action();
+        router.refresh();
+      } catch (caught) {
+        setError(caught instanceof Error ? caught.message : "Action failed.");
+      }
+    });
+  }
+
+  function confirmDeleteSelected(): void {
+    const userIds = [...selected];
+    startTransition(async () => {
+      setError(null);
+      try {
+        const result = await bulkAnonymizeUsersAction(locale, { userIds });
+        if (!result.ok) throw new Error(result.error.message);
+        setSelected(new Set());
+        setConfirmOpen(false);
         router.refresh();
       } catch (caught) {
         setError(caught instanceof Error ? caught.message : "Action failed.");
@@ -160,17 +182,12 @@ export function AdminUsersView({
         <Button
           type="button"
           size="sm"
-          variant="outline"
+          variant="danger"
           disabled={isPending || selected.size === 0}
-          onClick={() =>
-            runAction(async () => {
-              const result = await bulkAnonymizeUsersAction(locale, {
-                userIds: [...selected],
-              });
-              if (!result.ok) throw new Error(result.error.message);
-              setSelected(new Set());
-            })
-          }
+          onClick={() => {
+            if (selected.size === 0) return;
+            setConfirmOpen(true);
+          }}
         >
           Delete Selected
         </Button>
@@ -198,10 +215,10 @@ export function AdminUsersView({
                   </th>
                   <th className={ADMIN_TABLE_TH}>User</th>
                   <th className={ADMIN_TABLE_TH}>Contact</th>
-                  <th className={ADMIN_TABLE_TH}>Orders</th>
-                  <th className={ADMIN_TABLE_TH}>Roles</th>
-                  <th className={ADMIN_TABLE_TH}>Status</th>
-                  <th className={ADMIN_TABLE_TH}>Created</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Orders</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Roles</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Status</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Created</th>
                 </tr>
               </thead>
               <tbody className={ADMIN_TABLE_TBODY}>
@@ -241,12 +258,12 @@ export function AdminUsersView({
                           {user.phone ?? "—"}
                         </p>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
+                      <td className={ADMIN_TABLE_TD_CENTER}>
                         <span className="font-medium text-gray-900">
                           {user.orderCount}
                         </span>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
+                      <td className={ADMIN_TABLE_TD_CENTER}>
                         <span
                           className={`${ADMIN_BADGE} ${
                             user.role === "ADMIN"
@@ -257,7 +274,7 @@ export function AdminUsersView({
                           {user.role.toLowerCase()}
                         </span>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
+                      <td className={ADMIN_TABLE_TD_CENTER}>
                         <button
                           type="button"
                           role="switch"
@@ -277,7 +294,7 @@ export function AdminUsersView({
                               }
                             })
                           }
-                          className={`relative h-5 w-9 rounded-full transition-colors disabled:opacity-40 ${
+                          className={`relative mx-auto block h-5 w-9 rounded-full transition-colors disabled:opacity-40 ${
                             isActive ? "bg-green-500" : "bg-gray-300"
                           }`}
                           aria-label={
@@ -293,7 +310,7 @@ export function AdminUsersView({
                           />
                         </button>
                       </td>
-                      <td className={ADMIN_TABLE_TD}>
+                      <td className={ADMIN_TABLE_TD_CENTER}>
                         <span className="text-sm text-gray-600">
                           {formatCreated(user.createdAt)}
                         </span>
@@ -306,6 +323,17 @@ export function AdminUsersView({
           </div>
         )}
       </Card>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete"
+        description={`Are you sure you want to delete ${selected.size} selected user${selected.size === 1 ? "" : "s"}? This anonymizes their accounts and cannot be undone.`}
+        isPending={isPending}
+        onClose={() => {
+          if (!isPending) setConfirmOpen(false);
+        }}
+        onConfirm={confirmDeleteSelected}
+      />
     </section>
   );
 }

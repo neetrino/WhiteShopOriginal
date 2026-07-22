@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { ProfileMobileShell } from "@/features/profile/ui/ProfileMobileShell";
 import { ProfileSidebar } from "@/features/profile/ui/ProfileSidebar";
 import { requireUser } from "@/lib/auth/policies";
 import { isLocale } from "@/lib/i18n/config";
@@ -24,13 +25,22 @@ export default async function ProfileLayout({
   const dictionary = getDictionary(rawLocale);
 
   return (
-    <div className="grid grid-cols-1 items-start gap-6 pb-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
-      <ProfileSidebar
+    <div className="profile-desktop-page flex flex-col gap-6 pb-10 lg:min-h-0 lg:flex-1 lg:flex-row lg:gap-8 lg:overflow-hidden lg:pb-0">
+      <div className="hidden w-[280px] shrink-0 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+        <ProfileSidebar
+          locale={rawLocale}
+          user={user}
+          dictionary={dictionary.profile}
+        />
+      </div>
+
+      <ProfileMobileShell
         locale={rawLocale}
         user={user}
         dictionary={dictionary.profile}
-      />
-      <div className="min-h-0 min-w-0 overflow-visible">{children}</div>
+      >
+        {children}
+      </ProfileMobileShell>
     </div>
   );
 }

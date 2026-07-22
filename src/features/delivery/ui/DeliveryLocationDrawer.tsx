@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
-
 import { Button } from "@/components/ui/Button";
+import { SideSheet } from "@/components/ui/SideSheet";
 import {
   ADMIN_INPUT,
   ADMIN_LABEL,
@@ -86,58 +85,62 @@ function DeliveryLocationForm({
       }}
     >
       <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
-        <label>
-          <span className={ADMIN_LABEL}>Country</span>
-          <input
-            value={country}
-            onChange={(event) => setCountry(event.target.value)}
-            placeholder="Armenia"
-            required
-            className={ADMIN_INPUT}
-            disabled={isPending}
-          />
-        </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label>
+            <span className={ADMIN_LABEL}>Country</span>
+            <input
+              value={country}
+              onChange={(event) => setCountry(event.target.value)}
+              placeholder="Armenia"
+              required
+              className={ADMIN_INPUT}
+              disabled={isPending}
+            />
+          </label>
 
-        <label>
-          <span className={ADMIN_LABEL}>City</span>
-          <input
-            value={city}
-            onChange={(event) => setCity(event.target.value)}
-            placeholder="Yerevan"
-            required
-            className={ADMIN_INPUT}
-            disabled={isPending}
-          />
-        </label>
+          <label>
+            <span className={ADMIN_LABEL}>City</span>
+            <input
+              value={city}
+              onChange={(event) => setCity(event.target.value)}
+              placeholder="Yerevan"
+              required
+              className={ADMIN_INPUT}
+              disabled={isPending}
+            />
+          </label>
+        </div>
 
-        <label>
-          <span className={ADMIN_LABEL}>Price (AMD)</span>
-          <input
-            type="number"
-            min={0}
-            step={1}
-            required
-            value={priceAmount}
-            onChange={(event) => setPriceAmount(event.target.value)}
-            placeholder="1500"
-            className={ADMIN_INPUT}
-            disabled={isPending}
-          />
-        </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label>
+            <span className={ADMIN_LABEL}>Price (AMD)</span>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              required
+              value={priceAmount}
+              onChange={(event) => setPriceAmount(event.target.value)}
+              placeholder="1500"
+              className={ADMIN_INPUT}
+              disabled={isPending}
+            />
+          </label>
 
-        <label>
-          <span className={ADMIN_LABEL}>Free delivery from (AMD)</span>
-          <input
-            type="number"
-            min={0}
-            step={1}
-            value={freeThresholdAmount}
-            onChange={(event) => setFreeThresholdAmount(event.target.value)}
-            placeholder="50000"
-            className={ADMIN_INPUT}
-            disabled={isPending}
-          />
-        </label>
+          <label>
+            <span className={ADMIN_LABEL}>Free delivery from (AMD)</span>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={freeThresholdAmount}
+              onChange={(event) => setFreeThresholdAmount(event.target.value)}
+              placeholder="50000"
+              className={ADMIN_INPUT}
+              disabled={isPending}
+            />
+          </label>
+        </div>
 
         {error ? <p className="text-sm text-red-700">{error}</p> : null}
       </div>
@@ -164,60 +167,26 @@ export function DeliveryLocationDrawer({
   onClose,
   location = null,
 }: DeliveryLocationDrawerProps) {
-  useEffect(() => {
-    if (!open) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function handleEscape(event: KeyboardEvent): void {
-      if (event.key === "Escape") onClose();
-    }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
-
   const formKey = location?.id ?? "new";
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/40"
-      role="dialog"
-      aria-modal="true"
-      aria-label={location ? "Edit location" : "Add location"}
-      onClick={onClose}
+    <SideSheet
+      open={open}
+      onClose={onClose}
+      ariaLabel={location ? "Edit location" : "Add location"}
     >
-      <div
-        className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            {location ? "Edit location" : "Add location"}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <DeliveryLocationForm
-          key={formKey}
-          locale={locale}
-          location={location}
-          onClose={onClose}
-        />
+      <div className="border-b border-gray-200 px-5 py-4">
+        <h2 className="text-lg font-semibold text-gray-900">
+          {location ? "Edit location" : "Add location"}
+        </h2>
       </div>
-    </div>
+
+      <DeliveryLocationForm
+        key={formKey}
+        locale={locale}
+        location={location}
+        onClose={onClose}
+      />
+    </SideSheet>
   );
 }

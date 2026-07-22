@@ -18,9 +18,9 @@ export function OrderDetailsDrawerItems({
   detail,
 }: OrderDetailsDrawerItemsProps) {
   return (
-    <div className="px-6 py-5">
+    <div className="rounded-2xl border border-gray-200 px-5 py-4">
       <h3 className="mb-4 text-base font-semibold text-gray-900">Items</h3>
-      <div className={`${ADMIN_TABLE_OUTER_SCROLL} rounded-lg border border-gray-200`}>
+      <div className={`${ADMIN_TABLE_OUTER_SCROLL} rounded-xl border border-gray-100`}>
         <table className={ADMIN_TABLE}>
           <thead className={ADMIN_TABLE_THEAD}>
             <tr>

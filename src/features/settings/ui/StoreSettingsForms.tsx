@@ -37,6 +37,7 @@ export function StoreSettingsForms({
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
       <Card className="p-6">
         <form
           className="flex flex-col gap-4"
@@ -160,6 +161,7 @@ export function StoreSettingsForms({
           </Button>
         </form>
       </Card>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import { SideSheet } from "@/components/ui/SideSheet";
 
 import {
   getAdminMenuItems,
@@ -32,13 +34,6 @@ export function AdminMenuDrawer({ locale, pathname }: AdminMenuDrawerProps) {
   const [productsNestedExpanded, toggleProductsNested] =
     useAdminProductsSubnavExpanded(pathname, locale);
 
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
   return (
     <div className="lg:hidden">
       <button
@@ -64,19 +59,18 @@ export function AdminMenuDrawer({ locale, pathname }: AdminMenuDrawerProps) {
         Menu
       </button>
 
-      {open ? (
+      <SideSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        ariaLabel="Admin menu"
+        side="left"
+        panelClassName="w-1/2 min-w-[16rem] max-w-full"
+      >
         <div
-          className="fixed inset-0 z-50 flex bg-black/40"
-          onClick={() => setOpen(false)}
+          id="admin-menu-drawer-panel"
+          className="flex min-h-0 flex-1 flex-col"
         >
-          <div
-            id="admin-menu-drawer-panel"
-            className="flex h-full min-h-screen w-1/2 min-w-[16rem] max-w-full flex-col bg-white shadow-2xl"
-            role="dialog"
-            aria-modal="true"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-4">
+            <div className="border-b border-gray-200 px-4 py-4">
               <Link
                 href={`/${locale}`}
                 className="text-sm font-semibold text-gray-900"
@@ -84,26 +78,6 @@ export function AdminMenuDrawer({ locale, pathname }: AdminMenuDrawerProps) {
               >
                 White Shop
               </Link>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="h-10 w-10 rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
-                aria-label="Close admin menu"
-              >
-                <svg
-                  className="mx-auto h-5 w-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
             </div>
 
             <nav className="flex-1 divide-y divide-gray-100 overflow-y-auto">
@@ -188,9 +162,8 @@ export function AdminMenuDrawer({ locale, pathname }: AdminMenuDrawerProps) {
                 );
               })}
             </nav>
-          </div>
         </div>
-      ) : null}
+      </SideSheet>
     </div>
   );
 }

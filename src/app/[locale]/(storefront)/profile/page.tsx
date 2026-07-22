@@ -23,7 +23,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const { stats, recentOrders } = await getProfileDashboard(user.id);
 
   return (
-    <section className="space-y-8">
+    <section className="profile-sheet-keep-frame space-y-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
           {dictionary.profile.dashboard}
