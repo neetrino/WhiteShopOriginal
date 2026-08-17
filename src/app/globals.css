@@ -250,7 +250,7 @@ body {
 
 /**
  * MaMarie-style profile desktop shell:
- * lock viewport height, hide footer, scroll only the content column.
+ * lock viewport height, scroll only the content column; keep site footer visible.
  */
 @media (min-width: 1024px) {
   .storefront-shell:has(.profile-desktop-page) {
@@ -271,7 +271,7 @@ body {
   }
 
   .storefront-shell:has(.profile-desktop-page) .storefront-footer {
-    display: none;
+    flex-shrink: 0;
   }
 }
 
