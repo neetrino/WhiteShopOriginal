@@ -92,9 +92,7 @@ export function ProfileMobileShell({
   );
 
   const desktopColumn = (
-    <div className="min-w-0 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain">
-      {children}
-    </div>
+    <div className="min-w-0 flex-1">{children}</div>
   );
 
   // SSR / pre-hydration: hub on mobile via CSS; content only from lg up.
@@ -102,9 +100,7 @@ export function ProfileMobileShell({
     return (
       <>
         <div className="profile-mobile-page w-full lg:hidden">{hub}</div>
-        <div className="hidden lg:block lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain">
-          {children}
-        </div>
+        <div className="hidden min-w-0 flex-1 lg:block">{children}</div>
       </>
     );
   }
