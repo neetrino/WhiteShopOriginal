@@ -162,8 +162,25 @@ export function BulkChangeOrderStatusForm({
             </thead>
             <tbody className={ADMIN_TABLE_TBODY}>
               {orders.map((order) => (
-                <tr key={order.id} className={ADMIN_TABLE_ROW}>
-                  <td className={ADMIN_TABLE_TD_CHECK}>
+                <tr
+                  key={order.id}
+                  className={`${ADMIN_TABLE_ROW} cursor-pointer`}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Open order ${order.orderNumber}`}
+                  onClick={() => onOpenOrder(order.orderNumber)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onOpenOrder(order.orderNumber);
+                    }
+                  }}
+                >
+                  <td
+                    className={ADMIN_TABLE_TD_CHECK}
+                    onClick={(event) => event.stopPropagation()}
+                    onKeyDown={(event) => event.stopPropagation()}
+                  >
                     <input
                       type="checkbox"
                       className={ADMIN_TABLE_CHECKBOX}
@@ -174,13 +191,9 @@ export function BulkChangeOrderStatusForm({
                     />
                   </td>
                   <td className={ADMIN_TABLE_TD}>
-                    <button
-                      type="button"
-                      onClick={() => onOpenOrder(order.orderNumber)}
-                      className="font-medium text-gray-900 hover:underline"
-                    >
+                    <span className="font-medium text-gray-900">
                       {order.orderNumber}
-                    </button>
+                    </span>
                     {order.isArchived ? (
                       <span className="ml-2 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium uppercase text-gray-600">
                         Archived
@@ -191,7 +204,11 @@ export function BulkChangeOrderStatusForm({
                     <p className="text-sm text-gray-900">{order.contactName}</p>
                     <p className="text-xs text-gray-500">{order.contactEmail}</p>
                   </td>
-                  <td className={ADMIN_TABLE_TD_METRIC}>
+                  <td
+                    className={ADMIN_TABLE_TD_METRIC}
+                    onClick={(event) => event.stopPropagation()}
+                    onKeyDown={(event) => event.stopPropagation()}
+                  >
                     <AdminInlineStatusSelect
                       locale={locale}
                       orderNumber={order.orderNumber}
@@ -200,7 +217,11 @@ export function BulkChangeOrderStatusForm({
                       disabled={isPending || order.isArchived}
                     />
                   </td>
-                  <td className={ADMIN_TABLE_TD_METRIC}>
+                  <td
+                    className={ADMIN_TABLE_TD_METRIC}
+                    onClick={(event) => event.stopPropagation()}
+                    onKeyDown={(event) => event.stopPropagation()}
+                  >
                     <AdminInlineStatusSelect
                       locale={locale}
                       orderNumber={order.orderNumber}
