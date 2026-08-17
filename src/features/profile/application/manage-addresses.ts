@@ -39,7 +39,7 @@ async function clearDefaultFlags(
 }
 
 /**
- * Creates a customer address. Recipient name comes from the profile; phone from the form.
+ * Creates a customer address. Recipient name and phone come from the profile.
  * First address (or explicit default) becomes the default shipping/billing address.
  */
 export async function createCustomerAddressAction(
@@ -56,6 +56,13 @@ export async function createCustomerAddressAction(
   }
 
   const user = await requireUser(locale);
+  const phone = user.phone?.trim() ?? "";
+  if (phone.length < 5) {
+    return err(
+      "VALIDATION_ERROR",
+      "Add a phone number to your profile before saving an address.",
+    );
+  }
 
   try {
     const addressId = await withTransaction(async (tx) => {
@@ -78,7 +85,7 @@ export async function createCustomerAddressAction(
         userId: user.id,
         recipientFirstName: user.firstName,
         recipientLastName: user.lastName,
-        phone: parsed.data.phone,
+        phone,
         countryCode: "AM",
         city: parsed.data.city,
         line1: parsed.data.line1,
@@ -97,7 +104,7 @@ export async function createCustomerAddressAction(
 }
 
 /**
- * Updates an owned address. Keeps recipient name synced from the profile; phone from the form.
+ * Updates an owned address. Keeps recipient name and phone synced from the profile.
  */
 export async function updateCustomerAddressAction(
   locale: string,
@@ -115,6 +122,13 @@ export async function updateCustomerAddressAction(
   }
 
   const user = await requireUser(locale);
+  const phone = user.phone?.trim() ?? "";
+  if (phone.length < 5) {
+    return err(
+      "VALIDATION_ERROR",
+      "Add a phone number to your profile before saving an address.",
+    );
+  }
 
   try {
     const result = await withTransaction(async (tx) => {
@@ -143,7 +157,7 @@ export async function updateCustomerAddressAction(
         .set({
           recipientFirstName: user.firstName,
           recipientLastName: user.lastName,
-          phone: parsed.data.phone,
+          phone,
           city: parsed.data.city,
           line1: parsed.data.line1,
           isDefaultShipping: parsed.data.isDefault,

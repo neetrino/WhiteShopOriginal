@@ -23,7 +23,6 @@ const FIELD_CLASS =
 type AddressFormState = {
   line1: string;
   city: string;
-  phone: string;
   isDefault: boolean;
 };
 
@@ -43,8 +42,6 @@ type ProfileAddressesViewProps = {
     formEditTitle: string;
     line1: string;
     city: string;
-    phone: string;
-    phonePlaceholder: string;
     isDefault: string;
     cancel: string;
     add: string;
@@ -56,7 +53,6 @@ type ProfileAddressesViewProps = {
 const emptyForm: AddressFormState = {
   line1: "",
   city: "",
-  phone: "",
   isDefault: false,
 };
 
@@ -94,7 +90,6 @@ export function ProfileAddressesView({
     setForm({
       line1: address.line1,
       city: address.city,
-      phone: address.phone,
       isDefault: address.isDefaultShipping,
     });
     setShowForm(true);
@@ -213,20 +208,6 @@ export function ProfileAddressesView({
                   }
                   className={FIELD_CLASS}
                   autoComplete="address-level2"
-                />
-              </label>
-              <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700 sm:col-span-2">
-                {labels.phone}
-                <input
-                  required
-                  type="tel"
-                  value={form.phone}
-                  onChange={(event) =>
-                    setForm((prev) => ({ ...prev, phone: event.target.value }))
-                  }
-                  placeholder={labels.phonePlaceholder}
-                  className={FIELD_CLASS}
-                  autoComplete="tel"
                 />
               </label>
             </div>

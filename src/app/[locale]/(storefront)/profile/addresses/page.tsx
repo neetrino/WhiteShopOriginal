@@ -38,8 +38,6 @@ export default async function AddressesPage({ params }: AddressesPageProps) {
         formEditTitle: copy.formEditTitle,
         line1: copy.line1,
         city: copy.city,
-        phone: copy.phone,
-        phonePlaceholder: copy.phonePlaceholder,
         isDefault: copy.isDefault,
         cancel: dictionary.profile.cancel,
         add: copy.add,
