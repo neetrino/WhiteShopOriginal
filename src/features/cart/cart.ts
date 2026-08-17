@@ -185,5 +185,6 @@ export async function removeItem(itemId: string): Promise<void> {
 export async function revalidateCartPaths(): Promise<void> {
   revalidatePath("/[locale]/cart", "page");
   revalidatePath("/[locale]/checkout", "page");
-  revalidatePath("/", "layout");
+  // Header cart badge lives in the locale storefront layout Suspense island.
+  revalidatePath("/[locale]", "layout");
 }

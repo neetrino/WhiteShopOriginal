@@ -141,6 +141,7 @@ export function MobileBottomNav({
   return (
     <nav
       aria-label={dictionary.nav.navigation}
+      data-mobile-bottom-nav
       className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden"
     >
       <div className="mx-auto flex h-14 max-w-7xl items-stretch">
@@ -166,6 +167,7 @@ export function MobileBottomNav({
               onFocus={prefetchDrawerView}
               aria-label={label}
               aria-expanded={open}
+              data-cart-fly-target
               className={tabClassName(open)}
             >
               <span className="relative inline-flex">

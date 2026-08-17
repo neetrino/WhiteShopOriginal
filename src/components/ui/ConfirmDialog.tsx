@@ -2,11 +2,15 @@
 
 import {
   useEffect,
-  useState,
+  useRef,
   type AnimationEvent,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+
+import { useExitPresence } from "@/lib/react/use-exit-presence";
+import { useIsClient } from "@/lib/react/use-is-client";
+import { useOpenSnapshot } from "@/lib/react/use-open-snapshot";
 
 /** Keep mounted through exit keyframes (Mobee dialog out is 280ms; fallback 320ms). */
 const CONFIRM_DIALOG_EXIT_MS = 320;
@@ -44,43 +48,25 @@ export function ConfirmDialog({
   onConfirm,
   onClose,
 }: ConfirmDialogProps) {
-  const [mounted, setMounted] = useState(false);
-  const [rendered, setRendered] = useState(false);
-  const [exiting, setExiting] = useState(false);
-  const [displayTitle, setDisplayTitle] = useState(title);
-  const [displayDescription, setDisplayDescription] = useState(description);
-  const [displayConfirmLabel, setDisplayConfirmLabel] = useState(confirmLabel);
-  const [displayCancelLabel, setDisplayCancelLabel] = useState(cancelLabel);
+  const mounted = useIsClient();
+  const { rendered, exiting, finishExit } = useExitPresence(
+    open,
+    CONFIRM_DIALOG_EXIT_MS,
+  );
+  const displayTitle = useOpenSnapshot(open, title);
+  const displayDescription = useOpenSnapshot(open, description);
+  const displayConfirmLabel = useOpenSnapshot(open, confirmLabel);
+  const displayCancelLabel = useOpenSnapshot(open, cancelLabel);
+  const onCloseRef = useRef(onClose);
+  const isPendingRef = useRef(isPending);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
-    if (!open) return;
-    setDisplayTitle(title);
-    setDisplayDescription(description);
-    setDisplayConfirmLabel(confirmLabel);
-    setDisplayCancelLabel(cancelLabel);
-  }, [open, title, description, confirmLabel, cancelLabel]);
-
-  useEffect(() => {
-    if (open) {
-      setExiting(false);
-      setRendered(true);
-      return;
-    }
-
-    if (!rendered) return;
-
-    setExiting(true);
-    const timer = window.setTimeout(() => {
-      setRendered(false);
-      setExiting(false);
-    }, CONFIRM_DIALOG_EXIT_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [open, rendered]);
+    isPendingRef.current = isPending;
+  }, [isPending]);
 
   useEffect(() => {
     if (!rendered) return;
@@ -89,7 +75,9 @@ export function ConfirmDialog({
     document.body.style.overflow = "hidden";
 
     function handleKeyDown(event: KeyboardEvent): void {
-      if (event.key === "Escape" && !isPending) onClose();
+      if (event.key === "Escape" && !isPendingRef.current) {
+        onCloseRef.current();
+      }
     }
 
     document.addEventListener("keydown", handleKeyDown);
@@ -97,12 +85,7 @@ export function ConfirmDialog({
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [rendered, isPending, onClose]);
-
-  function finishExit(): void {
-    setRendered(false);
-    setExiting(false);
-  }
+  }, [rendered]);
 
   function handlePanelAnimationEnd(
     event: AnimationEvent<HTMLDivElement>,

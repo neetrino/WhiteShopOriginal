@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import { DROPDOWN_ANIMATION_MS } from "@/components/ui/SelectDropdown";
+import { useHoldFlag } from "@/lib/react/use-hold-flag";
 
 const HOVER_CLOSE_DELAY_MS = 140;
 
@@ -29,7 +30,7 @@ export function IconDropdown({
   openOnHover = false,
 }: IconDropdownProps) {
   const [open, setOpen] = useState(false);
-  const [elevated, setElevated] = useState(false);
+  const elevated = useHoldFlag(open, DROPDOWN_ANIMATION_MS);
   const rootRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuId = useId();
@@ -57,15 +58,6 @@ export function IconDropdown({
   useEffect(() => {
     return () => clearCloseTimer();
   }, []);
-
-  useEffect(() => {
-    if (open) {
-      setElevated(true);
-      return;
-    }
-    const timer = setTimeout(() => setElevated(false), DROPDOWN_ANIMATION_MS);
-    return () => clearTimeout(timer);
-  }, [open]);
 
   useEffect(() => {
     if (!open) return;

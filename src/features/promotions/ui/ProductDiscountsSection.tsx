@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { ADMIN_INPUT } from "@/features/admin/ui/admin-form-classes";
+import { AdminSearchInput } from "@/features/admin/ui/AdminSearchInput";
 import type { DiscountBoardProduct } from "@/features/promotions/application/discounts-board";
 import { upsertTargetDiscountAction } from "@/features/promotions/application/manage-discounts";
 import { currencySymbols, isCurrency } from "@/lib/money/currency";
+import { useSyncedState } from "@/lib/react/sync-state-from-prop";
 
 type ProductDiscountsSectionProps = {
   locale: string;
@@ -44,13 +46,8 @@ export function ProductDiscountsSection({
 }: ProductDiscountsSectionProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [drafts, setDrafts] = useState<Record<string, string>>(() =>
-    draftsFromProducts(products),
-  );
-
-  useEffect(() => {
-    setDrafts(draftsFromProducts(products));
-  }, [products]);
+  const sourceDrafts = useMemo(() => draftsFromProducts(products), [products]);
+  const [drafts, setDrafts] = useSyncedState(sourceDrafts);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -111,13 +108,12 @@ export function ProductDiscountsSection({
       <label className="sr-only" htmlFor="product-discount-search">
         Search products
       </label>
-      <input
+      <AdminSearchInput
         id="product-discount-search"
-        type="search"
         placeholder="Search by title or slug..."
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        className={`${ADMIN_INPUT} mb-4`}
+        wrapperClassName="mb-4"
       />
 
       {filtered.length === 0 ? (

@@ -43,23 +43,30 @@ export function ProfileMobileShell({
   /** Keeps sub-route content mounted while the close keyframe plays. */
   const [closingToHub, setClosingToHub] = useState(false);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  const [prevIsHub, setPrevIsHub] = useState(isHub);
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  if (isHub !== prevIsHub || pathname !== prevPathname) {
+    setPrevIsHub(isHub);
+    setPrevPathname(pathname);
+    if (isHub) {
+      setHubSheetOpen(false);
+      setClosingToHub(false);
+    }
+  }
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 1024px)");
     function sync(): void {
       setIsDesktop(media.matches);
     }
-    sync();
+    const frame = requestAnimationFrame(sync);
     media.addEventListener("change", sync);
-    return () => media.removeEventListener("change", sync);
+    return () => {
+      cancelAnimationFrame(frame);
+      media.removeEventListener("change", sync);
+    };
   }, []);
-
-  useEffect(() => {
-    if (isHub) {
-      setHubSheetOpen(false);
-      setClosingToHub(false);
-    }
-  }, [isHub, pathname]);
 
   const sheetOpen = (!isHub || hubSheetOpen) && !closingToHub;
 
@@ -92,9 +99,7 @@ export function ProfileMobileShell({
   );
 
   const desktopColumn = (
-    <div className="min-w-0 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain">
-      {children}
-    </div>
+    <div className="min-w-0 flex-1">{children}</div>
   );
 
   // SSR / pre-hydration: hub on mobile via CSS; content only from lg up.
@@ -102,9 +107,7 @@ export function ProfileMobileShell({
     return (
       <>
         <div className="profile-mobile-page w-full lg:hidden">{hub}</div>
-        <div className="hidden lg:block lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain">
-          {children}
-        </div>
+        <div className="hidden min-w-0 flex-1 lg:block">{children}</div>
       </>
     );
   }

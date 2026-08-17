@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
@@ -60,32 +60,38 @@ export function CouponDrawer({
   const [expiresAt, setExpiresAt] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevCoupon, setPrevCoupon] = useState(coupon);
 
-  useEffect(() => {
-    if (!open) return;
-
-    if (coupon) {
-      setName(coupon.code ?? "");
-      setCode(coupon.code ?? "");
-      setDiscountType(
-        coupon.discountType === "FIXED" ? "FIXED" : "PERCENTAGE",
-      );
-      setValue(String(coupon.discountValue));
-      setQuantity(
-        coupon.totalUsageLimit != null ? String(coupon.totalUsageLimit) : "",
-      );
-      setExpiresAt(toDateTimeLocal(coupon.endsAt));
-      setError(null);
-    } else {
-      setName("");
-      setCode("");
-      setDiscountType("PERCENTAGE");
-      setValue("10");
-      setQuantity("1");
-      setExpiresAt("");
-      setError(null);
+  if (open !== prevOpen || coupon !== prevCoupon) {
+    setPrevOpen(open);
+    setPrevCoupon(coupon);
+    if (open) {
+      if (coupon) {
+        setName(coupon.code ?? "");
+        setCode(coupon.code ?? "");
+        setDiscountType(
+          coupon.discountType === "FIXED" ? "FIXED" : "PERCENTAGE",
+        );
+        setValue(String(coupon.discountValue));
+        setQuantity(
+          coupon.totalUsageLimit != null
+            ? String(coupon.totalUsageLimit)
+            : "",
+        );
+        setExpiresAt(toDateTimeLocal(coupon.endsAt));
+        setError(null);
+      } else {
+        setName("");
+        setCode("");
+        setDiscountType("PERCENTAGE");
+        setValue("10");
+        setQuantity("1");
+        setExpiresAt("");
+        setError(null);
+      }
     }
-  }, [open, coupon]);
+  }
 
   return (
     <SideSheet

@@ -104,6 +104,7 @@ export function ProductDetailView({
             inWishlist={inWishlist}
             isSignedIn={isSignedIn}
             wishlistLabel={dictionary.nav.wishlist}
+            imageUrl={product.images[0]?.url ?? null}
             labels={{
               quantity: labels.quantity,
               decreaseQuantity: dictionary.cartDrawer.decreaseQuantity,

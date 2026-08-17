@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { ADMIN_INPUT } from "@/features/admin/ui/admin-form-classes";
 import type { DiscountBoardCategory } from "@/features/promotions/application/discounts-board";
 import { saveCategoryDiscountsAction } from "@/features/promotions/application/manage-discounts";
+import { useSyncedState } from "@/lib/react/sync-state-from-prop";
 
 type CategoryDiscountsSectionProps = {
   locale: string;
@@ -21,37 +22,32 @@ function parsePercent(raw: string): number | null | "invalid" {
   return next;
 }
 
+function draftsFromCategories(
+  categories: DiscountBoardCategory[],
+): Record<string, string> {
+  return Object.fromEntries(
+    categories.map((category) => [
+      category.id,
+      category.discountPercent != null
+        ? String(category.discountPercent)
+        : "",
+    ]),
+  );
+}
+
 export function CategoryDiscountsSection({
   locale,
   categories,
 }: CategoryDiscountsSectionProps) {
   const router = useRouter();
-  const [drafts, setDrafts] = useState<Record<string, string>>(() =>
-    Object.fromEntries(
-      categories.map((category) => [
-        category.id,
-        category.discountPercent != null
-          ? String(category.discountPercent)
-          : "",
-      ]),
-    ),
+  const sourceDrafts = useMemo(
+    () => draftsFromCategories(categories),
+    [categories],
   );
+  const [drafts, setDrafts] = useSyncedState(sourceDrafts);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    setDrafts(
-      Object.fromEntries(
-        categories.map((category) => [
-          category.id,
-          category.discountPercent != null
-            ? String(category.discountPercent)
-            : "",
-        ]),
-      ),
-    );
-  }, [categories]);
 
   const isDirty = useMemo(() => {
     return categories.some((category) => {

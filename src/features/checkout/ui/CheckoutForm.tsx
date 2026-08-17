@@ -10,6 +10,10 @@ import { previewCouponAction } from "@/features/checkout/application/preview-cou
 import { createOrderAction } from "@/features/checkout/create-order";
 import type { CheckoutPaymentMethod } from "@/features/checkout/domain/payment-methods";
 import { CheckoutDetailsSections } from "@/features/checkout/ui/CheckoutDetailsSections";
+import {
+  CASH_CHANGE_NONE,
+  type CashChangeValue,
+} from "@/features/checkout/ui/checkout-payment-assets";
 import { CheckoutOrderSummary } from "@/features/checkout/ui/CheckoutOrderSummary";
 import { CheckoutProductsInOrder } from "@/features/checkout/ui/CheckoutProductsInOrder";
 import type { CheckoutDeliveryOption } from "@/features/delivery/application/queries";
@@ -18,6 +22,8 @@ import { formatMoneyAmount } from "@/lib/money/format";
 
 type CheckoutLabels = {
   title: string;
+  titleLead: string;
+  titleAccent: string;
   productsInOrder: string;
   itemsOne: string;
   itemsMany: string;
@@ -46,11 +52,16 @@ type CheckoutLabels = {
   enterCity: string;
   selectDeliveryLocation: string;
   cashOnDelivery: string;
+  cashShort: string;
   cashOnDeliveryDescription: string;
+  cashChangeTitle: string;
+  cashChangeHint: string;
+  cashChangeNone: string;
+  cashChangeCourier: string;
   idram: string;
   idramDescription: string;
-  arca: string;
-  arcaDescription: string;
+  card: string;
+  cardDescription: string;
   couponTitle: string;
   couponPlaceholder: string;
   couponApply: string;
@@ -64,6 +75,8 @@ type CheckoutLabels = {
   processing: string;
   continueShopping: string;
   cartEmpty: string;
+  cartEmptyDescription: string;
+  cartEmptyCta: string;
 };
 
 type CheckoutFormProps = {
@@ -118,6 +131,8 @@ export function CheckoutForm({
   const [deliveryRuleId, setDeliveryRuleId] = useState(defaultRuleId);
   const [paymentMethod, setPaymentMethod] =
     useState<CheckoutPaymentMethod>("cash_on_delivery");
+  const [cashChangeFor, setCashChangeFor] =
+    useState<CashChangeValue>(CASH_CHANGE_NONE);
   const [error, setError] = useState<string | null>(null);
   const [couponDraft, setCouponDraft] = useState("");
   const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(
@@ -137,31 +152,39 @@ export function CheckoutForm({
       {
         id: "cash_on_delivery" as const,
         name: labels.cashOnDelivery,
+        shortName: labels.cashShort,
         description: labels.cashOnDeliveryDescription,
-        logoSrc: null,
       },
       {
         id: "idram" as const,
         name: labels.idram,
+        shortName: labels.idram,
         description: labels.idramDescription,
-        logoSrc: "/assets/payments/idram.svg",
       },
       {
         id: "arca" as const,
-        name: labels.arca,
-        description: labels.arcaDescription,
-        logoSrc: "/assets/payments/arca.svg",
+        name: labels.card,
+        shortName: labels.card,
+        description: labels.cardDescription,
       },
     ],
     [
-      labels.arca,
-      labels.arcaDescription,
+      labels.card,
+      labels.cardDescription,
       labels.cashOnDelivery,
       labels.cashOnDeliveryDescription,
+      labels.cashShort,
       labels.idram,
       labels.idramDescription,
     ],
   );
+
+  function onPaymentMethodChange(method: CheckoutPaymentMethod): void {
+    setPaymentMethod(method);
+    if (method === "cash_on_delivery" && !cashChangeFor) {
+      setCashChangeFor(CASH_CHANGE_NONE);
+    }
+  }
 
   function formatMoney(amount: number): string {
     return formatMoneyAmount(amount, "AMD", locale);
@@ -216,15 +239,23 @@ export function CheckoutForm({
 
   if (!hasItems) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="mb-8 text-3xl font-bold text-gray-900">{labels.title}</h1>
+      <div className="mx-auto w-full max-w-[1024px] px-4 pt-[45px] pb-16 sm:px-6 lg:px-6 lg:pt-12 lg:pb-12">
+        <h1 className="mb-6 text-[26px] leading-tight font-black uppercase text-gray-900 sm:text-[30px] sm:leading-[1.2]">
+          <span className="block">{labels.titleLead}</span>
+          {labels.titleAccent ? (
+            <span className="block">{labels.titleAccent}</span>
+          ) : null}
+        </h1>
         <Card className="rounded-2xl border border-gray-200/80 p-6 text-center shadow-none">
-          <p className="mb-4 text-gray-600">{labels.cartEmpty}</p>
+          <p className="mb-2 text-lg font-semibold text-gray-900">
+            {labels.cartEmpty}
+          </p>
+          <p className="mb-6 text-gray-600">{labels.cartEmptyDescription}</p>
           <Link
             href={productsHref}
             className="inline-flex h-11 items-center justify-center rounded-xl bg-gray-900 px-4 text-sm font-medium text-white hover:bg-gray-800"
           >
-            {labels.continueShopping}
+            {labels.cartEmptyCta}
           </Link>
         </Card>
       </div>
@@ -270,8 +301,13 @@ export function CheckoutForm({
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <h1 className="mb-8 text-3xl font-bold text-gray-900">{labels.title}</h1>
+    <div className="mx-auto w-full max-w-[1024px] px-4 pt-[45px] pb-16 sm:px-6 lg:px-6 lg:pt-12 lg:pb-12">
+      <h1 className="mb-6 text-[26px] leading-tight font-black uppercase text-gray-900 sm:text-[30px] sm:leading-[1.2]">
+        <span className="block">{labels.titleLead}</span>
+        {labels.titleAccent ? (
+          <span className="block">{labels.titleAccent}</span>
+        ) : null}
+      </h1>
 
       <CheckoutProductsInOrder
         products={orderProducts}
@@ -283,7 +319,7 @@ export function CheckoutForm({
       />
 
       <form onSubmit={onSubmit}>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
           <CheckoutDetailsSections
             labels={labels}
             pending={pending}
@@ -293,8 +329,11 @@ export function CheckoutForm({
             deliveryRuleId={deliveryRuleId}
             onDeliveryRuleChange={setDeliveryRuleId}
             paymentMethod={paymentMethod}
-            onPaymentMethodChange={setPaymentMethod}
+            onPaymentMethodChange={onPaymentMethodChange}
             paymentOptions={paymentOptions}
+            cashChangeValue={cashChangeFor}
+            onCashChangeValue={setCashChangeFor}
+            orderTotalAmount={totalAmount}
             defaultFirstName={defaultFirstName}
             defaultLastName={defaultLastName}
             defaultEmail={defaultEmail}

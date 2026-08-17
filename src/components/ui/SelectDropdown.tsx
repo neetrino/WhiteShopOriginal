@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
+import { useHoldFlag } from "@/lib/react/use-hold-flag";
+
 export const DROPDOWN_ANIMATION_MS = 280;
 
 export type SelectDropdownOption = {
@@ -22,6 +24,8 @@ type SelectDropdownProps = {
   onValueChange: (value: string) => void;
   /** Wait for close animation before calling onValueChange. Default true. */
   deferChange?: boolean;
+  /** Size the trigger to the selected label instead of full width. */
+  fitContent?: boolean;
 };
 
 export function SelectDropdown({
@@ -34,9 +38,10 @@ export function SelectDropdown({
   disabled = false,
   onValueChange,
   deferChange = true,
+  fitContent = false,
 }: SelectDropdownProps) {
   const [open, setOpen] = useState(false);
-  const [elevated, setElevated] = useState(false);
+  const elevated = useHoldFlag(open, DROPDOWN_ANIMATION_MS);
   const rootRef = useRef<HTMLDivElement>(null);
   const pendingChangeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listId = useId();
@@ -53,15 +58,6 @@ export function SelectDropdown({
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (open) {
-      setElevated(true);
-      return;
-    }
-    const timer = setTimeout(() => setElevated(false), DROPDOWN_ANIMATION_MS);
-    return () => clearTimeout(timer);
-  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -102,20 +98,26 @@ export function SelectDropdown({
   return (
     <div
       ref={rootRef}
-      className={`relative ${elevated ? "z-50" : "z-0"} ${className}`}
+      className={`relative ${elevated ? "z-50" : "z-0"} ${fitContent ? "w-fit max-w-full" : ""} ${className}`}
     >
       {name ? <input type="hidden" name={name} value={value} /> : null}
       <button
         type="button"
         disabled={disabled}
-        className="flex h-11 w-full items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 pr-3 text-left text-sm text-gray-900 shadow-sm outline-none transition-colors hover:border-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+        className={`flex h-11 items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 pr-3 text-left text-sm text-gray-900 shadow-sm outline-none transition-colors hover:border-gray-300 disabled:cursor-not-allowed disabled:opacity-50 ${
+          fitContent ? "w-auto max-w-full" : "w-full"
+        }`}
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
         onClick={() => setOpen((current) => !current)}
       >
-        <span className="min-w-0 truncate">{selectedLabel}</span>
+        <span
+          className={fitContent ? "whitespace-nowrap" : "min-w-0 truncate"}
+        >
+          {selectedLabel}
+        </span>
         <ChevronDown
           className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "rotate-180" : ""}`}
           aria-hidden
@@ -123,7 +125,9 @@ export function SelectDropdown({
       </button>
 
       <div
-        className={`absolute top-[calc(100%+0.5rem)] left-0 z-[100] grid w-full transition-[grid-template-rows,opacity,transform] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        className={`absolute top-[calc(100%+0.5rem)] left-0 z-[100] grid transition-[grid-template-rows,opacity,transform] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          fitContent ? "min-w-full w-max" : "w-full"
+        } ${
           open
             ? "translate-y-0 grid-rows-[1fr] opacity-100"
             : "pointer-events-none -translate-y-1 grid-rows-[0fr] opacity-0"

@@ -5,11 +5,9 @@ import { flushSync } from "react-dom";
 
 import { Card } from "@/components/ui/Card";
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
+import { AdminSearchInput } from "@/features/admin/ui/AdminSearchInput";
 import type { OrderStatus } from "@/features/orders/domain/order-status";
 import type { PaymentStatus } from "@/features/orders/domain/payment-status";
-
-const FILTER_SEARCH =
-  "h-11 min-w-0 flex-1 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 shadow-sm outline-none transition-colors placeholder:text-gray-400 hover:border-gray-300 focus:border-gray-300";
 
 const ORDER_STATUS_FILTERS = [
   { label: "Pending", value: "PENDING" },
@@ -76,11 +74,11 @@ export function AdminOrdersFilters({
           className="w-[200px] shrink-0"
           onValueChange={applyPayment}
         />
-        <input
+        <AdminSearchInput
           name="q"
           defaultValue={q ?? ""}
           placeholder="Search by order #, customer, email, phone…"
-          className={FILTER_SEARCH}
+          wrapperClassName="min-w-0 flex-1"
           aria-label="Search orders"
         />
       </form>

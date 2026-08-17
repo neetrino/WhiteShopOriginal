@@ -45,7 +45,10 @@ export function ProductCard({
 
   return (
     <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-md">
-      <div className="relative aspect-square overflow-hidden bg-gray-100">
+      <div
+        className="relative aspect-square overflow-hidden bg-gray-100"
+        data-cart-fly-source
+      >
         <AppLink
           href={href}
           prefetchPolicy={priority ? "intent" : "auto"}
@@ -91,6 +94,7 @@ export function ProductCard({
             label={addToCartLabel}
             disabled={!inStock}
             size="sm"
+            imageUrl={imageUrl}
             className="absolute right-3 bottom-3 z-10 h-9 w-9 bg-white/90 text-gray-800 shadow-sm hover:bg-white"
           />
         ) : null}

@@ -8,6 +8,8 @@ import {
   type RefObject,
 } from "react";
 
+import { useLatestRef } from "@/lib/react/use-latest-ref";
+
 const DISMISS_THRESHOLD_PX = 120;
 const SCROLL_DRAG_ARM_PX = 10;
 
@@ -56,12 +58,9 @@ export function useProfileMobileSheetDrag({
   const activeDragRef = useRef<DragSession | null>(null);
   const pendingScrollDragRef = useRef<DragSession | null>(null);
   const latestOffsetRef = useRef(0);
-  const onDismissRef = useRef(onDismiss);
-  const onSnapBackRef = useRef(onSnapBack);
-  const onOffsetChangeRef = useRef(onOffsetChange);
-  onDismissRef.current = onDismiss;
-  onSnapBackRef.current = onSnapBack;
-  onOffsetChangeRef.current = onOffsetChange;
+  const onDismissRef = useLatestRef(onDismiss);
+  const onSnapBackRef = useLatestRef(onSnapBack);
+  const onOffsetChangeRef = useLatestRef(onOffsetChange);
 
   const clearSessions = useCallback(() => {
     activeDragRef.current = null;
@@ -80,7 +79,7 @@ export function useProfileMobileSheetDrag({
         offsetY > 0 ? `translateY(${offsetY}px)` : "translateY(0)";
       onOffsetChangeRef.current(offsetY);
     },
-    [panelRef],
+    [panelRef, onOffsetChangeRef],
   );
 
   const beginDrag = useCallback(
@@ -163,7 +162,7 @@ export function useProfileMobileSheetDrag({
       applyOffset(0, true);
       onSnapBackRef.current();
     },
-    [applyOffset, panelRef],
+    [applyOffset, panelRef, onDismissRef, onSnapBackRef],
   );
 
   useEffect(() => {

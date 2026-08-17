@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Percent } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { ADMIN_INPUT } from "@/features/admin/ui/admin-form-classes";
 import { setGlobalDiscountAction } from "@/features/promotions/application/manage-discounts";
+import { useSyncedState } from "@/lib/react/sync-state-from-prop";
 
 const QUICK_PERCENTS = [10, 20, 30, 50] as const;
 
@@ -20,18 +21,12 @@ export function GlobalDiscountCard({
   initialPercent,
 }: GlobalDiscountCardProps) {
   const router = useRouter();
-  const [value, setValue] = useState(
-    initialPercent != null ? String(initialPercent) : "",
-  );
-  const [saved, setSaved] = useState(initialPercent);
+  const sourceValue = initialPercent != null ? String(initialPercent) : "";
+  const [value, setValue] = useSyncedState(sourceValue);
+  const [saved, setSaved] = useSyncedState(initialPercent);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    setValue(initialPercent != null ? String(initialPercent) : "");
-    setSaved(initialPercent);
-  }, [initialPercent]);
 
   function parseInput(): number | null | "invalid" {
     const trimmed = value.trim();

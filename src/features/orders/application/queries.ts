@@ -40,6 +40,7 @@ export type AdminOrderListItem = {
   baseCurrency: string;
   placedAt: Date;
   isArchived: boolean;
+  itemsCount: number;
 };
 
 export type AdminOrderDetail = {
@@ -113,6 +114,16 @@ export async function listAdminOrders(
         baseCurrency: orders.baseCurrency,
         placedAt: orders.placedAt,
         isArchived: orders.isArchived,
+        itemsCount: sql<number>`
+          coalesce(
+            (
+              select sum(${orderItems.quantity})
+              from ${orderItems}
+              where ${orderItems.orderId} = ${orders.id}
+            ),
+            0
+          )
+        `.mapWith(Number),
       })
       .from(orders)
       .where(where)
@@ -156,6 +167,16 @@ export async function listCustomerOrders(
         baseCurrency: orders.baseCurrency,
         placedAt: orders.placedAt,
         isArchived: orders.isArchived,
+        itemsCount: sql<number>`
+          coalesce(
+            (
+              select sum(${orderItems.quantity})
+              from ${orderItems}
+              where ${orderItems.orderId} = ${orders.id}
+            ),
+            0
+          )
+        `.mapWith(Number),
       })
       .from(orders)
       .where(where)
@@ -319,6 +340,16 @@ export async function getAdminDashboardMetrics(input: {
         baseCurrency: orders.baseCurrency,
         placedAt: orders.placedAt,
         isArchived: orders.isArchived,
+        itemsCount: sql<number>`
+          coalesce(
+            (
+              select sum(${orderItems.quantity})
+              from ${orderItems}
+              where ${orderItems.orderId} = ${orders.id}
+            ),
+            0
+          )
+        `.mapWith(Number),
       })
       .from(orders)
       .where(eq(orders.isArchived, false))

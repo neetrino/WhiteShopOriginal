@@ -3,9 +3,9 @@ import "server-only";
 import { count, desc, eq, sql } from "drizzle-orm";
 
 import { getDb } from "@/db/client";
-import { orders } from "@/db/schema";
+import { orderItems, orders } from "@/db/schema";
 
-const RECENT_ORDERS_LIMIT = 5;
+const RECENT_ORDERS_LIMIT = 6;
 
 export type ProfileDashboardStats = {
   totalOrders: number;
@@ -20,6 +20,7 @@ export type ProfileRecentOrder = {
   status: (typeof orders.$inferSelect)["status"];
   totalAmount: number;
   placedAt: Date;
+  itemsCount: number;
 };
 
 /** Aggregated order stats for the profile dashboard (SQL, not full-row scan). */
@@ -69,6 +70,16 @@ export async function listRecentProfileOrders(
       status: orders.status,
       totalAmount: orders.totalAmount,
       placedAt: orders.placedAt,
+      itemsCount: sql<number>`
+        coalesce(
+          (
+            select sum(${orderItems.quantity})
+            from ${orderItems}
+            where ${orderItems.orderId} = ${orders.id}
+          ),
+          0
+        )
+      `.mapWith(Number),
     })
     .from(orders)
     .where(eq(orders.userId, userId))

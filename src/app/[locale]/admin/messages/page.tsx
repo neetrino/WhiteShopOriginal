@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import {
-  ADMIN_INPUT,
   ADMIN_LABEL,
   ADMIN_PAGE_SUBTITLE,
   ADMIN_PAGE_TITLE,
   ADMIN_SELECT,
 } from "@/features/admin/ui/admin-form-classes";
+import { AdminSearchInput } from "@/features/admin/ui/AdminSearchInput";
 import {
   ADMIN_TABLE,
   ADMIN_TABLE_CARD,
@@ -89,11 +89,11 @@ export default async function AdminMessagesPage({
         <form method="get" className="flex flex-wrap items-end gap-3">
           <label className="min-w-[180px] flex-1">
             <span className={ADMIN_LABEL}>Search</span>
-            <input
+            <AdminSearchInput
               name="q"
               defaultValue={filters.q ?? ""}
               placeholder="Name, email, subject…"
-              className={ADMIN_INPUT}
+              wrapperClassName="mt-1"
             />
           </label>
           <label className="min-w-[140px]">

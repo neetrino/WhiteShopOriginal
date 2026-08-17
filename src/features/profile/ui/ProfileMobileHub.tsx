@@ -196,6 +196,11 @@ export function ProfileMobileHub({
             <p className="truncate text-sm leading-snug text-gray-500">
               {user.email}
             </p>
+            {user.phone ? (
+              <p className="truncate text-sm leading-snug text-gray-500">
+                {user.phone}
+              </p>
+            ) : null}
           </div>
         </div>
       </section>

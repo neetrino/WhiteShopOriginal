@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { X } from "lucide-react";
 
 import { ADMIN_LABEL } from "@/features/admin/ui/admin-form-classes";
@@ -106,11 +107,16 @@ export function ProductDrawerImages({
               key={image.key}
               className="relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50"
             >
-              <img
-                src={image.previewUrl}
-                alt=""
-                className="aspect-square w-full object-cover"
-              />
+              <div className="relative aspect-square w-full">
+                <Image
+                  src={image.previewUrl}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="object-cover"
+                  unoptimized={image.previewUrl.startsWith("blob:")}
+                />
+              </div>
               <div className="flex items-center justify-between gap-2 px-2 py-2">
                 <label className="flex items-center gap-1.5 text-xs text-gray-700">
                   <input

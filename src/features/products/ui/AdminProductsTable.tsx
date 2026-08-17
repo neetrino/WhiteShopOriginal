@@ -18,6 +18,7 @@ import {
   ADMIN_TABLE_STATE_INSET,
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_TH_CHECK,
   ADMIN_TABLE_THEAD,
 } from "@/features/admin/ui/admin-table-classes";
@@ -177,9 +178,9 @@ export function AdminProductsTable({
                       Price
                     </Link>
                   </th>
-                  <th className={ADMIN_TABLE_TH}>Category</th>
-                  <th className={ADMIN_TABLE_TH}>Featured</th>
-                  <th className={ADMIN_TABLE_TH}>Actions</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Category</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Featured</th>
+                  <th className={ADMIN_TABLE_TH_CENTER}>Actions</th>
                   <th className={ADMIN_TABLE_TH}>
                     <Link
                       href={sortLinks.created}

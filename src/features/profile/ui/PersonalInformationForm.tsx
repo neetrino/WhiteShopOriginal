@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -17,18 +17,28 @@ type PersonalInformationFormProps = {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
   labels: {
     title: string;
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
     cancel: string;
     save: string;
     saving: string;
     firstNamePlaceholder: string;
     lastNamePlaceholder: string;
     emailPlaceholder: string;
+    phonePlaceholder: string;
   };
+};
+
+type ProfileFormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
 };
 
 const initialState: UpdateProfileActionState = {};
@@ -38,22 +48,32 @@ export function PersonalInformationForm({
   firstName,
   lastName,
   email,
+  phone,
   labels,
 }: PersonalInformationFormProps) {
   const action = updateProfileAction.bind(null, locale);
   const [state, formAction, isPending] = useActionState(action, initialState);
-  const [values, setValues] = useState({
+  const savedValues: ProfileFormValues = {
     firstName,
     lastName,
     email,
-  });
+    phone,
+  };
+  const [values, setValues] = useState(savedValues);
+  const [prevSaved, setPrevSaved] = useState(savedValues);
 
-  useEffect(() => {
-    setValues({ firstName, lastName, email });
-  }, [firstName, lastName, email]);
+  if (
+    firstName !== prevSaved.firstName ||
+    lastName !== prevSaved.lastName ||
+    email !== prevSaved.email ||
+    phone !== prevSaved.phone
+  ) {
+    setPrevSaved(savedValues);
+    setValues(savedValues);
+  }
 
   function resetToSaved(): void {
-    setValues({ firstName, lastName, email });
+    setValues({ firstName, lastName, email, phone });
   }
 
   return (
@@ -105,21 +125,38 @@ export function PersonalInformationForm({
           </label>
         </div>
 
-        <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
-          {labels.email}
-          <input
-            name="email"
-            type="email"
-            required
-            value={values.email}
-            onChange={(event) =>
-              setValues((prev) => ({ ...prev, email: event.target.value }))
-            }
-            placeholder={labels.emailPlaceholder}
-            className={FIELD_CLASS}
-            autoComplete="email"
-          />
-        </label>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8">
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
+            {labels.email}
+            <input
+              name="email"
+              type="email"
+              required
+              value={values.email}
+              onChange={(event) =>
+                setValues((prev) => ({ ...prev, email: event.target.value }))
+              }
+              placeholder={labels.emailPlaceholder}
+              className={FIELD_CLASS}
+              autoComplete="email"
+            />
+          </label>
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
+            {labels.phone}
+            <input
+              name="phone"
+              type="tel"
+              required
+              value={values.phone}
+              onChange={(event) =>
+                setValues((prev) => ({ ...prev, phone: event.target.value }))
+              }
+              placeholder={labels.phonePlaceholder}
+              className={FIELD_CLASS}
+              autoComplete="tel"
+            />
+          </label>
+        </div>
 
         {state.error ? (
           <p className="text-sm text-red-700" role="alert">

@@ -19,7 +19,7 @@ export function ProfileSidebar({
 
   return (
     <aside
-      className="flex w-full flex-col rounded-[var(--radius)] border border-gray-300/60 bg-gradient-to-b from-gray-100/95 to-gray-50/90 shadow-inner lg:h-full lg:min-h-0 lg:overflow-hidden"
+      className="flex w-full flex-col rounded-[var(--radius)] border border-gray-300/60 bg-gradient-to-b from-gray-100/95 to-gray-50/90 shadow-inner"
       aria-label={dictionary.title}
     >
       <div className="shrink-0 border-b border-gray-300/50 bg-gray-50/50 p-4 sm:p-5">
@@ -42,10 +42,15 @@ export function ProfileSidebar({
           <div className="rounded-[var(--radius)] border border-gray-200/60 bg-white/70 px-3.5 py-2.5 text-left text-xs font-medium break-words text-gray-700 shadow-sm sm:text-sm">
             {user.email}
           </div>
+          {user.phone ? (
+            <div className="rounded-[var(--radius)] border border-gray-200/60 bg-white/70 px-3.5 py-2.5 text-left text-xs font-medium break-words text-gray-700 shadow-sm sm:text-sm">
+              {user.phone}
+            </div>
+          ) : null}
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div>
         <ProfileSidebarNav
           locale={locale}
           dictionary={dictionary}

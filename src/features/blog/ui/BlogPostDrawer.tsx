@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import { SideSheet } from "@/components/ui/SideSheet";
@@ -112,38 +112,42 @@ export function BlogPostDrawer({
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevPost, setPrevPost] = useState(post);
 
-  useEffect(() => {
-    if (!open) return;
-
-    if (post) {
-      setActiveLocale(
-        (locales.find((loc) => post.translations[loc]?.title) as
-          | Locale
-          | undefined) ?? "en",
-      );
-      setDrafts(draftsFromTranslations(post.translations));
-      setStatus(post.status);
-      setPublishedAt(post.publishedAt ?? "");
-      setImageFile(null);
-      setImagePreview(post.coverUrl ?? null);
-      setRemoveExistingImage(false);
-      setError(null);
-    } else {
-      setActiveLocale("en");
-      setDrafts({
-        hy: emptyDraft(),
-        en: emptyDraft(),
-        ru: emptyDraft(),
-      });
-      setStatus("DRAFT");
-      setPublishedAt("");
-      setImageFile(null);
-      setImagePreview(null);
-      setRemoveExistingImage(false);
-      setError(null);
+  if (open !== prevOpen || post !== prevPost) {
+    setPrevOpen(open);
+    setPrevPost(post);
+    if (open) {
+      if (post) {
+        setActiveLocale(
+          (locales.find((loc) => post.translations[loc]?.title) as
+            | Locale
+            | undefined) ?? "en",
+        );
+        setDrafts(draftsFromTranslations(post.translations));
+        setStatus(post.status);
+        setPublishedAt(post.publishedAt ?? "");
+        setImageFile(null);
+        setImagePreview(post.coverUrl ?? null);
+        setRemoveExistingImage(false);
+        setError(null);
+      } else {
+        setActiveLocale("en");
+        setDrafts({
+          hy: emptyDraft(),
+          en: emptyDraft(),
+          ru: emptyDraft(),
+        });
+        setStatus("DRAFT");
+        setPublishedAt("");
+        setImageFile(null);
+        setImagePreview(null);
+        setRemoveExistingImage(false);
+        setError(null);
+      }
     }
-  }, [open, post]);
+  }
 
   const draft = drafts[activeLocale];
 

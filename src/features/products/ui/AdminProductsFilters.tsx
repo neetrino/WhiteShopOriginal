@@ -5,10 +5,8 @@ import { flushSync } from "react-dom";
 
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import { ADMIN_LABEL } from "@/features/admin/ui/admin-form-classes";
+import { AdminSearchInput } from "@/features/admin/ui/AdminSearchInput";
 import type { AdminCategoryOption } from "@/features/products/application/list-admin-products";
-
-const FILTER_INPUT =
-  "h-11 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 shadow-sm outline-none transition-colors placeholder:text-gray-400 hover:border-gray-300 focus:border-gray-300";
 
 type AdminProductsFiltersProps = {
   total: number;
@@ -71,21 +69,21 @@ export function AdminProductsFilters({
         <input type="hidden" name="dir" value={dir} />
         <label>
           <span className={ADMIN_LABEL}>Search by title or slug</span>
-          <input
+          <AdminSearchInput
             name="q"
             defaultValue={q ?? ""}
             placeholder="Search by title or slug..."
-            className={`${FILTER_INPUT} mt-1`}
+            wrapperClassName="mt-1"
             aria-label="Search by title or slug"
           />
         </label>
         <label>
           <span className={ADMIN_LABEL}>Search by SKU</span>
-          <input
+          <AdminSearchInput
             name="sku"
             defaultValue={sku ?? ""}
             placeholder="Enter SKU code"
-            className={`${FILTER_INPUT} mt-1`}
+            wrapperClassName="mt-1"
             aria-label="Search by SKU"
           />
         </label>
