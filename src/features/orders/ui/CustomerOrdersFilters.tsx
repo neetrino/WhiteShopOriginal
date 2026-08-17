@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { Search } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
@@ -9,7 +10,7 @@ import type { OrderStatus } from "@/features/orders/domain/order-status";
 import type { PaymentStatus } from "@/features/orders/domain/payment-status";
 
 const FILTER_SEARCH =
-  "h-11 w-full min-w-0 shrink-0 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 shadow-sm outline-none transition-colors placeholder:text-gray-400 hover:border-gray-300 focus:border-gray-300 lg:flex-1 lg:shrink";
+  "h-11 w-full min-w-0 shrink-0 rounded-2xl border border-gray-200 bg-white py-0 pr-4 pl-10 text-sm text-gray-900 shadow-sm outline-none transition-colors placeholder:text-gray-400 hover:border-gray-300 focus:border-gray-300 lg:flex-1 lg:shrink";
 
 const ORDER_STATUS_FILTERS = [
   { label: "Pending", value: "PENDING" },
@@ -76,13 +77,19 @@ export function CustomerOrdersFilters({
           className="w-full lg:w-[200px] lg:shrink-0"
           onValueChange={applyPayment}
         />
-        <input
-          name="q"
-          defaultValue={q ?? ""}
-          placeholder="Search by order #"
-          className={FILTER_SEARCH}
-          aria-label="Search orders"
-        />
+        <div className="relative min-w-0 w-full lg:flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-gray-400"
+            aria-hidden
+          />
+          <input
+            name="q"
+            defaultValue={q ?? ""}
+            placeholder="Search by order #"
+            className={FILTER_SEARCH}
+            aria-label="Search orders"
+          />
+        </div>
       </form>
       <div className="border-t border-gray-200 px-4 py-3">
         <p className="text-sm text-gray-600">Total orders: {total}</p>

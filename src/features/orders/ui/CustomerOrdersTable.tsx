@@ -57,15 +57,22 @@ export function CustomerOrdersTable({
           </thead>
           <tbody className={ADMIN_TABLE_TBODY}>
             {orders.map((order) => (
-              <tr key={order.id} className={ADMIN_TABLE_ROW}>
-                <td className={ADMIN_TABLE_TD}>
-                  <button
-                    type="button"
-                    onClick={() => onOpenOrder(order.orderNumber)}
-                    className="font-medium text-gray-900 hover:underline"
-                  >
-                    {order.orderNumber}
-                  </button>
+              <tr
+                key={order.id}
+                className={`${ADMIN_TABLE_ROW} cursor-pointer`}
+                tabIndex={0}
+                role="button"
+                aria-label={`Open order ${order.orderNumber}`}
+                onClick={() => onOpenOrder(order.orderNumber)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onOpenOrder(order.orderNumber);
+                  }
+                }}
+              >
+                <td className={`${ADMIN_TABLE_TD} font-medium text-gray-900`}>
+                  {order.orderNumber}
                 </td>
                 <td className={ADMIN_TABLE_TD}>
                   <span
