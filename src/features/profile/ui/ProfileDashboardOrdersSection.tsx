@@ -6,7 +6,10 @@ import { AppLink } from "@/components/ui/AppLink";
 import type { AdminOrderDetailView } from "@/features/orders/application/order-detail-view";
 import { getCustomerOrderDetailAction } from "@/features/orders/application/get-customer-order-detail";
 import { OrderDetailsDrawer } from "@/features/orders/ui/OrderDetailsDrawer";
-import { formatOrderStatusLabel } from "@/features/orders/ui/order-drawer-format";
+import {
+  formatOrderDrawerMoney,
+  formatOrderStatusLabel,
+} from "@/features/orders/ui/order-drawer-format";
 import type { ProfileRecentOrder } from "@/features/profile/application/dashboard-queries";
 import { formatShortDate } from "@/features/profile/ui/format-short-date";
 import { ProfileRecentOrderCard } from "@/features/profile/ui/ProfileRecentOrderCard";
@@ -15,7 +18,6 @@ import {
   PROFILE_PRIMARY_BUTTON_CLASS,
   PROFILE_SECTION_TITLE_CLASS,
 } from "@/features/profile/ui/profile-surface-classes";
-import { formatMoneyAmount } from "@/lib/money/format";
 
 type ProfileDashboardOrdersSectionProps = {
   locale: string;
@@ -103,11 +105,7 @@ export function ProfileDashboardOrdersSection({
                   <ProfileRecentOrderCard
                     orderNumber={order.orderNumber}
                     status={formatOrderStatusLabel(order.status)}
-                    totalLabel={formatMoneyAmount(
-                      order.totalAmount,
-                      "AMD",
-                      locale,
-                    )}
+                    totalLabel={formatOrderDrawerMoney(order.totalAmount, "AMD")}
                     metaLine={`${order.itemsCount} ${itemWord}`}
                     placedOnLine={`${labels.placedOn} ${formatShortDate(order.placedAt, locale)}`}
                     orderNumberLabel={labels.orderNumber}

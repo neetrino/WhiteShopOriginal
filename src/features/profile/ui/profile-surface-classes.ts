@@ -8,7 +8,7 @@ export const PROFILE_CARD_FLAT_CLASS =
 export const PROFILE_SECTION_TITLE_CLASS = "text-xl font-bold text-gray-900";
 
 export const PROFILE_PENDING_BADGE_CLASS =
-  "inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium capitalize text-gray-700";
+  "inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium uppercase tracking-wide text-gray-700";
 
 export const PROFILE_PRIMARY_BUTTON_CLASS =
   "inline-flex h-11 items-center justify-center rounded-full bg-gray-900 px-6 text-sm font-semibold text-white transition hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900";
