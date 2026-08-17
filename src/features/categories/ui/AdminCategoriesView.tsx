@@ -11,9 +11,9 @@ import {
   deleteConfirmDescription,
 } from "@/components/ui/ConfirmDialog";
 import {
-  ADMIN_INPUT,
   ADMIN_PAGE_TITLE,
 } from "@/features/admin/ui/admin-form-classes";
+import { AdminSearchInput } from "@/features/admin/ui/AdminSearchInput";
 import {
   ADMIN_TABLE,
   ADMIN_TABLE_CARD,
@@ -179,11 +179,11 @@ export function AdminCategoriesView({
         </Button>
       </div>
 
-      <input
+      <AdminSearchInput
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Enter category title"
-        className={`${ADMIN_INPUT} mb-4`}
+        wrapperClassName="mb-4"
         aria-label="Search categories"
       />
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { ADMIN_INPUT } from "@/features/admin/ui/admin-form-classes";
+import { AdminSearchInput } from "@/features/admin/ui/AdminSearchInput";
 import type { DiscountBoardProduct } from "@/features/promotions/application/discounts-board";
 import { upsertTargetDiscountAction } from "@/features/promotions/application/manage-discounts";
 import { currencySymbols, isCurrency } from "@/lib/money/currency";
@@ -111,13 +112,12 @@ export function ProductDiscountsSection({
       <label className="sr-only" htmlFor="product-discount-search">
         Search products
       </label>
-      <input
+      <AdminSearchInput
         id="product-discount-search"
-        type="search"
         placeholder="Search by title or slug..."
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        className={`${ADMIN_INPUT} mb-4`}
+        wrapperClassName="mb-4"
       />
 
       {filtered.length === 0 ? (

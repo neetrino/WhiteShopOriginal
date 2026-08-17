@@ -11,9 +11,9 @@ import {
   deleteConfirmDescription,
 } from "@/components/ui/ConfirmDialog";
 import {
-  ADMIN_INPUT,
   ADMIN_PAGE_TITLE,
 } from "@/features/admin/ui/admin-form-classes";
+import { AdminSearchInput } from "@/features/admin/ui/AdminSearchInput";
 import { ADMIN_BADGE } from "@/features/admin/ui/status-badge";
 import { deleteBlogPostAction } from "@/features/blog/application/manage-blog";
 import type { AdminBlogListItem } from "@/features/blog/application/queries";
@@ -113,11 +113,11 @@ export function AdminBlogView({ locale, posts }: AdminBlogViewProps) {
         </Button>
       </div>
 
-      <input
+      <AdminSearchInput
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search by title or slug"
-        className={`${ADMIN_INPUT} mb-4`}
+        wrapperClassName="mb-4"
         aria-label="Search blog posts"
       />
 
