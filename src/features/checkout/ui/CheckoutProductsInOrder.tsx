@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { X } from "lucide-react";
 
 import type { CheckoutOrderProduct } from "@/features/checkout/ui/checkout-order-product";
 import { removeItem } from "@/features/cart/cart";
+import { useSyncedState } from "@/lib/react/sync-state-from-prop";
 
 type CheckoutProductsInOrderProps = {
   products: CheckoutOrderProduct[];
@@ -37,13 +38,9 @@ export function CheckoutProductsInOrder({
   onCartChanged,
 }: CheckoutProductsInOrderProps) {
   const router = useRouter();
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useSyncedState(initialProducts);
   const [pending, startTransition] = useTransition();
   const scrollerRef = useRef<HTMLUListElement>(null);
-
-  useEffect(() => {
-    setProducts(initialProducts);
-  }, [initialProducts]);
 
   useEffect(() => {
     const element = scrollerRef.current;

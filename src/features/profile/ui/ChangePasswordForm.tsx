@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -39,12 +39,14 @@ export function ChangePasswordForm({ locale, labels }: ChangePasswordFormProps) 
   const action = changePasswordAction.bind(null, locale);
   const [state, formAction, isPending] = useActionState(action, initialState);
   const [values, setValues] = useState(emptyForm);
+  const [prevSuccess, setPrevSuccess] = useState(state.success);
 
-  useEffect(() => {
+  if (state.success !== prevSuccess) {
+    setPrevSuccess(state.success);
     if (state.success) {
       setValues(emptyForm);
     }
-  }, [state.success]);
+  }
 
   return (
     <Card className="rounded-2xl border border-gray-200/80 p-5 shadow-none sm:p-7 lg:p-8">

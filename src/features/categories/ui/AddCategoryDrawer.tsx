@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
@@ -44,32 +45,36 @@ export function AddCategoryDrawer({
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevCategory, setPrevCategory] = useState(category);
 
-  useEffect(() => {
-    if (!open) return;
-
-    if (category) {
-      setTitle(category.title);
-      setSlug(category.slug);
-      setSlugTouched(true);
-      setParentId(category.parentId ?? "");
-      setStatus(category.status === "ARCHIVED" ? "ARCHIVED" : "ACTIVE");
-      setImageFile(null);
-      setImagePreview(category.imageUrl);
-      setRemoveExistingImage(false);
-      setError(null);
-    } else {
-      setTitle("");
-      setSlug("");
-      setSlugTouched(false);
-      setParentId("");
-      setStatus("ACTIVE");
-      setImageFile(null);
-      setImagePreview(null);
-      setRemoveExistingImage(false);
-      setError(null);
+  if (open !== prevOpen || category !== prevCategory) {
+    setPrevOpen(open);
+    setPrevCategory(category);
+    if (open) {
+      if (category) {
+        setTitle(category.title);
+        setSlug(category.slug);
+        setSlugTouched(true);
+        setParentId(category.parentId ?? "");
+        setStatus(category.status === "ARCHIVED" ? "ARCHIVED" : "ACTIVE");
+        setImageFile(null);
+        setImagePreview(category.imageUrl);
+        setRemoveExistingImage(false);
+        setError(null);
+      } else {
+        setTitle("");
+        setSlug("");
+        setSlugTouched(false);
+        setParentId("");
+        setStatus("ACTIVE");
+        setImageFile(null);
+        setImagePreview(null);
+        setRemoveExistingImage(false);
+        setError(null);
+      }
     }
-  }, [open, category]);
+  }
 
   const displaySlug = slugTouched ? slug : slugifyCategoryTitle(title) || "---";
   const parentOptions = categories.filter((item) => item.id !== category?.id);
@@ -249,10 +254,13 @@ export function AddCategoryDrawer({
                 ) : null}
               </div>
               {imagePreview ? (
-                <img
+                <Image
                   src={imagePreview}
                   alt=""
+                  width={112}
+                  height={112}
                   className="mt-3 h-28 w-28 rounded-xl border border-gray-200 object-cover"
+                  unoptimized={imagePreview.startsWith("blob:")}
                 />
               ) : null}
             </div>

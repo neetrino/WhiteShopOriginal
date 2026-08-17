@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChevronRight, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 
@@ -33,6 +34,7 @@ import {
 } from "@/features/categories/actions";
 import type { AdminCategoryListItem } from "@/features/categories/application/list-admin-categories";
 import { AddCategoryDrawer } from "@/features/categories/ui/AddCategoryDrawer";
+import { useSyncedState } from "@/lib/react/sync-state-from-prop";
 
 type AdminCategoriesViewProps = {
   locale: string;
@@ -79,16 +81,11 @@ export function AdminCategoriesView({
     id: string;
     title: string;
   } | null>(null);
-  const [ordered, setOrdered] = useState(categories);
+  const [ordered, setOrdered] = useSyncedState(categories);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const orderedRef = useRef(ordered);
   const dragOriginRef = useRef<AdminCategoryListItem[] | null>(null);
   const persistedRef = useRef(false);
-
-  useEffect(() => {
-    setOrdered(categories);
-    orderedRef.current = categories;
-  }, [categories]);
 
   useEffect(() => {
     orderedRef.current = ordered;
@@ -266,12 +263,14 @@ export function AdminCategoriesView({
                         </button>
                       </td>
                       <td className={ADMIN_TABLE_TD}>
-                        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded border border-dashed border-gray-300 bg-gray-50">
+                        <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded border border-dashed border-gray-300 bg-gray-50">
                           {category.imageUrl ? (
-                            <img
+                            <Image
                               src={category.imageUrl}
                               alt=""
-                              className="h-full w-full object-cover"
+                              fill
+                              sizes="40px"
+                              className="object-cover"
                             />
                           ) : (
                             <span className="text-gray-400">—</span>

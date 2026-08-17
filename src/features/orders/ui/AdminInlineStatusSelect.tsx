@@ -32,6 +32,8 @@ import {
   paymentStatusLabel,
   type PaymentStatus,
 } from "@/features/orders/domain/payment-status";
+import { useHoldFlag } from "@/lib/react/use-hold-flag";
+import { useSyncedState } from "@/lib/react/sync-state-from-prop";
 
 type MenuPosition = {
   top: number;
@@ -56,9 +58,9 @@ export function AdminInlineStatusSelect({
 }: AdminInlineStatusSelectProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHoldFlag(open, DROPDOWN_ANIMATION_MS);
   const [error, setError] = useState<string | null>(null);
-  const [displayValue, setDisplayValue] = useState(value);
+  const [displayValue, setDisplayValue] = useSyncedState(value);
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const [isPending, startTransition] = useTransition();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -67,25 +69,12 @@ export function AdminInlineStatusSelect({
   const menuId = useId();
 
   useEffect(() => {
-    setDisplayValue(value);
-  }, [value]);
-
-  useEffect(() => {
     return () => {
       if (pendingChangeRef.current) {
         clearTimeout(pendingChangeRef.current);
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (open) {
-      setMounted(true);
-      return;
-    }
-    const timer = setTimeout(() => setMounted(false), DROPDOWN_ANIMATION_MS);
-    return () => clearTimeout(timer);
-  }, [open]);
 
   const options =
     kind === "order"
@@ -115,10 +104,15 @@ export function AdminInlineStatusSelect({
 
   useLayoutEffect(() => {
     if (!open && !mounted) {
-      setMenuPosition(null);
-      return;
+      const frame = requestAnimationFrame(() => {
+        setMenuPosition(null);
+      });
+      return () => cancelAnimationFrame(frame);
     }
-    updateMenuPosition();
+    const frame = requestAnimationFrame(() => {
+      updateMenuPosition();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [open, mounted]);
 
   useEffect(() => {

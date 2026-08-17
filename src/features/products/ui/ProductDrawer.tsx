@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { SideSheet } from "@/components/ui/SideSheet";
@@ -81,39 +81,51 @@ export function ProductDrawer({
   const [stockOnHand, setStockOnHand] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevProduct, setPrevProduct] = useState(product);
+  const [prevCategories, setPrevCategories] = useState(initialCategories);
 
-  useEffect(() => {
-    if (!open) return;
-
-    setCategories(initialCategories);
-    if (product) {
-      setTitle(product.title);
-      setSlug(product.slug);
-      setDescription(product.description);
-      setImages(imagesFromProduct(product));
-      setRemovedImageIds([]);
-      setCategoryIds(product.categoryIds);
-      setPriceAmount(String(product.priceAmount));
-      setCompareAtAmount(
-        product.compareAtAmount != null ? String(product.compareAtAmount) : "",
-      );
-      setSku(product.sku);
-      setStockOnHand(String(product.stockOnHand));
-      setError(null);
-    } else {
-      setTitle("");
-      setSlug("");
-      setDescription("");
-      setImages([]);
-      setRemovedImageIds([]);
-      setCategoryIds([]);
-      setPriceAmount("");
-      setCompareAtAmount("");
-      setSku("");
-      setStockOnHand("");
-      setError(null);
+  if (
+    open !== prevOpen ||
+    product !== prevProduct ||
+    initialCategories !== prevCategories
+  ) {
+    setPrevOpen(open);
+    setPrevProduct(product);
+    setPrevCategories(initialCategories);
+    if (open) {
+      setCategories(initialCategories);
+      if (product) {
+        setTitle(product.title);
+        setSlug(product.slug);
+        setDescription(product.description);
+        setImages(imagesFromProduct(product));
+        setRemovedImageIds([]);
+        setCategoryIds(product.categoryIds);
+        setPriceAmount(String(product.priceAmount));
+        setCompareAtAmount(
+          product.compareAtAmount != null
+            ? String(product.compareAtAmount)
+            : "",
+        );
+        setSku(product.sku);
+        setStockOnHand(String(product.stockOnHand));
+        setError(null);
+      } else {
+        setTitle("");
+        setSlug("");
+        setDescription("");
+        setImages([]);
+        setRemovedImageIds([]);
+        setCategoryIds([]);
+        setPriceAmount("");
+        setCompareAtAmount("");
+        setSku("");
+        setStockOnHand("");
+        setError(null);
+      }
     }
-  }, [open, product, initialCategories]);
+  }
 
   function handleImagesChange(next: ProductDraftImage[]): void {
     const nextKeys = new Set(next.map((image) => image.key));

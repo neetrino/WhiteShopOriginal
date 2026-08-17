@@ -12,6 +12,9 @@ import {
 import { createPortal } from "react-dom";
 
 import { useProfileMobileSheetDrag } from "@/features/profile/ui/use-profile-mobile-sheet-drag";
+import { useIsClient } from "@/lib/react/use-is-client";
+import { useLatestRef } from "@/lib/react/use-latest-ref";
+import { useOpenSnapshot } from "@/lib/react/use-open-snapshot";
 
 /** Must match `.animate-bottom-sheet-panel-*` duration in globals.css. */
 export const PROFILE_MOBILE_TAB_SHEET_MS = 300;
@@ -40,23 +43,22 @@ export function ProfileMobileTabSheet({
   ariaLabel,
   children,
 }: ProfileMobileTabSheetProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
   const [rendered, setRendered] = useState(false);
   const [phase, setPhase] = useState<MotionPhase>("enter");
+  const [prevOpen, setPrevOpen] = useState(open);
   const [isDragging, setIsDragging] = useState(false);
   const [dragBackdropOpacity, setDragBackdropOpacity] = useState<number | null>(
     null,
   );
-  const [displayChildren, setDisplayChildren] = useState(children);
-  const [displayAriaLabel, setDisplayAriaLabel] = useState(ariaLabel);
+  const displayChildren = useOpenSnapshot(open, children);
+  const displayAriaLabel = useOpenSnapshot(open, ariaLabel);
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const exitNotifiedRef = useRef(false);
-  const onExitedRef = useRef(onExited);
-  const onCloseRef = useRef(onClose);
-  onExitedRef.current = onExited;
-  onCloseRef.current = onClose;
+  const onExitedRef = useLatestRef(onExited);
+  const onCloseRef = useLatestRef(onClose);
 
   const finishExit = useCallback(() => {
     if (exitNotifiedRef.current) return;
@@ -71,7 +73,7 @@ export function ProfileMobileTabSheet({
       panel.style.transform = "";
     }
     onExitedRef.current?.();
-  }, []);
+  }, [onExitedRef]);
 
   const handleDismissFromDrag = useCallback((releaseOffsetY: number) => {
     setIsDragging(false);
@@ -88,7 +90,7 @@ export function ProfileMobileTabSheet({
     }
 
     onCloseRef.current();
-  }, []);
+  }, [onCloseRef]);
 
   const handleSnapBack = useCallback(() => {
     setIsDragging(false);
@@ -117,53 +119,43 @@ export function ProfileMobileTabSheet({
     onOffsetChange: handleOffsetChange,
   });
 
-  const renderedRef = useRef(false);
-  const phaseRef = useRef<MotionPhase>("enter");
-  renderedRef.current = rendered;
-  phaseRef.current = phase;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    setDisplayChildren(children);
-    setDisplayAriaLabel(ariaLabel);
-  }, [open, children, ariaLabel]);
-
-  useEffect(() => {
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) {
-      exitNotifiedRef.current = false;
       setIsDragging(false);
       setDragBackdropOpacity(null);
       setPhase("enter");
       setRendered(true);
-      const panel = panelRef.current;
-      if (panel) {
-        panel.style.transition = "";
-        panel.style.transform = "";
-      }
-      return;
+    } else if (rendered && phase !== "exit-drag") {
+      setPhase("exit");
     }
+  }
 
-    if (!renderedRef.current) return;
-
-    // Swipe path already set `exit-drag` and started the transform.
-    if (phaseRef.current === "exit-drag") {
-      const timer = window.setTimeout(() => {
-        finishExit();
-      }, PROFILE_MOBILE_TAB_SHEET_MS);
-      return () => window.clearTimeout(timer);
+  useEffect(() => {
+    if (open) {
+      exitNotifiedRef.current = false;
     }
+  }, [open]);
 
-    setPhase("exit");
+  useEffect(() => {
+    if (!open) return;
+    const panel = panelRef.current;
+    if (panel) {
+      panel.style.transition = "";
+      panel.style.transform = "";
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (open || !rendered) return;
+    if (phase !== "exit" && phase !== "exit-drag") return;
+
     const timer = window.setTimeout(() => {
       finishExit();
     }, PROFILE_MOBILE_TAB_SHEET_MS);
 
     return () => window.clearTimeout(timer);
-  }, [open, finishExit]);
+  }, [open, rendered, phase, finishExit]);
 
   useEffect(() => {
     if (!rendered || phase !== "enter") return;
@@ -188,7 +180,7 @@ export function ProfileMobileTabSheet({
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [rendered]);
+  }, [rendered, onCloseRef]);
 
   function handlePanelAnimationEnd(
     event: AnimationEvent<HTMLDivElement>,

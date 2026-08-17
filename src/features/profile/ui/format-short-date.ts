@@ -3,8 +3,9 @@ import type { Locale } from "@/lib/i18n/config";
 /** Compact date for profile order cards so it stays on one line (e.g. 15.08.2026). */
 export function formatShortDate(
   value: string | Date,
-  _locale: Locale | string,
+  locale: Locale | string,
 ): string {
+  void locale;
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) {
     return "";

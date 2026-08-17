@@ -33,13 +33,15 @@ export async function registerAction(
     return { error: "Unable to create account with those details." };
   }
 
-  const { password, confirmPassword: _confirmPassword, ...registration } =
-    parsed.data;
+  const { firstName, lastName, email, phone, password } = parsed.data;
   const [user] = await getDb()
     .insert(users)
     .values({
       id: createId(),
-      ...registration,
+      firstName,
+      lastName,
+      email,
+      phone,
       passwordHash: await hashPassword(password),
       passwordUpdatedAt: new Date(),
       // Temporary Phase 3 bypass until the verification provider is connected.

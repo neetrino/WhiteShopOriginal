@@ -3,12 +3,15 @@
 import {
   useEffect,
   useRef,
-  useState,
   type AnimationEvent,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+
+import { useExitPresence } from "@/lib/react/use-exit-presence";
+import { useIsClient } from "@/lib/react/use-is-client";
+import { useOpenSnapshot } from "@/lib/react/use-open-snapshot";
 
 /** Must match `.animate-side-sheet-panel-*` duration in globals.css. */
 export const SIDE_SHEET_ANIMATION_MS = 300;
@@ -43,40 +46,25 @@ export function SideSheet({
   closeVariant = "circle",
   backdropBlur = false,
 }: SideSheetProps) {
-  const [mounted, setMounted] = useState(false);
-  const [rendered, setRendered] = useState(false);
-  const [exiting, setExiting] = useState(false);
-  const [displayChildren, setDisplayChildren] = useState(children);
-  const [displayAriaLabel, setDisplayAriaLabel] = useState(ariaLabel);
+  const mounted = useIsClient();
+  const { rendered, exiting, finishExit } = useExitPresence(
+    open,
+    SIDE_SHEET_ANIMATION_MS,
+  );
+  const displayChildren = useOpenSnapshot(open, children);
+  const displayAriaLabel = useOpenSnapshot(open, ariaLabel);
   const exitDoneRef = useRef(false);
+  const onCloseRef = useRef(onClose);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    setDisplayChildren(children);
-    setDisplayAriaLabel(ariaLabel);
-  }, [open, children, ariaLabel]);
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (open) {
       exitDoneRef.current = false;
-      setExiting(false);
-      setRendered(true);
-      return;
     }
-
-    if (!rendered) return;
-
-    setExiting(true);
-    const timer = window.setTimeout(() => {
-      finishExit();
-    }, SIDE_SHEET_ANIMATION_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [open, rendered]);
+  }, [open]);
 
   useEffect(() => {
     if (!rendered) return;
@@ -85,7 +73,7 @@ export function SideSheet({
     document.body.style.overflow = "hidden";
 
     function handleKeyDown(event: KeyboardEvent): void {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
     }
 
     document.addEventListener("keydown", handleKeyDown);
@@ -93,13 +81,12 @@ export function SideSheet({
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [rendered, onClose]);
+  }, [rendered]);
 
-  function finishExit(): void {
+  function handleFinishExit(): void {
     if (exitDoneRef.current) return;
     exitDoneRef.current = true;
-    setRendered(false);
-    setExiting(false);
+    finishExit();
   }
 
   function handlePanelAnimationEnd(
@@ -107,7 +94,7 @@ export function SideSheet({
   ): void {
     if (event.target !== event.currentTarget) return;
     if (!event.animationName.includes("side-sheet-panel-out")) return;
-    finishExit();
+    handleFinishExit();
   }
 
   if (!mounted || !rendered) return null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -34,6 +34,13 @@ type PersonalInformationFormProps = {
   };
 };
 
+type ProfileFormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+};
+
 const initialState: UpdateProfileActionState = {};
 
 export function PersonalInformationForm({
@@ -46,16 +53,24 @@ export function PersonalInformationForm({
 }: PersonalInformationFormProps) {
   const action = updateProfileAction.bind(null, locale);
   const [state, formAction, isPending] = useActionState(action, initialState);
-  const [values, setValues] = useState({
+  const savedValues: ProfileFormValues = {
     firstName,
     lastName,
     email,
     phone,
-  });
+  };
+  const [values, setValues] = useState(savedValues);
+  const [prevSaved, setPrevSaved] = useState(savedValues);
 
-  useEffect(() => {
-    setValues({ firstName, lastName, email, phone });
-  }, [firstName, lastName, email, phone]);
+  if (
+    firstName !== prevSaved.firstName ||
+    lastName !== prevSaved.lastName ||
+    email !== prevSaved.email ||
+    phone !== prevSaved.phone
+  ) {
+    setPrevSaved(savedValues);
+    setValues(savedValues);
+  }
 
   function resetToSaved(): void {
     setValues({ firstName, lastName, email, phone });

@@ -43,23 +43,30 @@ export function ProfileMobileShell({
   /** Keeps sub-route content mounted while the close keyframe plays. */
   const [closingToHub, setClosingToHub] = useState(false);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  const [prevIsHub, setPrevIsHub] = useState(isHub);
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  if (isHub !== prevIsHub || pathname !== prevPathname) {
+    setPrevIsHub(isHub);
+    setPrevPathname(pathname);
+    if (isHub) {
+      setHubSheetOpen(false);
+      setClosingToHub(false);
+    }
+  }
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 1024px)");
     function sync(): void {
       setIsDesktop(media.matches);
     }
-    sync();
+    const frame = requestAnimationFrame(sync);
     media.addEventListener("change", sync);
-    return () => media.removeEventListener("change", sync);
+    return () => {
+      cancelAnimationFrame(frame);
+      media.removeEventListener("change", sync);
+    };
   }, []);
-
-  useEffect(() => {
-    if (isHub) {
-      setHubSheetOpen(false);
-      setClosingToHub(false);
-    }
-  }, [isHub, pathname]);
 
   const sheetOpen = (!isHub || hubSheetOpen) && !closingToHub;
 

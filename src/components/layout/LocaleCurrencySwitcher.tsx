@@ -10,6 +10,7 @@ import type { Locale } from "@/lib/i18n/config";
 import { localeLabels, locales } from "@/lib/i18n/config";
 import type { Currency } from "@/lib/money/currency";
 import { currencies } from "@/lib/money/currency";
+import { useLatestRef } from "@/lib/react/use-latest-ref";
 
 const HOVER_CLOSE_DELAY_MS = 140;
 
@@ -58,6 +59,7 @@ export function LocaleCurrencySwitcher({
   const [open, setOpen] = useState(false);
   const [rendered, setRendered] = useState(false);
   const [entered, setEntered] = useState(false);
+  const [prevOpen, setPrevOpen] = useState(open);
   const rootRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuId = useId();
@@ -79,6 +81,8 @@ export function LocaleCurrencySwitcher({
     setOpen(false);
   }
 
+  const closeMenuRef = useLatestRef(closeMenu);
+
   function scheduleClose(): void {
     clearCloseTimer();
     closeTimerRef.current = setTimeout(() => {
@@ -87,14 +91,22 @@ export function LocaleCurrencySwitcher({
     }, HOVER_CLOSE_DELAY_MS);
   }
 
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      setRendered(true);
+      setEntered(false);
+    } else {
+      setEntered(false);
+    }
+  }
+
   useEffect(() => {
     return () => clearCloseTimer();
   }, []);
 
   useEffect(() => {
     if (open) {
-      setRendered(true);
-      setEntered(false);
       let frame2 = 0;
       const frame1 = requestAnimationFrame(() => {
         frame2 = requestAnimationFrame(() => setEntered(true));
@@ -105,7 +117,6 @@ export function LocaleCurrencySwitcher({
       };
     }
 
-    setEntered(false);
     const timer = setTimeout(() => setRendered(false), DROPDOWN_ANIMATION_MS);
     return () => clearTimeout(timer);
   }, [open]);
@@ -115,12 +126,12 @@ export function LocaleCurrencySwitcher({
 
     function handlePointerDown(event: MouseEvent): void {
       if (!rootRef.current?.contains(event.target as Node)) {
-        closeMenu();
+        closeMenuRef.current();
       }
     }
 
     function handleKeyDown(event: KeyboardEvent): void {
-      if (event.key === "Escape") closeMenu();
+      if (event.key === "Escape") closeMenuRef.current();
     }
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -129,7 +140,7 @@ export function LocaleCurrencySwitcher({
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open]);
+  }, [open, closeMenuRef]);
 
   function selectCurrency(next: Currency): void {
     if (next === currency) {

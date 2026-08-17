@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 import type { CheckoutPaymentMethod } from "@/features/checkout/domain/payment-methods";
 import { CheckoutCashChangeSection } from "@/features/checkout/ui/CheckoutCashChangeSection";
@@ -118,11 +119,12 @@ function CardBrandBadge({
           transformOrigin: "center",
         }}
       >
-        <img
+        <Image
           src={badge.src}
           alt={badge.alt}
-          className="h-full w-full object-contain object-center"
-          loading="lazy"
+          fill
+          sizes={`${boxSize.widthPx}px`}
+          className="object-contain object-center"
         />
       </div>
     </div>
@@ -183,12 +185,12 @@ function IdramLogo({
         {errored ? (
           <span className="text-xs font-semibold text-gray-500">iDram</span>
         ) : (
-          <img
+          <Image
             src={IDRAM_LOGO_SRC}
             alt="iDram"
-            className="w-auto object-contain object-center"
-            style={{ height: 26 }}
-            loading="lazy"
+            width={80}
+            height={26}
+            className="h-[26px] w-auto object-contain object-center"
             onError={onError}
           />
         )}
@@ -200,12 +202,12 @@ function IdramLogo({
         {errored ? (
           <span className="text-xs font-semibold text-gray-500">iDram</span>
         ) : (
-          <img
+          <Image
             src={IDRAM_LOGO_SRC}
             alt="iDram"
-            className="w-auto object-contain object-center"
-            style={{ height: 32 }}
-            loading="lazy"
+            width={96}
+            height={32}
+            className="h-8 w-auto object-contain object-center"
             onError={onError}
           />
         )}

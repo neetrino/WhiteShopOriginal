@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import Image from "next/image";
 
 import {
   CASH_CHANGE_NONE,
@@ -114,11 +115,12 @@ export function CheckoutCashChangeSection({
               aria-label={formatDram(amount)}
               title={formatDram(amount)}
             >
-              <img
+              <Image
                 src={CASH_NOTE_SRC[amount]}
                 alt={formatDram(amount)}
-                className="absolute inset-0 h-full w-full object-cover object-center"
-                loading="lazy"
+                fill
+                sizes="(max-width: 1024px) 45vw, 160px"
+                className="object-cover object-center"
               />
             </button>
           );

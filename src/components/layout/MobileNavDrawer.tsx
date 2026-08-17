@@ -15,6 +15,7 @@ import { Menu, X } from "lucide-react";
 import { AppLink } from "@/components/ui/AppLink";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
+import { useIsClient } from "@/lib/react/use-is-client";
 
 const MENU_EXIT_MS = 260;
 const MENU_GAP_PX = 8;
@@ -49,15 +50,16 @@ export function MobileNavDrawer({
 }: MobileNavDrawerProps) {
   const menuId = useId();
   const pathname = usePathname() ?? "";
+  const mounted = useIsClient();
   const panelRef = useRef<HTMLDivElement>(null);
   const exitTimerRef = useRef<number | null>(null);
-  const renderedRef = useRef(false);
 
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [rendered, setRendered] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [panelTopPx, setPanelTopPx] = useState(72);
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
   const clearExitTimer = useCallback(() => {
     if (exitTimerRef.current !== null) {
@@ -72,66 +74,76 @@ export function MobileNavDrawer({
     setPanelTopPx(header.getBoundingClientRect().bottom);
   }, []);
 
-  const openMenu = useCallback(() => {
-    clearExitTimer();
-    measureHeader();
-    renderedRef.current = true;
-    setRendered(true);
-    setExpanded(false);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setExpanded(true);
-      });
-    });
-  }, [clearExitTimer, measureHeader]);
-
-  const closeMenu = useCallback(() => {
-    clearExitTimer();
-    setExpanded(false);
-    exitTimerRef.current = window.setTimeout(() => {
-      renderedRef.current = false;
-      setRendered(false);
-      exitTimerRef.current = null;
-    }, MENU_EXIT_MS);
-  }, [clearExitTimer]);
-
   const toggleMenu = useCallback(() => {
     setOpen((current) => !current);
   }, []);
 
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setOpen(false);
+  }
+
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      setRendered(true);
+      setExpanded(false);
+    } else if (rendered) {
+      setExpanded(false);
+    }
+  }
+
   useEffect(() => {
-    setMounted(true);
     return () => clearExitTimer();
   }, [clearExitTimer]);
 
   useEffect(() => {
-    if (open) {
-      openMenu();
-      return;
+    if (open && rendered) {
+      let frame2 = 0;
+      const frame1 = requestAnimationFrame(() => {
+        measureHeader();
+        frame2 = requestAnimationFrame(() => {
+          setExpanded(true);
+        });
+      });
+      return () => {
+        cancelAnimationFrame(frame1);
+        cancelAnimationFrame(frame2);
+      };
     }
-    if (!renderedRef.current) return;
-    closeMenu();
-  }, [open, openMenu, closeMenu]);
+
+    if (!open && rendered) {
+      exitTimerRef.current = window.setTimeout(() => {
+        setRendered(false);
+        exitTimerRef.current = null;
+      }, MENU_EXIT_MS);
+      return () => clearExitTimer();
+    }
+  }, [open, rendered, measureHeader, clearExitTimer]);
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 768px)");
     function closeOnDesktop(): void {
       if (media.matches) setOpen(false);
     }
-    closeOnDesktop();
+    const frame = requestAnimationFrame(closeOnDesktop);
     media.addEventListener("change", closeOnDesktop);
-    return () => media.removeEventListener("change", closeOnDesktop);
+    return () => {
+      cancelAnimationFrame(frame);
+      media.removeEventListener("change", closeOnDesktop);
+    };
   }, []);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
 
   useLayoutEffect(() => {
     if (!rendered) return;
-    measureHeader();
+    const frame = requestAnimationFrame(() => {
+      measureHeader();
+    });
     window.addEventListener("resize", measureHeader);
-    return () => window.removeEventListener("resize", measureHeader);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", measureHeader);
+    };
   }, [rendered, measureHeader]);
 
   useEffect(() => {

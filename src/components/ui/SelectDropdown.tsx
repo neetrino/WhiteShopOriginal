@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
+import { useHoldFlag } from "@/lib/react/use-hold-flag";
+
 export const DROPDOWN_ANIMATION_MS = 280;
 
 export type SelectDropdownOption = {
@@ -39,7 +41,7 @@ export function SelectDropdown({
   fitContent = false,
 }: SelectDropdownProps) {
   const [open, setOpen] = useState(false);
-  const [elevated, setElevated] = useState(false);
+  const elevated = useHoldFlag(open, DROPDOWN_ANIMATION_MS);
   const rootRef = useRef<HTMLDivElement>(null);
   const pendingChangeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listId = useId();
@@ -56,15 +58,6 @@ export function SelectDropdown({
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (open) {
-      setElevated(true);
-      return;
-    }
-    const timer = setTimeout(() => setElevated(false), DROPDOWN_ANIMATION_MS);
-    return () => clearTimeout(timer);
-  }, [open]);
 
   useEffect(() => {
     if (!open) return;
