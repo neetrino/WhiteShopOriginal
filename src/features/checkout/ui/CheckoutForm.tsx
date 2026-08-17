@@ -242,7 +242,9 @@ export function CheckoutForm({
       <div className="mx-auto w-full max-w-[1024px] px-4 pt-[45px] pb-16 sm:px-6 lg:px-6 lg:pt-12 lg:pb-12">
         <h1 className="mb-6 text-[26px] leading-tight font-black uppercase text-gray-900 sm:text-[30px] sm:leading-[1.2]">
           <span className="block">{labels.titleLead}</span>
-          <span className="block">{labels.titleAccent}</span>
+          {labels.titleAccent ? (
+            <span className="block">{labels.titleAccent}</span>
+          ) : null}
         </h1>
         <Card className="rounded-2xl border border-gray-200/80 p-6 text-center shadow-none">
           <p className="mb-2 text-lg font-semibold text-gray-900">
@@ -302,7 +304,9 @@ export function CheckoutForm({
     <div className="mx-auto w-full max-w-[1024px] px-4 pt-[45px] pb-16 sm:px-6 lg:px-6 lg:pt-12 lg:pb-12">
       <h1 className="mb-6 text-[26px] leading-tight font-black uppercase text-gray-900 sm:text-[30px] sm:leading-[1.2]">
         <span className="block">{labels.titleLead}</span>
-        <span className="block">{labels.titleAccent}</span>
+        {labels.titleAccent ? (
+          <span className="block">{labels.titleAccent}</span>
+        ) : null}
       </h1>
 
       <CheckoutProductsInOrder

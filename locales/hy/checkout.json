@@ -1,7 +1,7 @@
 {
-  "title": "Պատվերի վճարում",
-  "titleLead": "Պատվերի",
-  "titleAccent": "վճարում",
+  "title": "Վճարում",
+  "titleLead": "Վճարում",
+  "titleAccent": "",
   "productsInOrder": "Պատվերի ապրանքներ",
   "itemsOne": "1 ապրանք",
   "itemsMany": "{count} ապրանք",
