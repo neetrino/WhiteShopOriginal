@@ -52,13 +52,11 @@ export function CartDrawer({
   const [loadingView, setLoadingView] = useState(false);
   const [pending, startTransition] = useTransition();
   const labels = dictionary.cartDrawer;
-  const badgeCount = view?.itemCount ?? itemCount;
+  // Prefer live server count while closed — cached view goes stale after addToCart.
+  const badgeCount = open && view != null ? view.itemCount : itemCount;
   const hasItems = Boolean(view && view.items.length > 0);
 
-  function prefetchDrawerView(): void {
-    if (view || loadingView || open) {
-      return;
-    }
+  function loadDrawerView(): void {
     setLoadingView(true);
     startTransition(async () => {
       const next = await loadCartDrawerViewAction(locale, currency);
@@ -67,16 +65,17 @@ export function CartDrawer({
     });
   }
 
+  function prefetchDrawerView(): void {
+    if (view || loadingView || open) {
+      return;
+    }
+    loadDrawerView();
+  }
+
   function openDrawer(): void {
     setOpen(true);
-    if (!view) {
-      setLoadingView(true);
-      startTransition(async () => {
-        const next = await loadCartDrawerViewAction(locale, currency);
-        setView(next);
-        setLoadingView(false);
-      });
-    }
+    // Always refetch: layout-level CartDrawer keeps client state across navigations.
+    loadDrawerView();
   }
 
   function closeDrawer(): void {

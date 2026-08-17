@@ -57,13 +57,15 @@ export function CheckoutOrderSummary({
   processingLabel,
 }: CheckoutOrderSummaryProps) {
   return (
-    <div>
-      <Card className="sticky top-4 rounded-2xl border border-gray-200/80 p-6 shadow-none">
-        <h2 className="mb-6 text-xl font-semibold text-gray-900">{title}</h2>
+    <div className="lg:col-span-2">
+      <Card className="sticky top-4 rounded-3xl border-0 p-6 shadow-sm ring-1 ring-gray-200/80 sm:p-7">
+        <h2 className="mb-6 text-lg font-bold tracking-tight text-gray-900">
+          {title}
+        </h2>
 
         <div className="mb-6 rounded-xl border border-gray-200 p-4">
           <p className="mb-3 text-sm text-gray-700">{couponTitle}</p>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <input
               type="text"
               name="couponCodeDraft"
@@ -78,13 +80,13 @@ export function CheckoutOrderSummary({
               placeholder={couponPlaceholder}
               autoComplete="off"
               disabled={isSubmitting || isApplyingCoupon}
-              className="h-11 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              className="h-10 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             />
             <Button
               type="button"
               variant="secondary"
-              size="md"
-              className="h-11 shrink-0 rounded-lg px-4 text-sm"
+              size="sm"
+              className="h-9 shrink-0 rounded-lg px-3 text-xs font-medium"
               disabled={isSubmitting || isApplyingCoupon || !couponDraft.trim()}
               onClick={onApplyCoupon}
             >
@@ -117,8 +119,8 @@ export function CheckoutOrderSummary({
             <span>{taxLabel}</span>
             <span>{taxFormatted}</span>
           </div>
-          <div className="border-t border-gray-200 pt-4">
-            <div className="flex justify-between text-lg font-bold text-gray-900">
+          <div className="mt-2 border-t border-dashed border-gray-300 pt-4">
+            <div className="flex justify-between gap-3 text-base font-bold text-gray-900 sm:text-lg">
               <span>{totalLabel}</span>
               <span>{totalFormatted}</span>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Minus, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { addToCart } from "@/features/cart/cart";
@@ -35,6 +36,7 @@ export function ProductPurchaseControls({
   wishlistLabel,
   labels,
 }: ProductPurchaseControlsProps) {
+  const router = useRouter();
   const maxQty = Math.max(stockOnHand, 0);
   const [quantity, setQuantity] = useState(maxQty > 0 ? 1 : 0);
   const [message, setMessage] = useState<string | null>(null);
@@ -57,6 +59,7 @@ export function ProductPurchaseControls({
       try {
         await addToCart(productId, quantity);
         setMessage(labels.added);
+        router.refresh();
       } catch {
         setError(labels.error);
       }

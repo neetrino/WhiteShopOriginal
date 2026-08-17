@@ -1,5 +1,7 @@
 {
-  "title": "Վճարում",
+  "title": "Պատվերի վճարում",
+  "titleLead": "Պատվերի",
+  "titleAccent": "վճարում",
   "productsInOrder": "Պատվերի ապրանքներ",
   "itemsOne": "1 ապրանք",
   "itemsMany": "{count} ապրանք",
@@ -25,21 +27,30 @@
     "city": "Քաղաք"
   },
   "shipping": {
-    "storePickup": "Ինքնաառաքում",
+    "storePickup": "Խանութից վերցնել",
     "storePickupDescription": "Վերցրեք պատվերը խանութից (Անվճար)",
     "delivery": "Առաքում",
     "deliveryDescription": "Կառաքենք ձեր հասցեով",
-    "freePickup": "Անվճար (Ինքնաառաքում)",
+    "freePickup": "Անվճար (Խանութից)",
     "enterCity": "Մուտքագրեք քաղաքը",
     "selectDeliveryLocation": "Ընտրեք առաքման վայրը"
   },
   "payment": {
     "cashOnDelivery": "Կանխիկ առաքման պահին",
-    "cashOnDeliveryDescription": "Վճարեք կանխիկ՝ պատվերը ստանալիս",
-    "idram": "Idram",
-    "idramDescription": "Վճարեք Idram դրամապանակով կամ քարտով",
-    "arca": "ArCa",
-    "arcaDescription": "Վճարեք ArCa քարտով"
+    "cashShort": "Կանխիկ",
+    "cashOnDeliveryDescription": "Վճարեք պատվերը ստանալիս։",
+    "cashChange": {
+      "title": "ՄԱՆՐ",
+      "hint": "Սեղմեք այն թղթադրամին, որը կվճարեք, որպեսզի պատրաստենք մանրը:",
+      "none": "Մանր պետք չէ",
+      "courierChange": "Առաքիչը պետք է տա մանր՝ {amount}"
+    },
+    "idram": "iDram",
+    "idramDescription": "Վճարեք ձեր iDram հաշվով։",
+    "card": "Բանկային քարտ",
+    "cardDescription": "Անվտանգ վճարում բանկային քարտով։",
+    "arca": "Բանկային քարտ",
+    "arcaDescription": "Անվտանգ վճարում բանկային քարտով։"
   },
   "coupon": {
     "title": "Ունե՞ք պրոմոկոդ",
@@ -60,7 +71,9 @@
     "continueShopping": "Շարունակել գնումները"
   },
   "errors": {
-    "cartEmpty": "Զամբյուղը դատարկ է"
+    "cartEmpty": "Զամբյուղը դատարկ է",
+    "cartEmptyDescription": "Ավելացրեք ապրանքներ՝ շարունակելու համար",
+    "cartEmptyCta": "Շարունակել գնումները"
   },
   "success": {
     "title": "Պատվերը հաստատված է",

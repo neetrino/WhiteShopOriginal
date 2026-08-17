@@ -62,6 +62,8 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
       deliveryOptions={deliveryOptions}
       labels={{
         title: copy.title,
+        titleLead: copy.titleLead,
+        titleAccent: copy.titleAccent,
         productsInOrder: copy.productsInOrder,
         itemsOne: copy.itemsOne,
         itemsMany: copy.itemsMany,
@@ -90,11 +92,16 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         enterCity: copy.shipping.enterCity,
         selectDeliveryLocation: copy.shipping.selectDeliveryLocation,
         cashOnDelivery: copy.payment.cashOnDelivery,
+        cashShort: copy.payment.cashShort,
         cashOnDeliveryDescription: copy.payment.cashOnDeliveryDescription,
+        cashChangeTitle: copy.payment.cashChange.title,
+        cashChangeHint: copy.payment.cashChange.hint,
+        cashChangeNone: copy.payment.cashChange.none,
+        cashChangeCourier: copy.payment.cashChange.courierChange,
         idram: copy.payment.idram,
         idramDescription: copy.payment.idramDescription,
-        arca: copy.payment.arca,
-        arcaDescription: copy.payment.arcaDescription,
+        card: copy.payment.card,
+        cardDescription: copy.payment.cardDescription,
         couponTitle: copy.coupon.title,
         couponPlaceholder: copy.coupon.placeholder,
         couponApply: copy.coupon.apply,
@@ -108,6 +115,8 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         processing: copy.buttons.processing,
         continueShopping: copy.buttons.continueShopping,
         cartEmpty: copy.errors.cartEmpty,
+        cartEmptyDescription: copy.errors.cartEmptyDescription,
+        cartEmptyCta: copy.errors.cartEmptyCta,
       }}
     />
   );

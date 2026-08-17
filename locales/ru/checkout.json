@@ -1,5 +1,7 @@
 {
-  "title": "Оформление",
+  "title": "Оформление заказа",
+  "titleLead": "Оформление",
+  "titleAccent": "заказа",
   "productsInOrder": "Товары в заказе",
   "itemsOne": "1 товар",
   "itemsMany": "{count} товаров",
@@ -35,11 +37,20 @@
   },
   "payment": {
     "cashOnDelivery": "Наличными при получении",
-    "cashOnDeliveryDescription": "Оплатите наличными при получении заказа",
-    "idram": "Idram",
-    "idramDescription": "Оплата через Idram или картой",
-    "arca": "ArCa",
-    "arcaDescription": "Оплата картой ArCa"
+    "cashShort": "Наличные",
+    "cashOnDeliveryDescription": "Оплатите при получении заказа.",
+    "cashChange": {
+      "title": "СДАЧА",
+      "hint": "Нажмите на купюру, которой будете платить, чтобы мы подготовили сдачу:",
+      "none": "Сдача не нужна",
+      "courierChange": "Курьеру нужно приготовить сдачу {amount}"
+    },
+    "idram": "iDram",
+    "idramDescription": "Оплатите через свой аккаунт iDram.",
+    "card": "Банковская карта",
+    "cardDescription": "Безопасная оплата банковской картой.",
+    "arca": "Банковская карта",
+    "arcaDescription": "Безопасная оплата банковской картой."
   },
   "coupon": {
     "title": "Есть промокод?",
@@ -60,7 +71,9 @@
     "continueShopping": "Продолжить покупки"
   },
   "errors": {
-    "cartEmpty": "Корзина пуста"
+    "cartEmpty": "Корзина пуста",
+    "cartEmptyDescription": "Добавьте товары, чтобы продолжить",
+    "cartEmptyCta": "Продолжить покупки"
   },
   "success": {
     "title": "Заказ подтверждён",
