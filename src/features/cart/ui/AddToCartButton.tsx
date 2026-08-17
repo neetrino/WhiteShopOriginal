@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { addToCart } from "@/features/cart/cart";
+import { playCartFlyAnimation } from "@/features/cart/play-cart-fly-animation";
 
 type AddToCartButtonProps = {
   productId: string;
@@ -13,6 +14,7 @@ type AddToCartButtonProps = {
   disabled?: boolean;
   className?: string;
   size?: "sm" | "md";
+  imageUrl?: string | null;
 };
 
 export function AddToCartButton({
@@ -21,6 +23,7 @@ export function AddToCartButton({
   disabled = false,
   className = "",
   size = "md",
+  imageUrl = null,
 }: AddToCartButtonProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -31,6 +34,11 @@ export function AddToCartButton({
     event.preventDefault();
     event.stopPropagation();
     if (disabled || pending) return;
+
+    playCartFlyAnimation({
+      fromElement: event.currentTarget,
+      imageUrl,
+    });
 
     startTransition(async () => {
       try {

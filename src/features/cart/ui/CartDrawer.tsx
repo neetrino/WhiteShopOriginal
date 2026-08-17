@@ -289,6 +289,7 @@ export function CartDrawer({
           className="inline-flex h-11 items-center gap-1 rounded-lg px-1 text-gray-700 transition-colors hover:text-gray-900"
           aria-label={dictionary.nav.cart}
           aria-expanded={open}
+          data-cart-fly-target
         >
           <span className="relative inline-flex h-11 w-11 items-center justify-center">
             <ShoppingCart className="h-5 w-5" aria-hidden="true" />

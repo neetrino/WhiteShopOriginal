@@ -1,10 +1,12 @@
 "use client";
 
+import type { MouseEvent } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { addToCart } from "@/features/cart/cart";
+import { playCartFlyAnimation } from "@/features/cart/play-cart-fly-animation";
 import { WishlistButton } from "@/features/wishlist/ui/WishlistButton";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -15,6 +17,7 @@ type ProductPurchaseControlsProps = {
   inWishlist: boolean;
   isSignedIn: boolean;
   wishlistLabel: string;
+  imageUrl?: string | null;
   labels: {
     quantity: string;
     decreaseQuantity: string;
@@ -34,6 +37,7 @@ export function ProductPurchaseControls({
   inWishlist,
   isSignedIn,
   wishlistLabel,
+  imageUrl = null,
   labels,
 }: ProductPurchaseControlsProps) {
   const router = useRouter();
@@ -51,10 +55,20 @@ export function ProductPurchaseControls({
     setError(null);
   }
 
-  function handleAdd(): void {
+  function handleAdd(event: MouseEvent<HTMLButtonElement>): void {
     if (disabled || quantity < 1) return;
     setMessage(null);
     setError(null);
+
+    const flySource =
+      document.querySelector<HTMLElement>("[data-product-detail-fly-source]") ??
+      event.currentTarget;
+
+    playCartFlyAnimation({
+      fromElement: flySource,
+      imageUrl,
+    });
+
     startTransition(async () => {
       try {
         await addToCart(productId, quantity);
