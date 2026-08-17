@@ -265,7 +265,7 @@ export function ProfileAddressesView({
           </p>
         ) : null}
 
-        <div className="space-y-4 sm:space-y-5">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-4">
           {addresses.length > 0 ? (
             addresses.map((address) => (
               <ProfileAddressCard
@@ -284,7 +284,7 @@ export function ProfileAddressesView({
               />
             ))
           ) : (
-            <p className="py-12 text-center text-sm text-gray-500 sm:py-16">
+            <p className="col-span-full py-12 text-center text-sm text-gray-500 sm:py-16">
               {labels.noAddresses}
             </p>
           )}
