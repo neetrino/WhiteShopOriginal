@@ -232,8 +232,8 @@ export function CheckoutDetailsSections({
       {shippingMethod === "delivery" ? (
         <section className={SECTION_CLASS}>
           <h2 className={SECTION_TITLE_CLASS}>{labels.shippingAddress}</h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end">
+            <div className="flex w-fit max-w-full shrink-0 flex-col gap-1.5 text-sm font-medium text-gray-700">
               {labels.deliveryLocation}
               <SelectDropdown
                 name="deliveryRuleId"
@@ -246,9 +246,10 @@ export function CheckoutDetailsSections({
                 }))}
                 disabled={pending || deliveryOptions.length === 0}
                 onValueChange={onDeliveryRuleChange}
+                fitContent
               />
             </div>
-            <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-700">
+            <label className="flex min-w-0 flex-1 flex-col gap-1.5 text-sm font-medium text-gray-700">
               {labels.address}
               <input
                 name="line1"
