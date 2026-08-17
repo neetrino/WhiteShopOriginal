@@ -5,6 +5,7 @@ import { Copy, Pencil, Star, Trash2 } from "lucide-react";
 import {
   ADMIN_TABLE_ROW,
   ADMIN_TABLE_TD,
+  ADMIN_TABLE_TD_CENTER,
   ADMIN_TABLE_TD_CHECK,
   ADMIN_TABLE_CHECKBOX,
 } from "@/features/admin/ui/admin-table-classes";
@@ -87,19 +88,19 @@ export function AdminProductRow({
           ) : null}
         </div>
       </td>
-      <td className={ADMIN_TABLE_TD}>
-        <span className="line-clamp-2 max-w-[160px] text-gray-700">
+      <td className={ADMIN_TABLE_TD_CENTER}>
+        <span className="line-clamp-2 max-w-[160px] inline-block text-gray-700">
           {product.categoryLabels.length > 0
             ? product.categoryLabels.join(", ")
             : "—"}
         </span>
       </td>
-      <td className={ADMIN_TABLE_TD}>
+      <td className={ADMIN_TABLE_TD_CENTER}>
         <button
           type="button"
           disabled={disabled}
           onClick={onFeatured}
-          className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-amber-500"
+          className="inline-flex rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-amber-500"
           aria-label={
             product.isFeatured ? "Unfeature product" : "Feature product"
           }
@@ -109,8 +110,8 @@ export function AdminProductRow({
           />
         </button>
       </td>
-      <td className={ADMIN_TABLE_TD}>
-        <div className="flex items-center gap-1">
+      <td className={ADMIN_TABLE_TD_CENTER}>
+        <div className="inline-flex items-center justify-center gap-1">
           <button
             type="button"
             onClick={onEdit}
